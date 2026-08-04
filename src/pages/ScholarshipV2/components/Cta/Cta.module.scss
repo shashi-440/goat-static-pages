@@ -1,0 +1,141 @@
+// Grey, continuing the band that starts at the FAQ above — the card reads better
+// on a tint than on white.
+//
+// No top padding: this shares one continuous band with the FAQ, so the gap
+// between them should be a single 88px (the FAQ's bottom padding), not the 176px
+// two stacked paddings gave. Between differently-coloured sections 176px reads as
+// a break; inside one band it just reads as a hole.
+.section {
+  align-items: center;
+  background: #f7f7f7;
+  display: flex;
+  flex-direction: column;
+  padding: 0 80px 88px;
+  width: 100%;
+}
+
+// Figma: 1351 × 440 card. Capped at 1280 to sit on the page grid the other
+// sections use, keeping the design's aspect ratio.
+.card {
+  aspect-ratio: 1351 / 440;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  max-width: 1280px;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.image {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+// Flat tint over the whole photo.
+.tint {
+  background: rgba(8, 10, 15, 0.2);
+  inset: 0;
+  position: absolute;
+}
+
+// Holds the left side dark enough for the copy, fading out to the right.
+.scrim {
+  background-image: linear-gradient(
+    90deg,
+    rgba(5, 8, 13, 0.8) 0%,
+    rgba(5, 8, 13, 0.48) 42%,
+    rgba(5, 8, 13, 0.14) 78%,
+    rgba(5, 8, 13, 0.04) 100%
+  );
+  inset: 0;
+  position: absolute;
+}
+
+// Bottom-up scrim over the lower 190px of the 440px card (43.18%).
+.scrimBottom {
+  background-image: linear-gradient(
+    180deg,
+    rgba(5, 8, 13, 0) 0%,
+    rgba(5, 8, 13, 0.34) 42%,
+    rgba(5, 8, 13, 0.72) 100%
+  );
+  bottom: 0;
+  height: 43.18%;
+  left: 0;
+  position: absolute;
+  right: 0;
+}
+
+// Copy sits bottom-left inside 56px padding.
+.content {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  inset: 0;
+  justify-content: flex-end;
+  padding: 56px;
+  position: absolute;
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+  // Figma: 24px from the copy down to the button.
+  gap: 24px;
+  width: 100%;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.heading {
+  color: #fff;
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -1px;
+  line-height: 48px;
+  margin: 0;
+}
+
+.sub {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 26px;
+  margin: 0;
+}
+
+// White pill with dark ink — the design's own treatment for this card, rather
+// than the brand gradient the page's other CTAs use.
+.button {
+  align-items: center;
+  // .block is a column flex container, so without this the button stretches to
+  // the full card width instead of hugging its label.
+  align-self: flex-start;
+  background: #fff;
+  border-radius: 999px;
+  color: #111928 !important;
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 600;
+  justify-content: center;
+  line-height: 1.25;
+  padding: 11px 16px;
+  text-decoration: none;
+  transition: background 0.2s ease;
+  white-space: nowrap;
+
+  // The site's global a:hover rule tints link text, so the colour is pinned on
+  // every state — same guard the navbar's button needs.
+  &:hover,
+  &:active,
+  &:focus {
+    background: #f2f4f7;
+    color: #111928 !important;
+  }
+}

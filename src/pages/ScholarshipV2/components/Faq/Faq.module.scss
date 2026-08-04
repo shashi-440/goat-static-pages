@@ -1,0 +1,125 @@
+// Continues the grey band that starts at the criteria section above.
+.section {
+  align-items: center;
+  background: #f7f7f7;
+  display: flex;
+  flex-direction: column;
+  padding: 88px 80px;
+  width: 100%;
+}
+
+.inner {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  max-width: 1352px;
+  width: 100%;
+}
+
+.headingBlock {
+  text-align: center;
+}
+
+.heading {
+  color: #202020;
+  font-size: 40px;
+  font-weight: 550;
+  letter-spacing: -0.8px;
+  line-height: 48px;
+  margin: 0;
+}
+
+.subheading {
+  color: #636363;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 26px;
+  margin: 20px 0 0;
+}
+
+// Figma: the list is 880px wide, centred.
+.list {
+  display: flex;
+  flex-direction: column;
+  margin-top: 96px;
+  max-width: 880px;
+  width: 100%;
+}
+
+.item {
+  // Rule under every row, matching the design's 1px separators.
+  border-bottom: 1px solid #e5e7eb;
+
+  &:first-child {
+    border-top: 1px solid #e5e7eb;
+  }
+}
+
+.trigger {
+  align-items: center;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  display: flex;
+  gap: 24px;
+  justify-content: space-between;
+  padding: 28px 0;
+  text-align: left;
+  width: 100%;
+}
+
+.question {
+  color: #202020;
+  font-size: 18px;
+  font-weight: 550;
+  letter-spacing: -0.18px;
+  line-height: 26px;
+}
+
+// "+" built from two bars so the open state can rotate it into an ×.
+.toggle {
+  flex-shrink: 0;
+  height: 12px;
+  position: relative;
+  transition: transform 0.25s ease;
+  width: 12px;
+
+  &::before,
+  &::after {
+    background: #202020;
+    content: "";
+    inset: 0;
+    margin: auto;
+    position: absolute;
+  }
+
+  &::before {
+    height: 1.5px;
+    width: 12px;
+  }
+
+  &::after {
+    height: 12px;
+    width: 1.5px;
+  }
+}
+
+.toggleOpen {
+  transform: rotate(45deg);
+}
+
+.answer {
+  color: #636363;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  // Clear of the toggle column so the answer lines up under the question.
+  margin: 0 60px 28px 0;
+  max-width: 800px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toggle {
+    transition: none;
+  }
+}

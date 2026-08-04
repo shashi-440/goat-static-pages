@@ -1,0 +1,226 @@
+// Figma 2097:3652. The design draws this section on a 1177px column (167px
+// gutters), but every other section here — and the navbar — sits on the 1280
+// grid, so the narrower column read as a misalignment. Page consistency wins.
+.section {
+  align-items: center;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  // 88px: the page-wide section rhythm. Figma draws 79px here, but every
+  // section shares one value so the gaps between them are uniform.
+  padding: 88px 80px;
+  width: 100%;
+}
+
+.inner {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  // Figma: 56px between the heading, the feature card and the columns.
+  gap: 56px;
+  max-width: 1280px;
+  width: 100%;
+}
+
+// Two columns, two rows: the heading sits alone on the first row, and the video
+// and the category list share the second. Putting them on the same grid row is
+// what makes the list start level with the top of the video rather than with the
+// heading above it.
+// Equal halves with a 64px gutter, the same split the intro section above uses,
+// so both sections share one column boundary down the page.
+.top {
+  align-items: start;
+  column-gap: 64px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  // Heading → video/list.
+  row-gap: 96px;
+  width: 100%;
+}
+
+// Two-tone: the first line white, the second dropped to #8e8e8e. Spans both
+// columns on the first row so it can centre against the whole section rather
+// than just the video column beneath it.
+.heading {
+  color: #fff;
+  font-size: 36px;
+  font-weight: 550;
+  grid-column: 1 / -1;
+  grid-row: 1;
+  letter-spacing: -0.72px;
+  line-height: 40px;
+  margin: 0;
+  text-align: center;
+}
+
+.headingMuted {
+  color: #8e8e8e;
+}
+
+// Media card, sized for the left column. Second row, so the list beside it
+// starts at the same y.
+.feature {
+  grid-column: 1;
+  grid-row: 2;
+  aspect-ratio: 16 / 10;
+  background: #f7f7f7;
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.featureImage {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+// 93px band over the foot of the image — a plain bottom-up gradient, not a
+// frosted bar.
+.caption {
+  align-items: flex-end;
+  background-image: linear-gradient(to top, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  left: 0;
+  padding: 24px;
+  position: absolute;
+  right: 0;
+}
+
+.captionText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.captionTitle {
+  color: #f7f7f7;
+  font-size: 14px;
+  font-weight: 550;
+  line-height: 17px;
+}
+
+.captionMeta {
+  align-items: center;
+  color: #8e8e8e;
+  display: flex;
+  font-size: 14px;
+  font-weight: 400;
+  gap: 8px;
+  line-height: 17px;
+}
+
+// The separator is set larger than the text either side of it.
+.captionDot {
+  font-size: 16px;
+  line-height: 24px;
+}
+
+// 36px solid white circle. Figma leaves its inner icon slot empty.
+.captionAction {
+  background: #fff;
+  border-radius: 999px;
+  flex-shrink: 0;
+  height: 36px;
+  width: 36px;
+}
+
+// Vertical list of the four categories, level with the video beside it.
+.list {
+  display: flex;
+  flex-direction: column;
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+  width: 100%;
+}
+
+// Quiet eyebrow above the list.
+.listLabel {
+  color: #8e8e8e;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  line-height: 16px;
+  margin-bottom: 24px;
+  text-transform: uppercase;
+}
+
+.row {
+  align-items: flex-start;
+  display: flex;
+  gap: 20px;
+  padding: 24px 0;
+
+  // Flush with the top and bottom of the list. `of-type` rather than `child`
+  // because the label span is now the first child — the rows are the only divs
+  // in here, so this still targets the first and last of them.
+  &:first-of-type {
+    padding-top: 0;
+  }
+
+  &:last-of-type {
+    padding-bottom: 0;
+  }
+}
+
+// Divider between rows — the same gradient stroke used elsewhere in the section.
+.hRule {
+  background-image: linear-gradient(
+    to right,
+    rgba(229, 231, 235, 0.1),
+    rgba(229, 231, 235, 0.3) 50%,
+    rgba(229, 231, 235, 0.1)
+  );
+  flex-shrink: 0;
+  height: 1px;
+  width: 100%;
+}
+
+// Fixed 32px slot every icon sits in, so all four rows share one left edge and
+// one optical centre regardless of each glyph's own size.
+.iconSlot {
+  align-items: center;
+  display: flex;
+  flex-shrink: 0;
+  height: 32px;
+  justify-content: center;
+  // Centres the 32px slot on the first 24px title line rather than letting it
+  // hang above the text.
+  margin-top: -4px;
+  width: 32px;
+}
+
+// No size here on purpose — the width/height attributes carry each icon's own
+// glyph size (see CATEGORIES), and a CSS rule would override all of them.
+.icon {
+  display: block;
+}
+
+// Label on its own line with the sentence beneath it, back to the type sizes the
+// Figma section specifies (18/24 title, 14/18 body, 8px apart).
+.rowText {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.rowTitle {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 24px;
+}
+
+// Secondary/neutral/400
+.rowDesc {
+  color: #9ca3af;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18px;
+}
