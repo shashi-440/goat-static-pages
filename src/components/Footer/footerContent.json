@@ -1,0 +1,115 @@
+{
+  "_comment": "Resolved footer content, captured from the live SSR output of amber-user-website /about-us-v2 (global desktop variant, en). Labels are the English Tolgee resolutions; hrefs are post-localisation. Edit here rather than in Footer.tsx.",
+
+  "logo": {
+    "src": "https://prod-static-assets.amberstudent.com/images/amber-hd.svg?auto=format",
+    "alt": "amber-div",
+    "width": "86px",
+    "height": "34.05px"
+  },
+
+  "copyright": "All rights reserved.",
+
+  "appDownload": {
+    "getAppLabel": "Get the app",
+    "paymentOptionsLabel": "Payment Options",
+    "playStore": {
+      "href": "https://play.google.com/store/apps/details?id=com.amberstudent",
+      "src": "https://static-assets.amberstudent.com/images/playstore-android.svg",
+      "alt": "play store",
+      "width": "20px",
+      "height": "20px",
+      "testId": "footer-get-app-link-Playstore"
+    },
+    "appStore": {
+      "href": "https://apps.apple.com/us/app/amber-book-student-housing/id6447250749",
+      "src": "https://static-assets.amberstudent.com/images/app-store.svg",
+      "alt": "app store",
+      "width": "20px",
+      "height": "20px",
+      "testId": "footer-get-app-link-Appstore"
+    },
+    "paymentPartners": {
+      "src": "https://static-assets.amberstudent.com/images/footer_payment_partners.svg",
+      "alt": "payment-partners",
+      "width": "158px",
+      "height": "28px"
+    }
+  },
+
+  "trustpilot": {
+    "href": "https://uk.trustpilot.com/review/amberstudent.com",
+    "businessUnitId": "5e6b5b0e9d5f2a0001a7b6a9",
+    "reviewsCount": { "rounded": 5000, "absolute": 4127 }
+  },
+
+  "columns": [
+    {
+      "heading": "Company",
+      "testId": "footer-company-section",
+      "_comment": "tagHasTestId mirrors upstream: the Company column stamps data-testid=\"footer-option-tag\" on its badge spans, the Discover column does not.",
+      "tagHasTestId": true,
+      "items": [
+        { "label": "About", "href": "/about", "gaKey": "About" },
+        { "label": "How it works", "href": "/how-it-works", "gaKey": "How it works" },
+        { "label": "Refer a Friend", "href": "/referral-programme", "gaKey": "Refer a Friend" },
+        { "label": "Group Bookings", "href": "/group-booking", "gaKey": "Group Bookings", "tag": "New" },
+        { "label": "List with us", "href": "/list", "gaKey": "List with us", "tag": "New" },
+        { "label": "Partner with us", "href": "/partner", "gaKey": "Partner with us", "tag": "New" },
+        { "label": "Universities", "href": "/university-partnerships", "gaKey": "Universities", "tag": "New" },
+        { "label": "Careers", "href": "/career", "gaKey": "Careers", "tag": "We are hiring!" }
+      ]
+    },
+    {
+      "heading": "Discover",
+      "testId": "footer-discover-section",
+      "tagHasTestId": false,
+      "items": [
+        { "label": "Blog", "href": "/blog", "gaKey": "Blog" },
+        { "label": "Podcast", "href": "/podcast", "gaKey": "Podcast" },
+        { "label": "Newsroom", "href": "/news", "gaKey": "Newsroom" },
+        { "label": "Amber Plus", "href": "/plus", "gaKey": "Amber Plus" },
+        { "label": "Media Mention", "href": "/media", "gaKey": "Media Mention" },
+        { "label": "Ambassador", "href": "/ambassador", "gaKey": "Ambassador" },
+        { "label": "Scholarships", "href": "/scholarship", "gaKey": "Scholarships", "tag": "Apply Now" },
+        { "label": "Exams", "href": "/exams", "gaKey": "Exams", "tag": "New", "hiddenForUsers": true }
+      ]
+    }
+  ],
+
+  "support": {
+    "heading": "Support",
+    "testId": "footer-support-section",
+    "items": [
+      { "label": "Help Center", "href": "/help", "gaKey": "Help Center", "testId": "Help Center" },
+      { "label": "Contact", "href": "/contact", "gaKey": "Contact", "testId": "contact" },
+      { "label": "T&C", "href": "/terms", "gaKey": "Terms and Conditions", "testId": "T&C" },
+      { "label": "Privacy Policy", "href": "/privacy", "gaKey": "Privacy Policy", "testId": "Privacy Policy" },
+      { "label": "Sitemap", "href": "/sitemap", "gaKey": "Sitemap", "testId": "Sitemap" }
+    ]
+  },
+
+  "contact": {
+    "heading": "Contact us",
+    "testId": "footer-contactUs-section",
+    "_comment": "In amber-user-website the phone number is chosen from the Redux `country` code (AU/US/IN/default UK). This sandbox has no geo state, so the UK default is baked in — the same number an unresolved visitor sees.",
+    "items": [
+      { "icon": "envelope", "label": "contact@amberstudent.com", "link": "mailto:contact@amberstudent.com" },
+      { "icon": "whatsapp", "label": "WhatsApp", "link": "https://wa.me/447888863490" },
+      { "icon": "phone", "label": "+44 7456741634", "link": "tel: +44 7456741634" }
+    ]
+  },
+
+  "followUs": {
+    "label": "Follow us",
+    "items": [
+      { "name": "Instagram", "href": "https://www.instagram.com/amberstudent/", "src": "https://static-assets.amberstudent.com/images/Instagram.svg", "alt": "app store", "testId": "footer-instagram" },
+      { "name": "Youtube", "href": "https://www.youtube.com/channel/UCzm8GT3xWuXqQt9O7CFpqJw", "src": "https://static-assets.amberstudent.com/images/Youtube.svg", "alt": "youtube", "testId": "footer-youtube" },
+      { "name": "Tiktok", "href": "https://www.tiktok.com/@amberstudent.com", "src": "https://static-assets.amberstudent.com/images/tiktok.svg", "alt": "tiktok", "testId": "footer-tiktok" },
+      { "name": "LinkedIn", "href": "https://www.linkedin.com/company/amberstudent", "src": "https://static-assets.amberstudent.com/images/Linkedin.svg", "alt": "app store", "testId": "footer-linkedin" },
+      { "name": "Facebook", "href": "https://www.facebook.com/amberstudent", "src": "https://static-assets.amberstudent.com/images/Facebook.svg", "alt": "facebook", "testId": "mobile-footer-facebook" },
+      { "name": "Twitter", "href": "https://twitter.com/amberstudent_", "src": "https://static-assets.amberstudent.com/images/Twitter.svg", "alt": "twitter icon", "testId": "footer-twitter" },
+      { "name": "Pinterest", "href": "https://www.pinterest.com/amberstudent/", "src": "https://static-assets.amberstudent.com/images/pinterest.svg", "alt": "pinterest icon", "testId": "footer-pinterest" }
+    ]
+  }
+}

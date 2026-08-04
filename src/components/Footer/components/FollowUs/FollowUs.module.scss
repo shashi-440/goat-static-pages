@@ -1,0 +1,51 @@
+.outerDivChina {
+  margin-top: 20px;
+}
+
+.label {
+  color: $neutral6;
+  font-size: 14px;
+  font-weight: 500;
+}
+.innerDivChina {
+  align-items: center;
+  display: flex;
+  flex-flow: wrap;
+  flex-direction: row;
+  gap: 18px;
+  margin-top: 12px;
+}
+
+.innerDiv {
+  align-items: center;
+  display: flex;
+  flex-flow: wrap;
+  flex-direction: row;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.spacing {
+  justify-content: space-between;
+}
+
+.outerDiv {
+  margin-top: 36px;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.mediaImg {
+  max-height: 22px;
+  max-width: 22px;
+  cursor: pointer;
+  transition: transform 0.3s ease-in-out;
+}
+
+.mediaImg:hover {
+  transform: scale(1.2);
+}

@@ -1,0 +1,158 @@
+.outerContainer {
+  align-items: center;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: row;
+  @include gap-with-margin(16px);
+  justify-content: center;
+  margin-bottom: 40px;
+  margin-top: 16px;
+  padding: 16px 24px;
+
+  &.desktop {
+    background-color: $neutral0;
+    justify-content: left;
+    align-items: flex-start;
+    @include applies-between(md, lg) {
+      @include gap-with-margin(6px);
+      padding: 16px 16px;
+    }
+  }
+}
+
+.ChinaOuterContainer {
+  align-items: center;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: row;
+  @include gap-with-margin(16px);
+  justify-content: start;
+  margin-top: 16px;
+  padding: 16px 24px 16px 0;
+
+  &.desktop {
+    background-color: $neutral0;
+    justify-content: left;
+  }
+}
+
+.ICPLabel {
+  color: $neutral6;
+  font-weight: 400;
+  font-size: medium;
+  margin-top: -20px;
+}
+
+.ICPUrl {
+  color: $neutral6;
+  font-weight: 400;
+  font-size: medium;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.ICPUrl:hover {
+  color: $primary8;
+  font-weight: 400;
+  font-size: medium;
+  cursor: pointer;
+}
+
+.outerChinaContainer {
+  display: flex;
+  flex: 2.15;
+  flex-direction: row;
+  @include gap-with-margin(15px);
+  margin-bottom: 40px;
+  margin-top: 16px;
+}
+
+.mobileContainer {
+  display: flex;
+  flex: 2.25;
+  flex-direction: row;
+  gap: 32px;
+}
+
+.chinaOuterContainer {
+  display: flex;
+  gap: 38;
+  height: 100%;
+}
+
+.appContainer {
+  height: 28px;
+}
+
+.chinaAppContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.paymentContainer {
+  align-items: "flex-start";
+  display: "flex";
+  flex-direction: "column";
+  justify-content: "flex-end";
+}
+
+.chinaContainer {
+  display: "flex";
+  flex-direction: "column";
+  gap: 12;
+  height: "100%";
+  justify-content: "flex-end";
+}
+
+.appHeader {
+  display: "flex";
+  flex-direction: "column";
+  justify-content: "flex-end";
+}
+
+.headerText {
+  color: $neutral6;
+  font-weight: 500;
+  font-size: 14px;
+  max-width: 120px;
+}
+
+.container {
+  height: 100%;
+  width: auto;
+}
+
+.appImg {
+  height: 30;
+  width: 30;
+}
+
+.imgPartners {
+  height: 28;
+  margin-top: 12px;
+  width: "150px";
+}
+
+.divider {
+  background-color: $neutral3;
+  height: 61px;
+  width: 2px;
+}
+
+.imageWrapper {
+  align-items: center;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  @include gap-with-margin(12px);
+  height: 28px;
+  justify-content: flex-start;
+  margin-top: 12px;
+}
+
+.ICPContainer {
+  display: flex;
+  flex-direction: column;
+}

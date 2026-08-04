@@ -1,0 +1,36 @@
+.showSkeleton {
+  position: relative;
+  z-index: 1;
+}
+.fallbackClass {
+  opacity: 0;
+}
+.animateOpacity {
+  transform: scale(0.9);
+  opacity: 0;
+  transition: opacity 0.25s ease 0s, transform 0.25s ease 0s;
+  border-radius: inherit;
+  &.show {
+    opacity: 1;
+    transform: none;
+  }
+  &.noTransformAnimation {
+    transform: none;
+    transition: opacity 0.25s ease 0s;
+  }
+}
+.shimmerBackground {
+  background: #dee2e6;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -468px 0;
+  }
+  100% {
+    background-position: 468px 0;
+  }
+}

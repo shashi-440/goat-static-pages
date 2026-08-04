@@ -1,0 +1,40 @@
+.outerDiv {
+  align-items: center;
+  border: 1px solid $neutral2;
+  border-radius: 8px;
+  color: $primary4;
+  display: flex;
+  margin-top: 12px;
+  padding: 8px 12px;
+  text-decoration: none;
+}
+
+.label {
+  color: $neutral9;
+  font-size: 12px;
+  font-weight: 400;
+  margin-left: 6px;
+  overflow-wrap: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+}
+
+.bottomLine {
+  align-items: "center";
+  color: $neutral7;
+  font-size: 10;
+}
+
+.paymentMethods {
+  color: $neutral6;
+  font-size: 14px;
+  font-weight: "600";
+  min-width: "0px";
+  overflow: "hidden";
+  text-overflow: "ellipsis";
+}
+
+.growDiv {
+  flex-grow: 1;
+}

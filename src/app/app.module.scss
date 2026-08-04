@@ -1,0 +1,236 @@
+html {
+  margin: 0;
+  overflow-x: hidden;
+  padding: 0;
+  &.bodyLocked {
+    overflow: hidden;
+  }
+  &.bodyLockedSticky {
+    overflow: clip;
+  }
+}
+.addFullHeight {
+  height: 100%;
+}
+
+button {
+  cursor: pointer;
+}
+
+a,
+abbr,
+acronym,
+address,
+applet,
+article,
+aside,
+audio,
+b,
+big,
+blockquote,
+body,
+canvas,
+caption,
+center,
+cite,
+code,
+dd,
+del,
+details,
+dfn,
+div,
+dl,
+dt,
+em,
+embed,
+fieldset,
+figcaption,
+figure,
+footer,
+form,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+header,
+hgroup,
+html,
+i,
+iframe,
+img,
+ins,
+kbd,
+label,
+legend,
+li,
+mark,
+menu,
+nav,
+object,
+ol,
+output,
+p,
+pre,
+q,
+ruby,
+s,
+samp,
+section,
+small,
+span,
+strike,
+strong,
+sub,
+summary,
+sup,
+table,
+tbody,
+td,
+tfoot,
+th,
+thead,
+time,
+tr,
+tt,
+u,
+ul,
+var,
+video {
+  border: 0;
+  font: inherit;
+  font-size: 100%;
+  margin: 0;
+  padding: 0;
+  vertical-align: baseline;
+}
+
+body {
+  background: #fff;
+  color: $fontColorDark1;
+  font-family: var(
+    --whitelabel_body_font,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif,
+    "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Segoe UI Symbol"
+  ) !important;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 400;
+  height: 100%;
+  line-height: 1.4;
+  margin: 0;
+  padding: 0;
+  &.bodyLocked {
+    --removed-scroll-width: 0;
+
+    overflow: hidden !important;
+    position: relative !important;
+    touch-action: none;
+    .pageContent {
+      transform: unset !important;
+    }
+  }
+  // Used by desktop modals on pages with sticky elements — overflow:clip
+  // prevents scrolling without creating a new scroll container, so
+  // position:sticky children continue to work.
+  &.bodyLockedSticky {
+    overflow: clip !important;
+    touch-action: none;
+  }
+  // Used by SearchModalMobile — position:fixed prevents iOS Safari
+  // from shifting the underlying page scroll when scrolling inside the modal.
+  &.bodyLockedFixed {
+    overflow: hidden !important;
+    position: fixed !important;
+    width: 100%;
+    touch-action: none;
+  }
+}
+
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  color: #333;
+  margin: 0;
+}
+
+a {
+  color: $primary8;
+  font-weight: 500;
+  transition: opacity 0.2s ease;
+  transition: opacity 0.2s ease;
+  transition: opacity 0.2s ease;
+  transition: opacity 0.2s ease;
+
+  &:hover,
+  &:active,
+  &:focus {
+    color: $danger5;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+// Whitelabel font classes - maximum specificity to override CSS modules
+.wl-title-font,
+h1.wl-title-font,
+h2.wl-title-font,
+h3.wl-title-font,
+h4.wl-title-font,
+h5.wl-title-font,
+h6.wl-title-font,
+h1[class*="wl-title-font"],
+h2[class*="wl-title-font"],
+h3[class*="wl-title-font"],
+h4[class*="wl-title-font"],
+h5[class*="wl-title-font"],
+h6[class*="wl-title-font"] {
+  font-family: var(--whitelabel_title_font, inherit) !important;
+}
+
+.wl-body-font,
+h1.wl-body-font,
+h2.wl-body-font,
+h3.wl-body-font,
+h4.wl-body-font,
+h5.wl-body-font,
+h6.wl-body-font,
+h1[class*="wl-body-font"],
+h2[class*="wl-body-font"],
+h3[class*="wl-body-font"],
+h4[class*="wl-body-font"],
+h5[class*="wl-body-font"],
+h6[class*="wl-body-font"] {
+  font-family: var(--whitelabel_body_font, inherit) !important;
+}
+
+@include applies-below(sm) {
+  iframe[id^="launcher"] {
+    display: none !important;
+  }
+
+  iframe[title="Messaging window"] {
+    border-radius: 0 !important;
+  }
+}
+@include applies-below(lg) {
+  iframe[id^="launcher"] {
+    bottom: 8px !important;
+    z-index: 100 !important;
+  }
+}

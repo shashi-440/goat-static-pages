@@ -1,0 +1,13 @@
+// WIP marker for the static footer — see FooterDesktop.tsx for why this lives
+// in the shim rather than in the pages.
+.wip {
+  // Enough to read as "not for review" while the footer's shape stays legible.
+  filter: blur(6px);
+  // The blur feathers the content's edges; clipping keeps it from bleeding past
+  // the footer's own box. The pages and the footer are both white, so the
+  // feathered edge blends in rather than showing a seam.
+  background: #fff;
+  overflow: hidden;
+  // Nothing in here is meant to be read or copied yet.
+  user-select: none;
+}

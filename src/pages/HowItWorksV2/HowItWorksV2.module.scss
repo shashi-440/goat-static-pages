@@ -1,0 +1,15 @@
+.page {
+  background: #fff;
+  // Instrument Sans is loaded via Helmet <link> in HowItWorksV2.tsx and applied
+  // to the whole page so it stays scoped here (site default is unchanged).
+  font-family: "Instrument Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  overflow-x: hidden;
+  // Clear the fixed (64px) navbar so content doesn't hide behind it.
+  padding-top: 64px;
+  width: 100%;
+
+  * {
+    font-family: inherit;
+  }
+}

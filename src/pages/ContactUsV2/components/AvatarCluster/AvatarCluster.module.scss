@@ -1,0 +1,73 @@
+// Figma node 2047:974 — three 43.484px faces, 2px white ring, overlapping by
+// 32px. Sits inline in the h1, so the margins stand in for the spaces the
+// design reserves around it in the headline text.
+.cluster {
+  align-items: center;
+  display: inline-flex;
+  margin: 0 12px;
+
+  // Centre the faces on the headline's LINE BOX rather than on the text
+  // baseline. `vertical-align: middle` aligns to baseline + half the x-height,
+  // which drops the cluster ~6px too low. Instead the cluster is exactly as tall
+  // as the h1's 56px line-height and top-aligned to the line box, so
+  // `align-items: center` centres the 43.48px faces within it — matching the
+  // design, where the cluster's centre sits on the line-box centre.
+  height: 56px;
+  vertical-align: top;
+}
+
+.avatar {
+  border-radius: 50%;
+  display: block;
+  flex-shrink: 0;
+  height: 43.48px;
+  position: relative;
+  transition: margin-right 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  width: 43.48px;
+
+  // 2px white ring drawn OUTSIDE the circle, so the photo keeps its full
+  // 43.48px and the ring reads clearly where the faces overlap. A `border`
+  // would eat into the photo instead and the separation nearly disappears.
+  // Each face paints over the one before it, so its own left ring is what
+  // creates the white gap between them.
+  box-shadow: 0 0 0 2px #fff;
+
+  // The overlap. Only the faces that have a neighbour to tuck under.
+  &:not(:last-child) {
+    margin-right: -32px;
+  }
+}
+
+// Hover: the stack fans apart to show all three faces.
+.cluster:hover .avatar:not(:last-child) {
+  margin-right: -12px;
+}
+
+.photo {
+  border-radius: 50%;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+// Semantic/green/5 online dot, bottom-right of the last face.
+.presence {
+  background: #0e9f6e;
+  border: 1.5px solid #fff;
+  border-radius: 50%;
+  bottom: 2px;
+  height: 12px;
+  position: absolute;
+  right: -3px;
+  width: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avatar {
+    transition: none;
+  }
+
+  .cluster:hover .avatar:not(:last-child) {
+    margin-right: -32px;
+  }
+}

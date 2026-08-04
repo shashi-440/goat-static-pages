@@ -1,0 +1,226 @@
+.section {
+  align-items: center;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+  padding: 80px;
+  width: 100%;
+}
+
+.heading {
+  color: #fff;
+  font-size: 40px;
+  font-weight: 550;
+  letter-spacing: -0.72px;
+  line-height: 40px;
+  text-align: center;
+}
+
+.grid {
+  display: flex;
+  gap: 24px;
+  max-width: 1280px;
+  width: 100%;
+}
+
+.column {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+// ---- Flip card: vertical (X-axis) flip hinging on the horizontal middle ----
+.flipCard {
+  --tilt-x: 0deg; // set by JS from the cursor's vertical position
+
+  // Perspective lives on this PARENT so it applies to the tilt below.
+  perspective: 700px;
+  width: 100%;
+}
+
+// Dedicated tilt layer: takes the cursor-driven tilt with a short transition for
+// smooth mouse tracking. Separate from `.flipInner` so it never interferes with
+// the flip's 0.7s timing — the close (×) stays as smooth as the open (+).
+.tilt {
+  height: 100%;
+  transform: rotateX(var(--tilt-x));
+  transform-style: preserve-3d;
+  transition: transform 0.12s ease-out;
+  width: 100%;
+}
+
+.cardTall {
+  height: 305px;
+}
+
+.cardShort {
+  height: 250px;
+}
+
+.flipInner {
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  // Smooth, weighty flip.
+  transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
+  width: 100%;
+}
+
+// Vertical flip — rotate around the X (horizontal) axis so the card turns
+// top-over-bottom from its middle.
+.isFlipped {
+  transform: rotateX(180deg);
+}
+
+.face {
+  backface-visibility: hidden;
+  background: #fff;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  inset: 0;
+  justify-content: space-between;
+  padding: 24px;
+  position: absolute;
+  width: 100%;
+}
+
+// Back face is pre-flipped on the same axis so it reads upright once revealed.
+.back {
+  transform: rotateX(180deg);
+}
+
+.cardText {
+  color: #222;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: -0.26px;
+  line-height: 1.4;
+}
+
+.answerText {
+  color: #222;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: -0.26px;
+  line-height: 1.4;
+}
+
+// "Amber." highlight with the brand red gradient (card 3).
+.amber {
+  background: linear-gradient(100deg, #ff5771 10%, #e53762 51%, #ff5771 106%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  font-weight: 700;
+}
+
+.toggleRow {
+  display: flex;
+  width: 100%;
+}
+
+.toggleStart {
+  justify-content: flex-start;
+}
+
+.toggleEnd {
+  justify-content: flex-end;
+}
+
+// Both toggles are dark circular buttons; on hover they lighten to grey.
+.toggle {
+  align-items: center;
+  background: #222;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  display: flex;
+  height: 40px;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.2s ease;
+  width: 40px;
+
+  &:hover {
+    background: #6b7280; // grey on hover
+  }
+}
+
+// Plus (+) icon built from two crossed bars.
+.plus {
+  display: block;
+  height: 16px;
+  position: relative;
+  width: 16px;
+
+  &::before,
+  &::after {
+    background: #fff;
+    border-radius: 1px;
+    content: "";
+    height: 2.5px;
+    left: 0;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+  }
+
+  // Vertical bar.
+  &::after {
+    transform: translateY(-50%) rotate(90deg);
+  }
+}
+
+// Cross (×) icon built from two rotated bars.
+.cross {
+  display: block;
+  height: 16px;
+  position: relative;
+  width: 16px;
+
+  &::before,
+  &::after {
+    background: #fff;
+    border-radius: 1px;
+    content: "";
+    height: 2.5px;
+    left: 0;
+    position: absolute;
+    top: 50%;
+    width: 16px;
+  }
+
+  &::before {
+    transform: translateY(-50%) rotate(45deg);
+  }
+
+  &::after {
+    transform: translateY(-50%) rotate(-45deg);
+  }
+}
+
+.imageCard {
+  border-radius: 16px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.imageLandscape {
+  aspect-ratio: 384 / 329.14;
+}
+
+.imageSquare {
+  aspect-ratio: 1 / 1;
+}
+
+.image {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}

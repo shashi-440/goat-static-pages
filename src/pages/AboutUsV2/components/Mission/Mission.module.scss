@@ -1,0 +1,100 @@
+.section {
+  background: #fff;
+  padding: 80px;
+  width: 100%;
+}
+
+.container {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  max-width: 1040px;
+  width: 100%;
+}
+
+.mission {
+  color: #636363;
+  font-size: 24px;
+  font-weight: 550;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.founder {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 32px;
+}
+
+.avatar {
+  align-items: center;
+  display: flex;
+  height: 70px;
+  justify-content: center;
+  // No clipping — the cycling stamp rotates/scales on hover and needs room.
+  width: 70px;
+}
+
+.avatarImage {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.signature {
+  height: 41px;
+  width: 180px;
+}
+
+.signatureImage {
+  height: 100%;
+  object-fit: contain;
+  width: 100%;
+}
+
+.founderCaption {
+  color: #636363;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 20px;
+}
+
+.divider {
+  background: #e5e7eb;
+  border: 0;
+  height: 1px;
+  margin: 32px 0;
+  width: 100%;
+}
+
+.stats {
+  display: flex;
+  width: 100%;
+}
+
+.stat {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+}
+
+.statValue {
+  color: #202020;
+  font-size: 30px;
+  font-weight: 550;
+  letter-spacing: -0.3px;
+  line-height: 36px;
+}
+
+.statLabel {
+  color: #636363;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 20px;
+}

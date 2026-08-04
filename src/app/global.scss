@@ -1,0 +1,17 @@
+// hide swiftsell bot
+div#chat-bubble-close {
+  display: none !important;
+}
+div#chat-bubble-open {
+  display: none !important;
+}
+
+// Scroll lock utility class (used by modals/panels)
+body.no-scroll {
+  overflow: hidden !important;
+}
+
+// hide captcha
+.grecaptcha-badge {
+  display: none;
+}

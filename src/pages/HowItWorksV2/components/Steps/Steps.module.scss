@@ -1,0 +1,168 @@
+.section {
+  align-items: center;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 100px 80px 120px;
+  width: 100%;
+}
+
+.headingBlock {
+  text-align: center;
+}
+
+.heading {
+  color: #111928;
+  font-size: 40px;
+  font-weight: 550;
+  letter-spacing: -0.72px;
+  line-height: 1.2;
+  margin: 0;
+}
+
+// Second line of the heading, dropped back to grey.
+.headingMuted {
+  color: #9ca3af;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 64px;
+  list-style: none;
+  margin: 72px 0 0;
+  max-width: 1280px;
+  padding: 0;
+  // Containing block for the connector rail, and the offsetParent the rail
+  // geometry is measured against.
+  position: relative;
+  width: 100%;
+}
+
+// Connector rail. Sits ON the 1280px content grid rather than out in the
+// gutter, centred on the chips' midpoint (14px: chips are 28px wide at left: 0).
+// Keeping the chips inside the grid is what makes the section's left edge line
+// up with the navbar logo — hanging them in the gutter read as misaligned, since
+// the eye takes the leftmost element as the edge.
+// The effect narrows top/height to chip-1 → chip-3 centres; the
+// `top: 0; bottom: 0` default means the track still connects the chips if that
+// script never runs.
+.rail {
+  background: #e5e7eb;
+  bottom: 0;
+  left: 14px;
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  width: 1px;
+}
+
+// The dark progress fill. scaleY from the top is compositor-friendly, so the
+// scroll handler never triggers layout. Starts at 0 — without JS only the grey
+// track shows, which is still a connected line.
+.railFill {
+  background: #111928;
+  display: block;
+  height: 100%;
+  transform: scaleY(0);
+  transform-origin: top center;
+  width: 100%;
+}
+
+// Copy block left, media right, copy centred against the media's height.
+// The copy column carries the 48px rail indent on top of its 444px text measure,
+// so the text keeps exactly the width it had before the rail existed (and the
+// descriptions keep their 3-line rhythm). 492 + 76 + 712 = 1280.
+.row {
+  align-items: center;
+  display: grid;
+  column-gap: 76px;
+  grid-template-columns: minmax(0, 492fr) minmax(0, 712fr);
+}
+
+.copy {
+  min-width: 0;
+  // Clears the rail and chip. Absolutely positioned children are placed against
+  // the padding box, so this does NOT push the chip off the grid line.
+  padding-left: 48px;
+  // Anchors the chip.
+  position: relative;
+}
+
+// Numbered chip, lifted out of the flow so it sits on the rail beside the title
+// rather than above it. Pinned to the column's left edge — the same grid line as
+// the navbar logo. Opaque fill so the rail reads as passing behind it; it paints
+// after the rail, so no z-index is needed.
+.marker {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #111928;
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 500;
+  height: 28px;
+  justify-content: center;
+  left: 0;
+  position: absolute;
+  // Centres the 28px chip on the title's first line (24px × 1.4 = 33.6px).
+  top: 3px;
+  transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  width: 28px;
+}
+
+// Reached: the chip fills to match the rail's dark fill, so the numbers read as
+// completed rather than staying uniform while the line moves past them.
+.markerActive {
+  background: #111928;
+  border-color: #111928;
+  color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marker {
+    transition: none;
+  }
+}
+
+.cardTitle {
+  color: #111928;
+  font-size: 24px;
+  font-weight: 550;
+  // Same -0.01em optical tracking the smaller size used, scaled up.
+  letter-spacing: -0.24px;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.cardText {
+  color: #6b7280;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+  margin: 8px 0 0;
+}
+
+// Media slot. The clip fills it edge to edge; the colour only shows while the
+// clip is still loading.
+.media {
+  align-items: center;
+  aspect-ratio: 3 / 2;
+  background: #f7f7f7;
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  width: 100%;
+}
+
+// `cover` fills the box on both axes — the 16:9 clip is scaled to the 3:2 box's
+// height and cropped ~8% either side, which also trims the clip's own black
+// side padding. Centred, so the phone mockup is never clipped.
+.video {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}

@@ -1,0 +1,11 @@
+// Screen limits
+$min-screen: 480;
+$max-screen: 1440;
+
+// Generic scaling clamp function
+@function scaledPixelClamp($min, $max) {
+  $slope: ($max - $min) / ($max-screen - $min-screen) * 100;
+  $intercept: $min - ($slope * $min-screen / 100);
+
+  @return clamp(#{$min}px, calc(#{$intercept}px + #{$slope}vw), #{$max}px);
+}

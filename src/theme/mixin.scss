@@ -1,0 +1,316 @@
+//  Global Breakpoints
+$breakpoints: (
+  xs: 480px,
+  // Mobile (small)
+  sm: 650px,
+  // Large mobile / small tablet
+  md: 900px,
+  // Tablet (portrait)
+  lg: 1200px,
+  // Tablet (landscape) / Small laptop
+  xl: 1440px,
+  // Desktop / Large screen
+  2xl: 1920px,
+);
+
+@mixin scrollbar-hide() {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+    background: transparent !important;
+    -webkit-appearance: none !important;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: transparent !important;
+  }
+}
+
+@mixin header-h3() {
+  /* Headlines/H3 */
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 125%; /* 25px */
+  letter-spacing: 0.03px;
+}
+@mixin header-h4() {
+  /* Headlines/H4 */
+  font-weight: 700;
+  font-style: Bold;
+  font-size: 18px;
+  line-height: 125%;
+  letter-spacing: 0.15%;
+}
+
+@mixin header-h5() {
+  /* Headlines/H5 */
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 125%; /* 20px */
+  letter-spacing: 0.024px;
+}
+
+@mixin labels-l3() {
+  /* Labels/L3/Regular */
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 125%; /* 20px */
+}
+
+@mixin labels-l4() {
+  /* Labels/L4/Regular */
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 125%;
+  /* 17.5px */
+  letter-spacing: 0.035px;
+}
+
+@mixin labels-l4-emp() {
+  /* Labels/L4/Regular */
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 125%;
+  /* 17.5px */
+  letter-spacing: 0.035px;
+}
+
+@mixin labels-l5() {
+  /* Labels/L5/Regular */
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 125%;
+}
+
+@mixin labels-l5-emp($isImp: false) {
+  /* Labels/L4/Empasized */
+  font-size: 12px#{if($isImp, " !important", "")};
+  font-style: normal#{if($isImp, " !important", "")};
+  font-weight: 600#{if($isImp, " !important", "")};
+  line-height: 125%#{if($isImp, " !important", "")};
+}
+
+@mixin text-b3-emp() {
+  color: #111928;
+  /* Body text/B3/Emphasised */
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+}
+
+@mixin text-b4() {
+  /* Body text/B4/Regular */
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  /* 21px */
+  letter-spacing: 0.035px;
+}
+
+@mixin text-b4-emp() {
+  color: #111928;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%; /* 21px */
+}
+
+@mixin text-b5() {
+  /* Body text/B5/Regular */
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  /* 18px */
+  letter-spacing: 0.048px;
+}
+
+@mixin text-b5-emp() {
+  /* Body text/B5/Emp */
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+}
+
+@mixin add-desktop-viewport() {
+  @media (min-width: 1024px) {
+    max-width: 1700px;
+  }
+}
+@mixin add-button-state() {
+  &:hover {
+    background-color: rgba($color: #000000, $alpha: 0.05);
+    border-radius: 8px;
+  }
+  &:active {
+    transform: translateY(1px);
+  }
+  user-select: none;
+}
+
+@mixin mobile_only {
+  @media only screen and (max-width: 435px) {
+    @content;
+  }
+}
+
+@mixin tablet_only {
+  @media only screen and (max-width: 767px) and (min-width: 436px) {
+    @content;
+  }
+}
+
+@mixin desktop_only {
+  @media only screen and (min-width: 1024px) {
+    @content;
+  }
+}
+@mixin gap-with-margin($gap: 8px, $wrap: nowrap, $direction: row) {
+  & > * {
+    @if $direction == row {
+      margin-right: $gap;
+    } @else {
+      margin-bottom: $gap;
+    }
+
+    @if $wrap == wrap and $direction == row {
+      margin-bottom: $gap;
+    } @else if $wrap == wrap and $direction == column {
+      margin-right: $gap;
+    }
+  }
+
+  @if $wrap == wrap {
+    @if $direction == row {
+      & > *:nth-last-child(-n + 1):first-child,
+      & > *:nth-last-child(-n + 1):first-child ~ * {
+        margin-right: 0;
+      }
+      // & > *:nth-last-child(-n + 1) {
+      // margin-bottom: 0;
+      // }
+    } @else {
+      & > *:nth-last-child(-n + 1):first-child,
+      & > *:nth-last-child(-n + 1):first-child ~ * {
+        margin-bottom: 0;
+      }
+      & > *:nth-last-child(-n + 1) {
+        margin-right: 0;
+      }
+    }
+  } @else {
+    @if $direction == row {
+      & > *:last-child {
+        margin-right: 0;
+      }
+    } @else {
+      & > *:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+@mixin applies-above($breakpoint, $inclusive: true) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    $value: map-get($breakpoints, $breakpoint);
+
+    @if $inclusive {
+      @media (min-width: $value) {
+        @content;
+      }
+    } @else {
+      @media (min-width: calc(#{$value} + 1px)) {
+        @content;
+      }
+    }
+  } @else {
+    @warn "⚠️ Breakpoint '#{$breakpoint}' not found in $breakpoints map.";
+  }
+}
+
+@mixin applies-below($breakpoint, $inclusive: true) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    $value: map-get($breakpoints, $breakpoint);
+
+    @if $inclusive {
+      @media (max-width: $value) {
+        @content;
+      }
+    } @else {
+      @media (max-width: calc(#{$value} - 1px)) {
+        @content;
+      }
+    }
+  } @else {
+    @warn "⚠️ Breakpoint '#{$breakpoint}' not found in $breakpoints map.";
+  }
+}
+
+@mixin applies-between($min, $max, $inclusive: true) {
+  @if map-has-key($breakpoints, $min) and map-has-key($breakpoints, $max) {
+    $minValue: map-get($breakpoints, $min);
+    $maxValue: map-get($breakpoints, $max);
+
+    @if $inclusive {
+      @media (min-width: $minValue) and (max-width: $maxValue) {
+        @content;
+      }
+    } @else {
+      @media (min-width: calc(#{$minValue} + 1px))
+             and (max-width: calc(#{$maxValue} - 1px)) {
+        @content;
+      }
+    }
+  } @else {
+    @warn "⚠️ One of the breakpoints (‘#{$min}’ or ‘#{$max}’) not found in $breakpoints map.";
+  }
+}
+
+@mixin applies-on-portrait {
+  @media (orientation: portrait) {
+    @content;
+  }
+}
+
+@mixin applies-on-landscape {
+  @media (orientation: landscape) {
+    @content;
+  }
+}
+
+@mixin content-container($max-width: 1280px) {
+  max-width: $max-width !important;
+  margin: 0 auto !important;
+}
+
+@mixin responsive-section-padding(
+  $desktop: 48px 80px,
+  $desktopSmall: 48px 40px,
+  $tablet: 16px,
+  $mobile: 16px
+) {
+  padding: $desktop;
+
+  @include applies-between(md, lg) {
+    padding: $desktopSmall;
+  }
+
+  @include applies-between(sm, md) {
+    padding: $tablet;
+  }
+
+  @include applies-between(xs, sm) {
+    padding: $mobile;
+  }
+}

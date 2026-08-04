@@ -1,0 +1,35 @@
+.page {
+  background: #fff;
+  // Instrument Sans is loaded via Helmet <link> in ContactUsV2.tsx and applied
+  // to the whole page so it stays scoped to Contact Us (site default unchanged).
+  font-family: "Instrument Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  overflow-x: hidden;
+  // Clear the fixed (64px) navbar so content doesn't hide behind it.
+  padding-top: 64px;
+  width: 100%;
+
+  * {
+    font-family: inherit;
+  }
+}
+
+// Bottom-centre dock for the Copilot field — fixed to the viewport so it stays
+// put through the whole page, including over the footer. Sits below the fixed
+// navbar's z-index (100). The bar itself is click-through; only the field takes
+// pointer events, so it never blocks the content scrolling underneath.
+.copilotDock {
+  bottom: 32px;
+  display: flex;
+  justify-content: center;
+  left: 0;
+  padding: 0 24px;
+  pointer-events: none;
+  position: fixed;
+  right: 0;
+  z-index: 90;
+
+  > * {
+    pointer-events: auto;
+  }
+}

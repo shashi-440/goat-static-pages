@@ -1,0 +1,12 @@
+.container {
+  cursor: pointer;
+  height: auto;
+  width: auto;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  a {
+    min-width: 50px;
+    display: flex;
+  }
+}
