@@ -1,0 +1,370 @@
+// Figma 2122:8944 — card is 272 wide and 391 tall overall:
+//   header 193 − 130 overlap = 63 visible
+// + photo  312
+// = body   375, then the Watch Story pill (34) overlaps it by 18 → 391.
+$card-w: 272px;
+$photo-h: 312px;
+$header-h: 63px;
+$pill-overlap: 18px;
+$gap: 16px;
+
+// The band is inset:0 of this section, so the top padding IS how far the band
+// reaches above the cards. Figma had 37px; 85px lifts it higher, as asked. The
+// hero's bottom padding was reduced by the same 48px so the cards stay put and
+// the CTA-to-cards gap is unchanged. The bottom is the page-wide 88px rhythm.
+.section {
+  background: #fff;
+  overflow: hidden;
+  padding: 64px 0 40px;
+  position: relative;
+  width: 100%;
+}
+
+// hero-backdrop-band (Figma 2109:3553): a photo, not a flat fill. Two white
+// gradients over it fade it out at the top and bottom so it dissolves into the
+// white page instead of reading as a grey block.
+.band {
+  // Sized independently of the section box: the top edge sits at the section's
+  // top (i.e. the rail's top padding is how far it reaches above the cards) and
+  // the bottom stops short of the section's, so the band's height can be tuned
+  // without disturbing the 88px section rhythm below it.
+  bottom: 12px;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 0;
+}
+
+.bandImage {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.bandFade {
+  background-image: linear-gradient(
+      180deg,
+      rgb(255, 255, 255) 0%,
+      rgba(255, 255, 255, 0.4) 27.885%,
+      rgba(255, 255, 255, 0) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.3) 59.615%,
+      rgb(255, 255, 255) 100%
+    );
+  inset: 0;
+  position: absolute;
+}
+
+// Deliberately NOT overflow:hidden — .section already clips horizontally, and
+// clipping here too would cut the cards' hover shadow off at the rail edges.
+// The section's vertical padding gives the shadow room to fall.
+.viewport {
+  position: relative;
+  width: 100%;
+  z-index: 1;
+}
+
+.track {
+  display: flex;
+  gap: $gap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  // The rail holds two copies of the card list, so translating by exactly half
+  // its width lands copy 2 where copy 1 started — a seamless loop.
+  animation: drift 60s linear infinite;
+  width: max-content;
+  will-change: transform;
+
+  &:hover {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    // Half the track = one full copy of the list, including its trailing gap.
+    transform: translate3d(calc(-50% - #{$gap * 0.5}), 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    animation: none;
+  }
+}
+
+// ---------------------------------------------------------------- card
+
+// The list item holds the track slot; the button inside is the card itself.
+.cardItem {
+  flex: 0 0 auto;
+  width: $card-w;
+}
+
+// A <button>, so it needs the usual chrome reset.
+.card {
+  align-items: center;
+  appearance: none;
+  background: none;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  font: inherit;
+  padding: 0;
+  text-align: inherit;
+  // Lift on hover. On the card rather than the body so the Watch Story pill
+  // rises with it instead of detaching.
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  width: 100%;
+
+  // Keyboard focus needs to be visible without a permanent outline on click.
+  &:focus-visible {
+    outline: 2px solid #f5c43c;
+    outline-offset: 4px;
+  }
+}
+
+// Bordered, clipped body. Clipping is what trims the photo to the rounded
+// corners; the pill sits outside it, so it can overhang the bottom edge.
+.body {
+  border: 1px solid #1f2a37;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  // Pulls the pill up over the body's bottom edge.
+  margin-bottom: -$pill-overlap;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+  width: 100%;
+}
+
+// Secondary/neutral/900. In Figma this is a 193px box overlapped by 130px of
+// photo; only the top 63px shows, so it is built at that height directly.
+.header {
+  align-items: center;
+  background: #111928;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: $header-h;
+  justify-content: flex-start;
+  padding: 10px 16px 0;
+  width: 100%;
+}
+
+.name {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 550;
+  line-height: 17px;
+  white-space: nowrap;
+}
+
+// Award line, treated like a festival laurel credit.
+.meta {
+  align-items: center;
+  display: flex;
+  font-size: 12px;
+  gap: 6px;
+  line-height: 15px;
+  white-space: nowrap;
+}
+
+// Laurel + tier. Gold sampled from the "RECEIVED $10,000" badge (#FCCC00),
+// eased back slightly so 12px text doesn't vibrate against the navy header.
+// The laurel inherits this via currentColor.
+.award {
+  align-items: center;
+  color: #f5c43c;
+  display: flex;
+  font-weight: 600;
+  gap: 6px;
+}
+
+// Second place reads silver against the winners' gold.
+.awardRunnerUp {
+  color: #c9cfd8;
+}
+
+.laurel {
+  // Slightly taller than the text so the branches bracket it.
+  height: 14px;
+  width: 22px;
+}
+
+// Separator between the tier and the edition.
+.bullet {
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+  height: 3px;
+  width: 3px;
+}
+
+// Muted white so the gold laurel carries the emphasis.
+.edition {
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 400;
+}
+
+.photo {
+  background: #fff;
+  height: $photo-h;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+// Figma places the 313×313 square at (−22, −0.5) inside the 272×312 window,
+// which crops it just left of centre.
+.photoImage {
+  height: 313px;
+  left: -22px;
+  object-fit: cover;
+  position: absolute;
+  top: -0.5px;
+  width: 313px;
+}
+
+// ---- hover: diagonal scrim + award graphic, both hidden at rest ----
+
+// Keeps the design's diagonal angle and start point, but carries further down
+// and darker than its 0.3 ceiling — the gold badge needs the extra contrast at
+// the bottom of the frame to read against a light photo.
+.photoScrim {
+  background-image: linear-gradient(
+    173.18deg,
+    rgba(0, 0, 0, 0) 20%,
+    rgba(0, 0, 0, 0.42) 58%,
+    rgba(0, 0, 0, 0.8) 100%
+  );
+  inset: 0;
+  opacity: 0;
+  position: absolute;
+  transition: opacity 0.3s ease;
+}
+
+// Wrapper owns the hover reveal; the <Image> inside must not, because Image's
+// own `.animateOpacity.show` rule is two classes and would win.
+//
+// Figma sized this slot 160×200 for a portrait graphic; the supplied artwork is
+// landscape (2.083:1), so the box is re-proportioned to match it — 208 wide,
+// centred in the 272px card, sitting on roughly the same visual centre as the
+// original placement.
+.badge {
+  // Anchored to the bottom of the frame rather than measured from the top, so it
+  // stays put if the photo window height ever changes. 30px clears the Watch
+  // Story pill, which overlaps the card's bottom edge by 18px.
+  bottom: 30px;
+  // 168 × 81 keeps the artwork's 2.083:1 ratio; left 52 centres it in the 272px
+  // card ((272 − 168) / 2).
+  height: 81px;
+  left: 52px;
+  opacity: 0;
+  position: absolute;
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  // Settles into place as it fades in.
+  transform: translateY(8px);
+  width: 168px;
+}
+
+.badgeImage {
+  height: 100%;
+  object-fit: contain;
+  width: 100%;
+}
+
+.card:hover {
+  // Lifts the whole card off the rail.
+  transform: translateY(-6px);
+
+  // Soft elevation. Follows the design file's "Room Type Card" shadow geometry
+  // (2px offset / 24px blur / 6px spread) with a deeper alpha, since that token
+  // is tuned for a card at rest and this is the raised state.
+  .body {
+    box-shadow: 0 10px 24px 6px rgba(0, 0, 0, 0.16);
+  }
+
+  .photoScrim,
+  .badge {
+    opacity: 1;
+  }
+
+  .badge {
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+
+  .card:hover {
+    transform: none;
+  }
+}
+
+// ---- Watch Story pill ----
+
+.watch {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #1f2a37;
+  border-radius: 27px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  color: #000;
+  display: flex;
+  font-size: 12px;
+  font-weight: 550;
+  gap: 4px;
+  justify-content: center;
+  line-height: 15px;
+  padding: 8px 10px;
+  // Above the body so the overlap reads correctly.
+  position: relative;
+  white-space: nowrap;
+  z-index: 1;
+}
+
+// 18px slot, matching the design's icon frame so the pill keeps its width. The
+// Figma polygon is an upward triangle, so the slot rotates 90° to point it right
+// — on the slot rather than the image, since Image's `.animateOpacity.show`
+// sets `transform: none` at higher specificity and would cancel it.
+.playSlot {
+  align-items: center;
+  display: flex;
+  flex-shrink: 0;
+  height: 18px;
+  justify-content: center;
+  transform: rotate(90deg);
+  width: 18px;
+}
+
+// Exported with preserveAspectRatio="none", so it MUST be given its intrinsic
+// 12.6662 × 11.5 box — any other ratio stretches it out of shape.
+.playImage {
+  height: 11.5px;
+  width: 12.6662px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photoScrim,
+  .badge {
+    transition: none;
+  }
+
+  .badge {
+    transform: none;
+  }
+}

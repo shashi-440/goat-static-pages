@@ -1,0 +1,75 @@
+.section {
+  align-items: center;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 88px 80px;
+  width: 100%;
+}
+
+// Figma: 64px between the stats block and the copy column.
+.inner {
+  display: flex;
+  gap: 64px;
+  max-width: 1280px;
+  width: 100%;
+}
+
+// Equal half of the row. Was a fixed 557px (its content width), which combined
+// with the capped copy column left ~100px of the 1280 container unused and put
+// this section's column boundary somewhere different from the dark section's.
+.stats {
+  display: flex;
+  flex: 1 1 0;
+  // Figma: 16px between stat groups, each ~175px wide.
+  gap: 16px;
+  min-width: 0;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 175px;
+}
+
+.value {
+  color: #202020;
+  font-size: 30px;
+  font-weight: 550;
+  letter-spacing: -0.3px;
+  line-height: 36px;
+  white-space: nowrap;
+}
+
+.label {
+  color: #636363;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 20px;
+}
+
+// The other half. Figma draws a 557px measure, but that was inside its narrower
+// 1177px column; taking half of the 1280 grid keeps this section's split matched
+// to the dark section below it.
+.copy {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.paragraph {
+  color: #636363;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  margin: 0;
+
+  // The design sets an empty line between paragraphs; this stands in for it.
+  & + .paragraph {
+    margin-top: 28px;
+  }
+
+  strong {
+    font-weight: 700;
+  }
+}

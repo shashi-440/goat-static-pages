@@ -1,0 +1,101 @@
+// No horizontal padding on the section itself, so the separator below can reach
+// the viewport edges; the inner column keeps the 80px gutter via .inner.
+.section {
+  align-items: center;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 0 80px 88px;
+  width: 100%;
+}
+
+// Edge-to-edge rule between this section and the steps above it. `align-self:
+// stretch` fills the section's content box, then the negative margins push it
+// out through the 80px gutters to the viewport edges.
+.topRule {
+  align-self: stretch;
+  background: #e5e7eb;
+  height: 1px;
+  margin: 0 -80px 88px;
+}
+
+.inner {
+  max-width: 1280px;
+  width: 100%;
+}
+
+.heading {
+  color: #202020;
+  font-size: 40px;
+  font-weight: 550;
+  letter-spacing: -0.72px;
+  line-height: 40px;
+  margin: 0;
+  text-align: center;
+}
+
+.headingMuted {
+  color: #9ca3af;
+}
+
+// Figma 2118:3888 — four 248px columns split by 1px rules.
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin-top: 96px;
+  width: 100%;
+}
+
+.perk {
+  display: flex;
+  flex-direction: column;
+  padding-right: 48px;
+
+  & + .perk {
+    border-left: 1px solid #e5e7eb;
+    padding-left: 48px;
+  }
+}
+
+// Fixed slot so all four rows share one left edge and one optical centre,
+// whatever size the glyph inside is.
+.iconSlot {
+  align-items: center;
+  display: flex;
+  flex-shrink: 0;
+  height: 32px;
+  justify-content: center;
+  width: 32px;
+}
+
+// No size here on purpose — the width/height attributes carry each icon's own
+// glyph size (see PERKS), and a CSS rule would override all of them.
+.icon {
+  display: block;
+}
+
+// Label on its own line above the sentence — the criteria titles are too long to
+// run inline with their copy in a column this narrow.
+.perkText {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  // 48px in Figma, but that left the icon floating clear of its text —
+  // 24px anchors it to the block it labels.
+  margin-top: 24px;
+}
+
+.perkTitle {
+  color: #202020;
+  font-size: 16px;
+  font-weight: 550;
+  letter-spacing: -0.16px;
+  line-height: 24px;
+}
+
+.perkDesc {
+  color: #636363;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 22px;
+}

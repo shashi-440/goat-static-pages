@@ -20,6 +20,10 @@ const AsyncCareerV2Page = loadable(() => import("@Pages/CareerV2"), {
   fallback: <FullPageLoader />,
 });
 
+const AsyncScholarshipV2Page = loadable(() => import("@Pages/ScholarshipV2"), {
+  fallback: <FullPageLoader />,
+});
+
 const AsyncIndexPage = loadable(() => import("@Pages/Index"), {
   fallback: <FullPageLoader />,
 });
@@ -58,6 +62,11 @@ const routes: RouteConfig[] = [
         path: "/career-v2",
         exact: true,
         component: AsyncCareerV2Page,
+      },
+      {
+        path: "/scholarship-v2",
+        exact: true,
+        component: AsyncScholarshipV2Page,
       },
       {
         path: "/",

@@ -1,0 +1,126 @@
+// Chip size; the rule sits on its vertical centre.
+$chip: 28px;
+
+.section {
+  align-items: center;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 88px 80px;
+  width: 100%;
+}
+
+.inner {
+  max-width: 1280px;
+  width: 100%;
+}
+
+.head {
+  display: flex;
+  justify-content: center;
+}
+
+.heading {
+  color: #202020;
+  font-size: 40px;
+  font-weight: 550;
+  letter-spacing: -0.72px;
+  line-height: 48px;
+  margin: 0;
+  text-align: center;
+}
+
+// Second line drops back, matching the two-tone headings elsewhere on the page.
+.headingMuted {
+  color: #9ca3af;
+}
+
+.rail {
+  margin-top: 96px;
+  position: relative;
+  width: 100%;
+}
+
+// Track across the full rail, aligned to the chips' centre line.
+.rule {
+  background: #e5e7eb;
+  display: block;
+  height: 1px;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: ($chip * 0.5) - 0.5px;
+}
+
+// Progress. scaleX from the left edge keeps the scroll handler on the compositor
+// — it never touches layout. Starts at 0; without JS only the grey track shows.
+.ruleFill {
+  background: #111928;
+  display: block;
+  height: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  width: 100%;
+}
+
+.cols {
+  display: grid;
+  gap: 32px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  position: relative;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+}
+
+// Sits on the rule, opaque so the track appears to pass behind it.
+.chip {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #202020;
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 500;
+  height: $chip;
+  justify-content: center;
+  // Above the rule.
+  position: relative;
+  transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  width: $chip;
+}
+
+// Reached: fills to match the rule's dark progress.
+.chipActive {
+  background: #111928;
+  border-color: #111928;
+  color: #fff;
+}
+
+.colTitle {
+  color: #202020;
+  font-size: 16px;
+  font-weight: 550;
+  letter-spacing: -0.16px;
+  line-height: 24px;
+  margin-top: 24px;
+}
+
+.colText {
+  color: #636363;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 22px;
+  margin-top: 12px;
+  // Keeps the sentence off the neighbouring column.
+  max-width: 340px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip {
+    transition: none;
+  }
+}

@@ -1,0 +1,96 @@
+// Metrics shared with the other v2 heroes (AboutUsV2 / ContactUsV2 /
+// HowItWorksV2) so all four pages open on the same rhythm. The hero itself is
+// white — the photographic backdrop band belongs to the creator rail below.
+.hero {
+  align-items: center;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  // Top padding matches the other v2 heroes. The CTA-to-rail breathing room now
+  // lives entirely in the rail's top padding instead, so the backdrop band can
+  // reach further up behind the cards without shifting them.
+  padding: 56px 80px 21px;
+  width: 100%;
+}
+
+.header {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  // No flex gap — the ONLY title→subtitle spacing is the explicit 20px margin
+  // on the subtitle below, so the rendered gap is exactly 20px with nothing added.
+  gap: 0;
+  max-width: 880px;
+  text-align: center;
+}
+
+.title {
+  color: #202020;
+  font-size: 52px;
+  font-weight: 550;
+  letter-spacing: -1.04px;
+  line-height: 56px;
+  margin: 0;
+  max-width: 813px;
+  text-align: center;
+}
+
+// "$50,000" is set bold within the heading.
+.amount {
+  font-weight: 700;
+}
+
+.subtitle {
+  color: #636363;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.5;
+  // The single, explicit title→subtitle gap.
+  margin-top: 20px;
+  // Wide enough for the sentence to sit on one line at desktop; it still wraps
+  // rather than overflowing on narrower viewports.
+  max-width: 720px;
+}
+
+// The button itself is the navbar's .tryButton class (see Hero.tsx) — this only
+// positions it.
+// Deadline notice under the CTA. Kept quiet — muted greys at 13px, with the same
+// dot separator the winner cards and feature caption use.
+.note {
+  align-items: center;
+  color: #9ca3af;
+  display: flex;
+  font-size: 13px;
+  font-weight: 400;
+  gap: 8px;
+  justify-content: center;
+  line-height: 18px;
+  margin: 16px 0 0;
+}
+
+.noteLabel {
+  color: #636363;
+  font-weight: 550;
+}
+
+.noteDot {
+  background: #d1d5db;
+  border-radius: 50%;
+  flex-shrink: 0;
+  height: 3px;
+  width: 3px;
+}
+
+.ctaRow {
+  display: flex;
+  justify-content: center;
+  // Figma: 20px from the text block down to the button.
+  margin-top: 20px;
+
+  // .tryButton carries margin-left: 8px to space it from the navbar links, which
+  // would nudge it off-centre here. Class + element beats the single class, so
+  // this wins regardless of stylesheet order.
+  > a {
+    margin-left: 0;
+  }
+}
