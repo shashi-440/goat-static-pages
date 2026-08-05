@@ -1,0 +1,170 @@
+.section {
+  align-items: center;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  // 96px of air above the quote so it doesn't sit flush under the hero image.
+  padding: 96px 200px 80px;
+  width: 100%;
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  width: 100%;
+}
+
+.quoteWrap {
+  margin: 0;
+}
+
+// Figma sets this quote over 5 lines at 36px/1.5 (= 270px). The measure is
+// capped so the wrap matches rather than running the full 1112px container.
+.quote {
+  font-size: 36px;
+  font-weight: 450;
+  line-height: 1.5;
+  margin: 0 auto;
+  max-width: 940px;
+  text-align: center;
+
+  // Read-along ramp endpoints: faint grey → the Figma quote colour.
+  --dim: #{$neutral3};
+  --full: #{$neutral8};
+}
+
+.attribution {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: center;
+}
+
+// Founder portrait with the sunglasses-drop hover (from the avatar-hover
+// snippet). Two stacked layers in one round frame: the face NEVER moves, only
+// the shades animate — animating the face would visibly shift it, since the
+// face art and shades are separate images.
+.avatar {
+  // Registration nudges — the shades are baked on the same square grid as the
+  // portrait, so they scale with it; adjust only if the portrait is swapped.
+  --av-shade-x: 0px;
+  --av-shade-y: 0px;
+
+  // Motion tuning.
+  --av-dur-in: 300ms;
+  --av-dur-out: 200ms;
+  --av-drop: -14%; // how far above the face they start
+  --av-tilt: -7deg; // cant while descending; levels out at rest
+
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  // Square portrait (was a 50% circle) — the source art is already square, so
+  // this just stops masking its corners. Small radius to match the page's other
+  // rounded surfaces rather than a hard 90-degree corner.
+  border-radius: 8px;
+  display: block;
+  height: 90px;
+  image-rendering: -webkit-optimize-contrast;
+  overflow: hidden; // hides the shades until they drop in
+  position: relative;
+  width: 90px;
+}
+
+.shades {
+  background-image: var(--av-shades);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  image-rendering: pixelated; // keeps the 1-bit texture crisp
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  transform: translate(var(--av-shade-x), calc(var(--av-drop) + var(--av-shade-y)))
+    rotate(var(--av-tilt));
+  transform-origin: 56% 40%; // pivot at the bridge of the nose
+  transition: opacity var(--av-dur-out) cubic-bezier(0.4, 0, 0.6, 1),
+    transform var(--av-dur-out) cubic-bezier(0.4, 0, 0.6, 1);
+  will-change: transform, opacity;
+}
+
+.avatar:hover .shades,
+.avatar:focus-visible .shades {
+  opacity: 1;
+  transform: translate(var(--av-shade-x), var(--av-shade-y)) rotate(0deg);
+  transition: opacity calc(var(--av-dur-in) * 0.4) linear,
+    transform var(--av-dur-in) cubic-bezier(0.16, 1.02, 0.3, 1);
+}
+
+// Accessibility: keep the shades, drop the travel.
+@media (prefers-reduced-motion: reduce) {
+  .shades,
+  .avatar:hover .shades,
+  .avatar:focus-visible .shades {
+    transform: translate(var(--av-shade-x), var(--av-shade-y)) !important;
+    transition: opacity 120ms linear !important;
+  }
+}
+
+// Brand-pink ink revealed through the signature artwork (Figma mask group).
+.signature {
+  background: #d9004c;
+  display: block;
+  height: 41px;
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+  width: 180px;
+  -webkit-mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+}
+
+.role {
+  color: #636363;
+  font-size: 16px;
+  font-weight: 450;
+  line-height: 20px;
+  margin: 0;
+}
+
+.divider {
+  background: $neutral2;
+  border: 0;
+  height: 1px;
+  margin: 0;
+  width: 100%;
+}
+
+.stats {
+  display: flex;
+  width: 100%;
+}
+
+.stat {
+  align-items: center;
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  gap: 4px;
+  justify-content: center;
+  min-width: 0;
+  padding: 16px;
+}
+
+.statValue {
+  color: #202020;
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  line-height: 36px;
+}
+
+.statLabel {
+  color: #636363;
+  font-size: 16px;
+  font-weight: 450;
+  line-height: 20px;
+}

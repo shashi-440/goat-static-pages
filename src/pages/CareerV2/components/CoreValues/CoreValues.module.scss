@@ -1,0 +1,111 @@
+.section {
+  align-items: center;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 0 80px 80px;
+  width: 100%;
+}
+
+.heading {
+  color: #202020;
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -0.72px;
+  line-height: 40px;
+  margin: 0;
+  // Figma Section Header 2665:13604 is 168 tall: 80 above + 40 text + 48 below.
+  padding: 80px 0 48px;
+  text-align: center;
+  width: 100%;
+
+  // Fades in with the first card.
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.headingShown {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.grid {
+  display: flex;
+  gap: 24px;
+  width: 100%;
+}
+
+.card {
+  align-items: flex-start;
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+  padding: 24px;
+  position: relative;
+
+  // Entrance — each card fades and rises as `revealed` reaches it, giving the
+  // one-by-one appearance. The stagger is timed in CoreValues.tsx, not here, so
+  // each card's icon animation can be fired at the same moment.
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+
+  // Hairline divider between cards (Figma Line 609/610/611).
+  & + .card::before {
+    background: $neutral2;
+    content: "";
+    inset: 0 auto 0 -24px;
+    position: absolute;
+    width: 1px;
+  }
+}
+
+.cardShown {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heading,
+  .card {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+.icon {
+  display: block;
+  height: 32px;
+  width: 32px;
+}
+
+// Figma 2665:13611 fixes this text column at 254px, which is what makes the
+// longest value wrap to 5 lines (card 218 tall).
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 254px;
+  width: 100%;
+}
+
+.cardTitle {
+  color: $neutral9;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 24px;
+  margin: 0;
+}
+
+.cardBody {
+  color: $neutral6;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18px;
+  margin: 0;
+}
