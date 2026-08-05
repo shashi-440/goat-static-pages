@@ -1,0 +1,78 @@
+.controls {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.dots {
+  align-items: center;
+  border-radius: 999px;
+  display: flex;
+  gap: 8px;
+  height: 40px;
+  padding: 0 28px;
+}
+
+.dot {
+  background: #8e8e8e;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  height: 8px;
+  padding: 0;
+  transition: width 0.28s ease, background-color 0.28s ease;
+  width: 8px;
+}
+
+// Active dot stretches into a pill (Figma 2665:13592 / 2675:16201).
+.dotActive {
+  background: #202020;
+  width: 24px;
+}
+
+.arrow {
+  align-items: center;
+  border: 0;
+  border-radius: 999px;
+  color: #202020;
+  cursor: pointer;
+  display: flex;
+  height: 40px;
+  justify-content: center;
+  padding: 0;
+  transition: transform 0.18s ease, background-color 0.18s ease;
+  width: 40px;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+
+.dark {
+  .dots {
+    background: #f7f7f7;
+  }
+
+  .arrow {
+    background: #f0f0f0;
+
+    &:hover {
+      background: #fff;
+    }
+  }
+}
+
+.light {
+  .dots {
+    background: #fff;
+  }
+
+  .arrow {
+    background: #fff;
+
+    &:hover {
+      background: #f0f0f0;
+    }
+  }
+}

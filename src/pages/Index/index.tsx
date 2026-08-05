@@ -10,6 +10,8 @@ const PAGES = [
   { path: "/about-us-v2", title: "About Us", note: "ported from about-us-page-revamp" },
   { path: "/contact-us-v2", title: "Contact Us", note: "built in this sandbox" },
   { path: "/how-it-works-v2", title: "How It Works", note: "hero + three-step progress rail" },
+  { path: "/career-v2", title: "Careers", note: "built from the Career Page Cleanup Figma" },
+  { path: "/career-v3", title: "Careers v3", note: "new copy deck: origin story, world map, teams" },
   { path: "/scholarship-v2", title: "amberscholar", note: "built from Figma 2095:3370" },
 ];
 

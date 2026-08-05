@@ -1,0 +1,133 @@
+.section {
+  align-items: center;
+  background: #151515;
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+  padding: 80px;
+  width: 100%;
+}
+
+.header {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.title {
+  color: #fff;
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -0.72px;
+  line-height: 40px;
+  margin: 0;
+  text-align: center;
+}
+
+.subtitle {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -0.72px;
+  line-height: 40px;
+  margin: 0;
+  text-align: center;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  width: 100%;
+}
+
+.grid {
+  align-items: stretch;
+  display: flex;
+  width: 100%;
+}
+
+.titles {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  justify-content: center;
+  list-style: none;
+  margin: 0;
+  padding: 0 24px 0 0;
+  width: 457px;
+}
+
+.titleButton {
+  background: none;
+  border: 0;
+  color: $neutral5;
+  cursor: pointer;
+  display: block;
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  line-height: 36px;
+  padding: 0;
+  text-align: left;
+  transition: color 0.24s ease;
+  width: 100%;
+
+  &:hover {
+    color: $neutral3;
+  }
+}
+
+.titleActive,
+.titleActive:hover {
+  color: #fff;
+}
+
+.mediaColumn {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 40px;
+  width: 438px;
+}
+
+.media {
+  background: #f0f0f0;
+  border-radius: 16px;
+  height: 501px;
+  overflow: hidden;
+  width: 358px;
+}
+
+.image {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.copy {
+  align-items: flex-start;
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  gap: 24px;
+  justify-content: center;
+  min-width: 0;
+  padding: 40px 0 40px 24px;
+}
+
+.copyText {
+  color: $neutral3;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  margin: 0;
+  max-width: 346px;
+}
+
+.copyLead {
+  color: #f7f7f7;
+  font-weight: 600;
+}

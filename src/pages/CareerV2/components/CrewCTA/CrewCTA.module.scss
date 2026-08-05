@@ -1,0 +1,161 @@
+// Picks up exactly where Team's gradient ends (#0a0a0a) and keeps descending to
+// black, so the two sections read as one continuous fade rather than a flat
+// band butted against a gradient. AboutUsV2 uses a flat #0a0a0a here because
+// nothing gradients into it there.
+.section {
+  align-items: center;
+  background: linear-gradient(180deg, #0a0a0a 0%, #050505 55%, #000 100%);
+  display: flex;
+  flex-direction: column;
+  padding: 80px 120px;
+  width: 100%;
+}
+
+.avatars {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+.avatar {
+  border-radius: 999px;
+  flex-shrink: 0;
+  overflow: hidden;
+  // Needed so the stacking order below (outer behind inner) takes effect.
+  position: relative;
+}
+
+// Fan stacking: centre on top, each avatar going outward sits BEHIND the one
+// closer to the centre (on both sides).
+.left1,
+.right1 {
+  z-index: 1;
+}
+
+.left2,
+.right2 {
+  z-index: 0;
+}
+
+.avatarSmall {
+  height: 84px;
+  width: 84px;
+}
+
+.avatarMedium {
+  height: 90px;
+  width: 90px;
+
+  // Overlap neighbouring avatars
+  margin: 0 -20px;
+}
+
+// Center avatar — larger plain circle. No pink ring, matching AboutUsV2.
+.avatarCenter {
+  align-items: center;
+  border-radius: 999px;
+  display: flex;
+  flex-shrink: 0;
+  height: 123px;
+  justify-content: center;
+  margin: 0 -12px;
+  overflow: hidden;
+  position: relative;
+  width: 123px;
+  z-index: 2;
+}
+
+.avatarImage {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+// ---- Entrance: centre appears first, sides fan out left & right, staggered ----
+.center,
+.side {
+  opacity: 0;
+  transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+// Initial (collapsed toward centre) states.
+.center {
+  transform: scale(0.4);
+}
+
+.side {
+  // Sides start pulled in behind the centre; they slide out to their spots.
+  &.left1 {
+    transform: translateX(60px) scale(0.6);
+  }
+  &.left2 {
+    transform: translateX(130px) scale(0.6);
+  }
+  &.right1 {
+    transform: translateX(-60px) scale(0.6);
+  }
+  &.right2 {
+    transform: translateX(-130px) scale(0.6);
+  }
+}
+
+// Revealed state — everything eases to its natural position, staggered outward.
+.avatarsShown {
+  .center {
+    opacity: 1;
+    transform: scale(1);
+    transition-delay: 0ms;
+  }
+
+  .left1,
+  .right1 {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    transition-delay: 160ms;
+  }
+
+  .left2,
+  .right2 {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    transition-delay: 300ms;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .center,
+  .side {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+.copy {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.heading {
+  color: #fff;
+  font-size: 52px;
+  font-weight: 550;
+  letter-spacing: -1.04px;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.subtitle {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.5;
+  margin: 0;
+  max-width: 488px;
+}

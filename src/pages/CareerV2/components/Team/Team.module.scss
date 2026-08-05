@@ -1,0 +1,376 @@
+// White → near-black gradient that hands off seamlessly to CrewCTA below.
+//
+// The final stop is #0a0a0a — the exact colour CrewCTA's gradient starts from.
+// Ending at #000 instead left the page getting *lighter* across the boundary
+// (rgb 3 → rgb 10), which reads as a hard line however subtle the values are.
+.section {
+  align-items: center;
+  background: linear-gradient(
+    180deg,
+    #fff 0%,
+    #d2d2d2 36.194%,
+    #3d3d3d 74.324%,
+    #1a1a1a 88.556%,
+    #0a0a0a 100%
+  );
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+  padding: 80px;
+  width: 100%;
+}
+
+.header {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+.title {
+  color: $neutral9;
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -0.72px;
+  line-height: 40px;
+  margin: 0;
+  text-align: center;
+}
+
+.subtitle {
+  color: $neutral6;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.5;
+  margin: 0;
+  text-align: center;
+}
+
+// Carousel viewport clips the track horizontally; the track slides ONE card per
+// click. Clipping must be x-only: the hover tilt rotates a card in 3D so it
+// extends past its own box, and `overflow: hidden` would slice the near edge
+// flat. `clip` (not `hidden`) on x plus `visible` on y keeps the horizontal
+// clip without scrolling, and the padding gives the tilt room to lean into.
+.viewport {
+  overflow-x: clip;
+  overflow-y: visible;
+  // Room for the tilted card to overhang without being cut.
+  padding: 40px 0;
+  margin: -40px 0;
+  width: 100%;
+}
+
+.track {
+  --per-view: 3;
+  --gap: 24px;
+
+  display: flex;
+  gap: var(--gap);
+  // Track box == viewport width, so `100%` in the inline translateX resolves to
+  // one viewport; the step of `(100% + gap) / per-view` advances one card.
+  transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1);
+  width: 100%;
+  will-change: transform;
+}
+
+// ---- Flip card: vertical (X-axis) flip, same as AboutUsV2 WhyAmberExists ----
+.flipCard {
+  --tilt-x: 0deg; // set by JS from the cursor's vertical position
+
+  // Square cards, `per-view` of them filling the viewport with the gaps.
+  aspect-ratio: 1 / 1;
+  flex: 0 0 calc((100% - (var(--per-view) - 1) * var(--gap)) / var(--per-view));
+  min-width: 0;
+  // Perspective lives on this PARENT so it applies to the tilt below.
+  perspective: 1000px;
+}
+
+// Separate from `.flipInner` so the cursor tilt never interferes with the
+// flip's 0.7s timing — the close (x) stays as smooth as the open (+).
+.tilt {
+  height: 100%;
+  transform: rotateX(var(--tilt-x));
+  transform-style: preserve-3d;
+  transition: transform 0.12s ease-out;
+  width: 100%;
+}
+
+.flipInner {
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  // Smooth, weighty flip.
+  transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
+  width: 100%;
+}
+
+.isFlipped {
+  transform: rotateX(180deg);
+}
+
+.face {
+  backface-visibility: hidden;
+  border-radius: 24px;
+  height: 100%;
+  inset: 0;
+  overflow: hidden;
+  position: absolute;
+  width: 100%;
+
+  // `overflow: hidden` alone does NOT reliably clip children inside a
+  // `preserve-3d` ancestor — corners of the photo and the name-plate scrim leak
+  // past the rounded edge. A clip-path is applied in the same geometry and IS
+  // honoured in a 3D context, so the radius holds on all four corners.
+  clip-path: inset(0 round 24px);
+}
+
+.front {
+  background: #000;
+}
+
+// Figma 2675:16173 — white card, dark quote, pink signature, dark close button.
+.back {
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px;
+  transform: rotateX(180deg);
+}
+
+.photo {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+// Bottom fade so the white name plate stays legible over any portrait.
+.scrim {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0) 75.145%,
+    rgba(0, 0, 0, 0.8) 85.521%,
+    #000 100%
+  );
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.plate {
+  align-items: center;
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  left: 0;
+  padding: 24px;
+  position: absolute;
+  right: 0;
+}
+
+.identity {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  min-width: 0;
+}
+
+.flag {
+  border-radius: 999px;
+  display: block;
+  flex-shrink: 0;
+  height: 36px;
+  width: 36px;
+}
+
+.names {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  justify-content: center;
+  min-width: 0;
+}
+
+.name {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.role {
+  color: $neutral1;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: -0.14px;
+  line-height: 1.2;
+  margin: 0;
+}
+
+// ---- Toggle button: same +/x treatment as AboutUsV2's flip cards ----
+.toggle {
+  align-items: center;
+  background: #222;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  display: flex;
+  flex-shrink: 0;
+  height: 40px;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.2s ease;
+  width: 40px;
+
+  &:hover {
+    background: $neutral5; // grey on hover
+  }
+}
+
+.plus {
+  display: block;
+  height: 16px;
+  position: relative;
+  width: 16px;
+
+  &::before,
+  &::after {
+    background: #fff;
+    border-radius: 1px;
+    content: "";
+    height: 2.5px;
+    left: 0;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+  }
+
+  // Vertical bar.
+  &::after {
+    transform: translateY(-50%) rotate(90deg);
+  }
+}
+
+.cross {
+  display: block;
+  height: 16px;
+  position: relative;
+  width: 16px;
+
+  &::before,
+  &::after {
+    background: #fff;
+    border-radius: 1px;
+    content: "";
+    height: 2.5px;
+    left: 0;
+    position: absolute;
+    top: 50%;
+    width: 16px;
+  }
+
+  &::before {
+    transform: translateY(-50%) rotate(45deg);
+  }
+
+  &::after {
+    transform: translateY(-50%) rotate(-45deg);
+  }
+}
+
+// ---- Flipped (testimonial) face ----
+.quoteBody {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.quoteText {
+  color: $neutral7;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: -0.26px;
+  line-height: 1.4;
+  margin: 0;
+}
+
+// Figma 2675:16178 sets this 186px wide. Height follows the trimmed artwork's
+// 600x190 ratio so the ink fills the box instead of floating in whitespace.
+.quoteSignature {
+  display: block;
+  height: auto;
+  object-fit: contain;
+  object-position: left;
+  width: 186px;
+}
+
+.quoteFooter {
+  display: flex;
+  justify-content: flex-end;
+}
+
+// ---- Carousel controls (AboutUsV2 Amber Story treatment) ----
+.controls {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.dots {
+  align-items: center;
+  background: #f7f7f7;
+  border-radius: 999px;
+  display: flex;
+  gap: 8px;
+  height: 40px;
+  padding: 0 28px;
+}
+
+.dot {
+  background: #8e8e8e;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  height: 8px;
+  padding: 0;
+  transition: width 0.2s ease, background 0.2s ease;
+  width: 8px;
+}
+
+.dotActive {
+  background: #202020;
+  width: 24px;
+}
+
+.navButton {
+  align-items: center;
+  background: #f0f0f0;
+  border: 0;
+  border-radius: 999px;
+  color: #202020;
+  cursor: pointer;
+  display: flex;
+  height: 40px;
+  justify-content: center;
+  padding: 0;
+  transition: opacity 0.2s ease;
+  width: 40px;
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tilt,
+  .flipInner,
+  .track {
+    transition: none;
+  }
+}
