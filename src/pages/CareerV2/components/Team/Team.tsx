@@ -6,11 +6,17 @@ import styles from "./Team.module.scss";
 import harshalImg from "../../assets/team-harshal.jpg";
 import davidImg from "../../assets/team-david.jpg";
 import bhanuImg from "../../assets/team-bhanu.jpg";
+import mernaImg from "../../assets/team-merna.jpg";
+import danImg from "../../assets/team-dan.jpg";
+import solomonImg from "../../assets/team-solomon.jpg";
 import signatureImg from "../../assets/quote-signature.png";
 // Flattened PNG exports — Figma exports these flags as separate layer SVGs
 // (base circle, bands, chakra), so a single SVG is only ever one layer.
 import indiaFlag from "../../assets/flag-india.png";
 import ukFlag from "../../assets/flag-uk.png";
+import egyptFlag from "../../assets/flag-egypt.png";
+import singaporeFlag from "../../assets/flag-singapore.png";
+import nigeriaFlag from "../../assets/flag-nigeria.png";
 
 interface Member {
   name: string;
@@ -41,6 +47,15 @@ const MEMBERS: Member[] = [
       "“ The pace here is unlike anywhere I've worked. Decisions happen in days, not quarters, and you can see your work reach students almost immediately.",
   },
   {
+    name: "Merna Abdo",
+    role: "Business development Manager",
+    photo: mernaImg,
+    flag: egyptFlag,
+    country: "Egypt",
+    quote:
+      "“ I work with partners across different markets, and no two conversations are alike. You learn to listen first and build from what people actually need.",
+  },
+  {
     name: "Bhanu Majajan",
     role: "Director of Supply",
     photo: bhanuImg,
@@ -49,73 +64,23 @@ const MEMBERS: Member[] = [
     quote:
       "“ We're building in 80+ countries at once, which means every problem is new. That's exactly what makes it worth solving.",
   },
-  // --- PLACEHOLDER ROSTER -------------------------------------------------
-  // Figma only supplies three portraits, so these seven reuse them in rotation
-  // and their names / roles / quotes are written copy, not supplied content.
-  // Replace the photo + text as each real profile lands; the card needs nothing
-  // else. See "Two things worth knowing" in the README.
   {
-    name: "Priya Raghavan",
-    role: "VP of Engineering",
-    photo: davidImg,
-    flag: indiaFlag,
-    country: "India",
+    name: "Dan Teo",
+    role: "Global Operations Leader",
+    photo: danImg,
+    flag: singaporeFlag,
+    country: "Singapore",
     quote:
-      "“ We ship to students in 80+ countries, so nothing is theoretical here. You feel the impact of a release the same week you write it.",
+      "“ Running operations across time zones means the handover never really stops. It takes a team that trusts each other to make that feel effortless.",
   },
   {
-    name: "Tom Whitfield",
-    role: "Head of Partnerships",
-    photo: harshalImg,
-    flag: ukFlag,
-    country: "United Kingdom",
+    name: "Solomon Ajibode",
+    role: "Business Development Manager",
+    photo: solomonImg,
+    flag: nigeriaFlag,
+    country: "Nigeria",
     quote:
-      "“ Universities do not partner with a logo, they partner with people. Being trusted to build those relationships directly is the whole job.",
-  },
-  {
-    name: "Ananya Desai",
-    role: "Director of Design",
-    photo: bhanuImg,
-    flag: indiaFlag,
-    country: "India",
-    quote:
-      "“ Design here is not decoration. You are shaping the first thing a nervous student sees when they are moving to a country they have never visited.",
-  },
-  {
-    name: "Marcus Bell",
-    role: "Head of Student Experience",
-    photo: davidImg,
-    flag: ukFlag,
-    country: "United Kingdom",
-    quote:
-      "“ Every escalation is somebody's move-in week. That keeps the team honest about what actually matters.",
-  },
-  {
-    name: "Neha Kulkarni",
-    role: "Director of Operations",
-    photo: harshalImg,
-    flag: indiaFlag,
-    country: "India",
-    quote:
-      "“ Operations at this scale is a puzzle that changes every intake season. I have never once been bored.",
-  },
-  {
-    name: "Rohan Iyer",
-    role: "Head of Data",
-    photo: bhanuImg,
-    flag: indiaFlag,
-    country: "India",
-    quote:
-      "“ We have data on millions of student journeys. Turning that into a better first week for someone is the most satisfying part.",
-  },
-  {
-    name: "Sarah Ellison",
-    role: "Head of Brand",
-    photo: davidImg,
-    flag: ukFlag,
-    country: "United Kingdom",
-    quote:
-      "“ We get to build a brand students genuinely trust with one of the biggest decisions of their lives. That is rare.",
+      "“ Opening up a new market is equal parts research and relationships. Getting to do both, and to own the outcome, is why I stayed.",
   },
 ];
 
@@ -126,6 +91,10 @@ const MAX_TILT = 12;
 // Cards visible at once; the track slides ONE card per click, matching
 // AboutUsV2's Amber Story carousel.
 const PER_VIEW = 3;
+
+// Most dots the control row will ever show. Beyond this the dots window rather
+// than the row growing — matches the five-dot control in the Figma designs.
+const MAX_DOTS = 5;
 
 interface MemberCardProps {
   member: Member;
@@ -235,8 +204,24 @@ const Team = () => {
   const goPrev = () => setIndex((prev) => Math.max(0, prev - 1));
   const goNext = () => setIndex((prev) => Math.min(maxIndex, prev + 1));
 
+  // One dot per scroll position, capped at MAX_DOTS. Past the cap the dots become
+  // a sliding window centred on the active position (iOS page-indicator style) so
+  // the row stays a fixed width and every position is still reachable. Below the
+  // cap the row is simply as wide as there are positions — no filler, so the dots
+  // never imply more content than exists.
+  const positions = maxIndex + 1;
+  const dotCount = Math.min(positions, MAX_DOTS);
+  const dotStart = Math.max(0, Math.min(index - Math.floor(dotCount / 2), positions - dotCount));
+
   return (
     <section className={styles.section}>
+      {/* The section background is a gradient — white at the top, near black at the
+          bottom — so the section as a whole cannot carry data-nav-theme="dark" or
+          the header would flip while still over the white part. This zero-impact
+          marker covers the section from the portrait cards down, which is what the
+          shared Navbar detects. */}
+      <div className={styles.darkZone} data-nav-theme="dark" aria-hidden="true" />
+
       <Reveal className={styles.header}>
         <h2 className={styles.title}>Meet the People Behind Amber</h2>
         <p className={styles.subtitle}>The people behind our vision, culture and growth.</p>
@@ -258,17 +243,19 @@ const Team = () => {
 
       <div className={styles.controls}>
         <div className={styles.dots}>
-          {Array.from({ length: maxIndex + 1 }).map((_, i) => (
-            <button
-              // eslint-disable-next-line react/no-array-index-key
-              key={i}
-              type="button"
-              className={`${styles.dot} ${i === index ? styles.dotActive : ""}`}
-              onClick={() => setIndex(i)}
-              aria-label={`Go to position ${i + 1}`}
-              aria-current={i === index}
-            />
-          ))}
+          {Array.from({ length: dotCount }).map((_, n) => {
+            const i = dotStart + n;
+            return (
+              <button
+                key={i}
+                type="button"
+                className={`${styles.dot} ${i === index ? styles.dotActive : ""}`}
+                onClick={() => setIndex(i)}
+                aria-label={`Go to position ${i + 1}`}
+                aria-current={i === index}
+              />
+            );
+          })}
         </div>
         <button
           type="button"

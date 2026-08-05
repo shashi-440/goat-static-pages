@@ -131,3 +131,39 @@
     color: #fff !important;
   }
 }
+
+// Secondary treatment — soft grey fill, dark text. Applied only while the page
+// is unscrolled on pages that opt in via `ctaSecondaryUntilScroll`; scrolling
+// drops this class so the pink primary above takes over.
+// `background-image: none` is required to cancel the gradient (a plain
+// `background` shorthand would not override `background-image`).
+.tryButtonSecondary {
+  background-image: none;
+  background-color: rgba(17, 25, 40, 0.06);
+  // Matches .link colour, and needs !important for the same reason as above:
+  // the global `a:hover` rule would otherwise turn the label red.
+  color: #111928 !important;
+  transition: background-color 0.2s ease, color 0.35s ease;
+
+  &:hover,
+  &:active,
+  &:focus {
+    background-image: none;
+    background-color: rgba(17, 25, 40, 0.1);
+    color: #111928 !important;
+  }
+}
+
+// Over a dark section the grey fill and dark text would both disappear, so
+// lighten them the same way `.onDark .link` does.
+.onDark .tryButtonSecondary {
+  background-color: rgba(255, 255, 255, 0.16);
+  color: #fff !important;
+
+  &:hover,
+  &:active,
+  &:focus {
+    background-color: rgba(255, 255, 255, 0.24);
+    color: #fff !important;
+  }
+}

@@ -4,7 +4,15 @@
   // the whole page so it stays scoped here (site default is unchanged).
   font-family: "Instrument Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
     Arial, sans-serif;
-  overflow-x: hidden;
+  // `clip`, NOT `hidden`: with `overflow-x: hidden` the spec forces the other
+  // axis to compute to `auto`, which makes this a scroll container and clips
+  // children vertically — that sliced the top and bottom off the Team cards when
+  // their 3D hover tilt overhung the card box. `clip` suppresses horizontal
+  // overflow without creating a scrollport, so vertical overhang stays visible.
+  // This also absorbs the Team carousel's now-unclipped off-track cards: they are
+  // cut at the page edge (far from the three in view, so no corner shaving) rather
+  // than pushing out a horizontal scrollbar.
+  overflow-x: clip;
   // Clear the fixed (64px) navbar so content doesn't hide behind it.
   padding-top: 64px;
   width: 100%;

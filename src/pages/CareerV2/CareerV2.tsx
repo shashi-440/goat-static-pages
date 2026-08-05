@@ -29,7 +29,17 @@ const CareerV2 = () => (
       />
     </Helmet>
 
-    <Navbar />
+    {/* "Career" is dropped from the links here — this *is* the career page — and
+        the CTA becomes "Apply now", secondary until the page is scrolled. */}
+    <Navbar
+      links={[
+        { label: "Blogs", href: "/blog" },
+        { label: "About Us", href: "/about-us-v2" },
+      ]}
+      ctaLabel="Apply now"
+      ctaHref="#open-roles"
+      ctaSecondaryUntilScroll
+    />
     <Hero />
     <Mission />
     <Benefits />

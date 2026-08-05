@@ -4,11 +4,12 @@ import styles from "./RolesButton.module.scss";
 
 interface RolesButtonProps {
   /**
-   * `raised` — the hero's large dark gradient pill (Figma 2671:15547).
+   * `primary` — the hero's rounded pink pill, matching the header CTA.
+   * `raised` — the older dark extruded pill (Figma 2671:15547), kept for v3.
    * `light` — the small light pill on the Benefits band (Figma 2665:13587).
    * `solid` — the white pill matching AboutUsV2's CrewCTA button.
    */
-  variant?: "raised" | "light" | "solid";
+  variant?: "primary" | "raised" | "light" | "solid";
 }
 
 /**

@@ -4,8 +4,8 @@ import wrapperHOC from "@Utils/wrapperHOC";
 import Reveal from "../../../AboutUsV2/components/Reveal/Reveal";
 import RolesButton from "../RolesButton/RolesButton";
 import styles from "./Hero.module.scss";
-// 2400x1350 (16:9) JPEG — the hero goes full-bleed at 100vw before shrinking,
-// so it needs the extra width; JPEG keeps it at 428KB instead of 2.9MB.
+// 2432x1368 (16:9) JPEG — the hero goes full-bleed at 100vw before shrinking,
+// so it needs the extra width; JPEG keeps it at 767KB instead of 6MB.
 import heroImg from "../../assets/hero.jpg";
 
 // Distance (px) over which the hero image eases from full-bleed to contained.
@@ -58,7 +58,7 @@ const Hero = () => {
           Build the future of student living
         </Reveal>
         <Reveal delay={120} className={styles.cta}>
-          <RolesButton variant="raised" />
+          <RolesButton variant="primary" />
         </Reveal>
       </div>
 

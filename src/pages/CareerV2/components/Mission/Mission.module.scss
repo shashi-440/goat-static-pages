@@ -19,14 +19,17 @@
   margin: 0;
 }
 
-// Figma sets this quote over 5 lines at 36px/1.5 (= 270px). The measure is
-// capped so the wrap matches rather than running the full 1112px container.
+// Figma set the original (shorter) quote over 5 lines at 36px/1.5 in a 940px
+// measure. This founder story is ~1.9x longer, which would run to ~9 lines at
+// that size. Dropping to 28px and letting it use the full 1112px container puts
+// it at ~6 lines / ~245px — close to the original block proportions, and 28px is
+// still a display size rather than body copy.
 .quote {
-  font-size: 36px;
+  font-size: 28px;
   font-weight: 450;
   line-height: 1.5;
   margin: 0 auto;
-  max-width: 940px;
+  max-width: 1112px;
   text-align: center;
 
   // Read-along ramp endpoints: faint grey → the Figma quote colour.
@@ -128,43 +131,4 @@
   font-weight: 450;
   line-height: 20px;
   margin: 0;
-}
-
-.divider {
-  background: $neutral2;
-  border: 0;
-  height: 1px;
-  margin: 0;
-  width: 100%;
-}
-
-.stats {
-  display: flex;
-  width: 100%;
-}
-
-.stat {
-  align-items: center;
-  display: flex;
-  flex: 1 0 0;
-  flex-direction: column;
-  gap: 4px;
-  justify-content: center;
-  min-width: 0;
-  padding: 16px;
-}
-
-.statValue {
-  color: #202020;
-  font-size: 30px;
-  font-weight: 600;
-  letter-spacing: -0.3px;
-  line-height: 36px;
-}
-
-.statLabel {
-  color: #636363;
-  font-size: 16px;
-  font-weight: 450;
-  line-height: 20px;
 }
