@@ -4,7 +4,10 @@
   display: flex;
   flex-direction: column;
   // 96px of air above the quote so it doesn't sit flush under the hero image.
-  padding: 96px 200px 80px;
+  // The horizontal inset was a flat 200px, which put this section 120px further
+  // in than every other one and off the Navbar's grid. The gutter now matches the
+  // page; the quote's own max-width keeps its measure from running too wide.
+  padding: 96px var(--page-gutter) 80px;
   width: 100%;
 }
 

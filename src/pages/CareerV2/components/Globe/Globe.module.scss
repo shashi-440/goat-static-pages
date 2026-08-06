@@ -1,0 +1,344 @@
+.section {
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  padding: 80px var(--page-gutter);
+  width: 100%;
+}
+
+.grid {
+  align-items: center;
+  display: flex;
+  gap: 64px;
+  justify-content: space-between;
+  max-width: 1280px;
+  width: 100%;
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  flex: 0 1 488px;
+  min-width: 0;
+}
+
+// Figma specifies 48px/-1.04px here, but every other section title on this page
+// is 40px/-0.72px (see Team, Benefits, CoreValues) — matched to those instead so
+// the page reads as one scale.
+.title {
+  color: $neutral9;
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -0.72px;
+  line-height: 1.2;
+  margin: 0 0 8px;
+}
+
+// Body copy is 18px across this page's sections; Figma's 17px would be the only
+// odd size on the page.
+.lede {
+  color: $neutral6;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 28px;
+  margin: 0 0 32px;
+}
+
+.operateFrom {
+  color: #444;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 20px;
+  margin: 0 0 16px;
+}
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  margin: 0 0 40px;
+  padding: 0;
+}
+
+.pill {
+  background: #f8f8f8;
+  border: 1px solid #e0e0e0;
+  border-radius: 9999px;
+  color: #000;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 20px;
+  padding: 7px 17px 9px;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  white-space: nowrap;
+}
+
+// Hovered / focused pill — reads as the one currently shown on the globe.
+.pillActive {
+  background: #202020;
+  border-color: #202020;
+  color: #fff;
+}
+
+.cta {
+  display: flex;
+}
+
+.globeWrap {
+  cursor: grab;
+  flex: 0 0 auto;
+  position: relative;
+  // Stop the browser turning a drag into a text selection or a scroll gesture.
+  touch-action: none;
+  user-select: none;
+}
+
+.isDragging {
+  cursor: grabbing;
+}
+
+// Holds the pins so the whole layer gets one mouseleave, which is what releases
+// the latched selection when the cursor leaves the globe.
+.pinLayer {
+  inset: 0;
+  position: absolute;
+}
+
+.canvas {
+  // Inline width/height are set from the JS SIZE so the canvas backing store and
+  // the CSS box agree; without that the sphere renders soft.
+  display: block;
+  max-width: 100%;
+}
+
+// ---- Pins ------------------------------------------------------------------
+// HTML buttons positioned each frame from the projected lat/long, so each one is
+// individually hoverable (COBE's own markers are drawn inside the canvas and
+// cannot be). `left`/`top` are the projected point; the translate puts the pin's
+// TIP on it, which is what makes the pin appear to stand on its city.
+.pin {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  height: 30px;
+  padding: 0;
+  position: absolute;
+  transform: translate(-50%, -100%);
+  // Only opacity is eased. Position must NOT be transitioned: it is re-set every
+  // ~32ms from the projection, and a transition would make each pin lag behind
+  // the globe it is supposed to be pinned to.
+  transition: opacity 0.18s linear;
+  width: 22px;
+  z-index: 2;
+}
+
+// Teardrop head — a circle with one corner pulled to a point, so the bottom is a
+// tip rather than a curve. Brand pink, matching the CTA gradient's first stop.
+.pinHead {
+  background: linear-gradient(160deg, #ff5771 0%, #e53762 100%);
+  border-radius: 50% 50% 50% 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.28);
+  display: block;
+  height: 20px;
+  left: 50%;
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%) rotate(-45deg);
+  width: 20px;
+
+  // Inner hole, so the pin reads as a map marker rather than a blob.
+  &::after {
+    background: #fff;
+    border-radius: 50%;
+    content: "";
+    height: 7px;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 7px;
+  }
+}
+
+// The small grounding dot under the tip, as in the reference.
+.pinDot {
+  background: rgba(229, 55, 98, 0.45);
+  border-radius: 50%;
+  bottom: -2px;
+  display: block;
+  height: 7px;
+  left: 50%;
+  position: absolute;
+  transform: translateX(-50%);
+  width: 7px;
+}
+
+.pinActive {
+  z-index: 4;
+
+  .pinHead {
+    box-shadow: 0 3px 10px rgba(229, 55, 98, 0.5);
+    transform: translateX(-50%) rotate(-45deg) scale(1.15);
+  }
+}
+
+// Ripple centred on the pin's tip — a soft pink wash that expands and fades,
+// twice, so the dots immediately around the pin appear to light up and settle.
+// Sits BEHIND the pin head (z-index) and ignores pointer events so it can never
+// interfere with the hover latch.
+.pinRipple {
+  animation: pinRipple 1.6s ease-out infinite;
+  background: radial-gradient(
+    circle,
+    rgba(255, 87, 113, 0.28) 0%,
+    rgba(255, 87, 113, 0.12) 45%,
+    rgba(255, 87, 113, 0) 70%
+  );
+  border-radius: 50%;
+  bottom: -22px;
+  content: "";
+  display: block;
+  height: 48px;
+  left: 50%;
+  pointer-events: none;
+  position: absolute;
+  width: 48px;
+  z-index: -1;
+}
+
+@keyframes pinRipple {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.4);
+  }
+
+  35% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) scale(1.9);
+  }
+}
+
+// ---- Country card: AboutUsV2's postage-stamp cutout ------------------------
+// Anchored to the hovered pin rather than the globe's centre: `left`/`top` are
+// the pin's projected point, and the translate lifts the card fully above it
+// (-100% of its own height, plus clearance for the pin head) so the card sits
+// over the globe with the pin visible beneath — as in the reference.
+.stamp {
+  animation: stampRise 0.28s ease both;
+  height: 216px;
+  pointer-events: none;
+  position: absolute;
+  transform: translate(-50%, calc(-100% - 34px));
+  width: 220px;
+  z-index: 3;
+}
+
+@keyframes stampRise {
+  from {
+    opacity: 0;
+    transform: translate(-50%, calc(-100% - 26px));
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, calc(-100% - 34px));
+  }
+}
+
+.stampCard {
+  animation: stampIn 0.4s cubic-bezier(0.4, 0.1, 0.2, 1) both;
+  display: block;
+  height: 100%;
+  position: relative;
+  width: 100%;
+}
+
+// The perforated frame sits BEHIND the photo so its scalloped white edge shows
+// around it — same layering as TitleStamp.
+.stampFrame {
+  height: 100%;
+  inset: 0;
+  object-fit: contain;
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+}
+
+// The frame SVG's inner opening is inset ~10.6% on every side (rect 29.5,28.7 →
+// 247.1,243.3 within the 277x272 viewBox). Same numbers as TitleStamp.
+.stampWindow {
+  inset: 10.6% 10.7% 10.6% 10.6%;
+  overflow: hidden;
+  position: absolute;
+}
+
+.stampPhoto {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.stampLabel {
+  background: rgba(0, 0, 0, 0.72);
+  border-radius: 999px;
+  bottom: 16%;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  left: 50%;
+  line-height: 16px;
+  padding: 5px 12px;
+  position: absolute;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+@keyframes stampIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92) rotate(-3deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(-2deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stamp,
+  .stampCard,
+  .pinRipple {
+    animation: none;
+    transition: none;
+  }
+
+  // Keep a static halo rather than a pulsing one, so the selected pin is still
+  // distinguishable without motion.
+  .pinRipple {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.2);
+  }
+
+  // `animation: none` drops the keyframe's transform with it, so restate the
+  // resting offset or the card would sit on top of its pin instead of above it.
+  .stamp {
+    opacity: 1;
+    transform: translate(-50%, calc(-100% - 34px));
+  }
+}
+
+.preload {
+  height: 0;
+  left: -9999px;
+  overflow: hidden;
+  position: absolute;
+  width: 0;
+}

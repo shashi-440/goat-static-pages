@@ -76,6 +76,30 @@
   }
 }
 
+// Dark CTA for the Globe section — the #222 fill from Figma 2859:18004, but on
+// the fully rounded pill the other CTAs on this page use rather than the design's
+// 12px corners.
+.dark {
+  background: #222;
+  border: 1px solid #111;
+  border-radius: 999px;
+  padding: 14px 28px;
+
+  .label {
+    // !important for the same reason as the other variants: the site's global
+    // `a:hover/active/focus` rule turns link text red otherwise.
+    color: #fff !important;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 20px;
+  }
+
+  &:hover {
+    background: #333;
+    transform: translateY(-1px);
+  }
+}
+
 // White pill matching AboutUsV2's CrewCTA button — taller and wider than the
 // Benefits variant, pure white rather than #f0f0f0.
 .solid {

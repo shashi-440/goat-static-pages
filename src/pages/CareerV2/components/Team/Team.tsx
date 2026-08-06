@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "@Components/Image";
 import wrapperHOC from "@Utils/wrapperHOC";
 import Reveal from "../../../AboutUsV2/components/Reveal/Reveal";
@@ -98,6 +98,8 @@ const MAX_DOTS = 5;
 
 interface MemberCardProps {
   member: Member;
+  /** Stagger, in ms, so the cards land one after another on first scroll-in. */
+  delay?: number;
 }
 
 /**
@@ -106,9 +108,36 @@ interface MemberCardProps {
  * WhyAmberExists cards. Flipped face follows Figma 2675:16173: white card, dark
  * quote, pink signature, dark round close button bottom-right.
  */
-const MemberCard = ({ member }: MemberCardProps) => {
+const MemberCard = ({ member, delay = 0 }: MemberCardProps) => {
   const [flipped, setFlipped] = useState(false);
+  const [shown, setShown] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
+
+  // Fade + rise the card in when the carousel first scrolls into view. This lives
+  // on the card rather than wrapping it in a <Reveal>, because `.flipCard` is a
+  // flex child with a computed basis — an extra wrapper element would break the
+  // one-card-per-click track maths.
+  useEffect(() => {
+    const node = cardRef.current;
+    if (!node) return undefined;
+
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setShown(true);
+      return undefined;
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setShown(true);
+          io.disconnect(); // once, then stay visible
+        }
+      },
+      { threshold: 0.15, rootMargin: "0px 0px -10% 0px" },
+    );
+    io.observe(node);
+    return () => io.disconnect();
+  }, []);
 
   // Vertical tilt that follows the cursor's height: hovering near the top tips
   // the card one way, near the bottom the opposite way — hinting the flip.
@@ -126,7 +155,8 @@ const MemberCard = ({ member }: MemberCardProps) => {
   return (
     <div
       ref={cardRef}
-      className={styles.flipCard}
+      className={`${styles.flipCard} ${shown ? styles.cardShown : ""}`}
+      style={{ transitionDelay: `${delay}ms` }}
       onMouseMove={handleMove}
       onMouseLeave={handleLeave}
     >
@@ -227,7 +257,10 @@ const Team = () => {
         <p className={styles.subtitle}>The people behind our vision, culture and growth.</p>
       </Reveal>
 
-      <Reveal className={styles.viewport} delay={120}>
+      {/* No <Reveal> wrapper here: that revealed the whole carousel as one unit,
+          so every card appeared at once. Each card now observes itself and is
+          staggered, so they land left to right. */}
+      <div className={styles.viewport}>
         <div
           className={styles.track}
           // Slide by a single card: one card-width + one gap per step.
@@ -235,11 +268,13 @@ const Team = () => {
             transform: `translateX(calc(${-index} * (100% + var(--gap)) / var(--per-view)))`,
           }}
         >
-          {MEMBERS.map((member) => (
-            <MemberCard key={member.name} member={member} />
+          {MEMBERS.map((member, i) => (
+            // Only the cards in the first view are staggered; the rest are
+            // off-screen anyway and should be ready by the time they slide in.
+            <MemberCard key={member.name} member={member} delay={Math.min(i, PER_VIEW) * 130} />
           ))}
         </div>
-      </Reveal>
+      </div>
 
       <div className={styles.controls}>
         <div className={styles.dots}>

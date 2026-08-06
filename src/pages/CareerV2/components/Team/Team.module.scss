@@ -16,7 +16,7 @@
   display: flex;
   flex-direction: column;
   gap: 56px;
-  padding: 80px;
+  padding: 80px var(--page-gutter);
   // Anchors `.darkZone` below.
   position: relative;
   width: 100%;
@@ -103,6 +103,26 @@
   min-width: 0;
   // Perspective lives on this PARENT so it applies to the tilt below.
   perspective: 1000px;
+
+  // Scroll-in state. Safe to transform here: the cursor tilt lives on `.tilt`, a
+  // child, so the two never fight over the same property. The delay is set inline
+  // per card, which is what staggers them.
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+
+.cardShown {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flipCard {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
 
 // Separate from `.flipInner` so the cursor tilt never interferes with the

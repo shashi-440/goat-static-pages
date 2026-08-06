@@ -5,7 +5,8 @@
   flex-direction: column;
   // Matches AboutUsV2: heading block sits 56px below the top of the hero
   // section (itself starting under the 64px navbar); image 40px below the CTA.
-  padding: 56px 80px 0;
+  // Horizontal gutter comes from the page so it tracks the Navbar's own.
+  padding: 56px var(--page-gutter) 0;
   width: 100%;
 }
 

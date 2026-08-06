@@ -17,6 +17,14 @@
   padding-top: 64px;
   width: 100%;
 
+  // Single source of truth for the page's horizontal gutter, matching the shared
+  // Navbar's own `--gutter` exactly. It resolves to 80px up to a 1440px viewport
+  // and then grows, so every section's content sits on the same centred 1280px
+  // column the nav does — a flat 80px would only line up below 1440px, above
+  // which the nav's capped column moves inward and the sections would not.
+  // Custom property so it inherits into every section's own module.
+  --page-gutter: max(80px, calc((100% - 1280px) / 2));
+
   * {
     font-family: inherit;
   }

@@ -55,7 +55,11 @@ const Hero = () => {
     <section className={styles.hero}>
       <div className={styles.header}>
         <Reveal as="h1" className={styles.title}>
-          Build the future of student living
+          {/* Explicit break so the line always falls after "home," as written,
+              rather than wherever the measure happens to put it. */}
+          We help students find home,
+          <br />
+          before they find everything else
         </Reveal>
         <Reveal delay={120} className={styles.cta}>
           <RolesButton variant="primary" />
