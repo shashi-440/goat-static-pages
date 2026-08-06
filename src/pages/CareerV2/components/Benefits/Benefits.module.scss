@@ -98,12 +98,29 @@
   justify-content: center;
 }
 
+// Backdrop was #f0f0f0, which flashed near-white against this dark band whenever
+// an image swapped and the box was briefly empty. A dark tone matching the
+// section means any uncovered moment is invisible.
 .media {
-  background: #f0f0f0;
+  background: #1d1d1d;
   border-radius: 16px;
   height: 501px;
   overflow: hidden;
+  position: relative;
   width: 358px;
+}
+
+// Slides are stacked and cross-faded rather than swapped, so there is never a
+// frame with no image painted.
+.slide {
+  inset: 0;
+  opacity: 0;
+  position: absolute;
+  transition: opacity 0.45s ease;
+}
+
+.slideActive {
+  opacity: 1;
 }
 
 .image {

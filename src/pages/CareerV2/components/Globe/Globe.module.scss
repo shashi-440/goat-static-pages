@@ -1,8 +1,11 @@
+// Top padding is lighter than the bottom: the globe canvas is 622px tall but the
+// sphere only spans ~498px of it, so there is already ~62px of empty canvas above
+// the visible globe doing the work of padding.
 .section {
   background: #fff;
   display: flex;
   justify-content: center;
-  padding: 80px var(--page-gutter);
+  padding: 40px var(--page-gutter) 80px;
   width: 100%;
 }
 

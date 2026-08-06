@@ -107,16 +107,28 @@ const Benefits = () => {
 
           <div className={styles.mediaColumn}>
             <div className={styles.media}>
-              {/* `key` forces a fresh <img> per slide so the swap is a clean cut
-                  rather than the previous photo lingering while the new one loads. */}
-              <Image
-                key={current.image}
-                src={current.image}
-                alt={current.alt}
-                className={styles.image}
-                width="100%"
-                height="100%"
-              />
+              {/* Every slide is mounted and stacked, with only the active one at
+                  full opacity. Two reasons: the images are all fetched on first
+                  paint, so no switch waits on the network (the first visit to a
+                  slide used to stall), and the outgoing photo stays put while the
+                  incoming one fades over it — previously a keyed swap unmounted
+                  the old <img> first, exposing the panel behind for a frame. */}
+              {BENEFITS.map((benefit, i) => (
+                <div
+                  key={benefit.title}
+                  className={`${styles.slide} ${i === active ? styles.slideActive : ""}`}
+                  aria-hidden={i !== active}
+                >
+                  <Image
+                    src={benefit.image}
+                    alt={i === active ? benefit.alt : ""}
+                    className={styles.image}
+                    width="100%"
+                    height="100%"
+                    isEagerLoad
+                  />
+                </div>
+              ))}
             </div>
           </div>
 

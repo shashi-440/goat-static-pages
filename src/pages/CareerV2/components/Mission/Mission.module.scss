@@ -7,7 +7,9 @@
   // The horizontal inset was a flat 200px, which put this section 120px further
   // in than every other one and off the Navbar's grid. The gutter now matches the
   // page; the quote's own max-width keeps its measure from running too wide.
-  padding: 96px var(--page-gutter) 80px;
+  // Bottom padding was 80px, which stacked with the Globe section's own 80px top
+  // AND the ~62px of empty canvas above the sphere — 222px of visual gap in all.
+  padding: 96px var(--page-gutter) 40px;
   width: 100%;
 }
 
