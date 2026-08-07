@@ -1,0 +1,490 @@
+// Rules top and bottom (Figma node 2483:8941). The top one used to come for
+// free from the logo-wall section's own bottom border; now that the wall lives
+// inside the hero, this section draws its own.
+.section {
+  align-items: center;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  padding: 96px 80px;
+  width: 100%;
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+  max-width: 1280px;
+  width: 100%;
+}
+
+.heading {
+  color: #111928;
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -1px;
+  line-height: 48px;
+  margin: 0;
+}
+
+.bento {
+  align-items: stretch;
+  display: flex;
+  gap: 24px;
+  width: 100%;
+}
+
+/* ---------------------------------------------------------------- hero card */
+
+.hero {
+  border-radius: 24px;
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  padding: 40px;
+  position: relative;
+}
+
+.heroImage {
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  position: absolute;
+  width: 100%;
+}
+
+// Sits between the photo and the glass bezel so the mock reads clearly.
+.heroWash {
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  background: rgba(0, 0, 0, 0.05);
+  inset: 0;
+  position: absolute;
+}
+
+.heroBezel {
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border-radius: 24px;
+  padding: 16px;
+  position: relative;
+  width: 100%;
+}
+
+.heroCard {
+  background: #fff;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow: hidden;
+  padding: 24px;
+  position: relative;
+  width: 100%;
+}
+
+// Clipped to 245px in the design — the rows below the cut are faded out rather
+// than removed, which is what gives the mock its "real product" depth.
+.heroPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: 245px;
+  opacity: 0.8;
+  padding: 16px;
+}
+
+.panelTop {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.heroStats {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+.fullBar {
+  display: block;
+  width: 100%;
+}
+
+.panelBottom {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.chart {
+  align-items: flex-end;
+  display: flex;
+  gap: 5px;
+  width: 100%;
+}
+
+.chartSmall {
+  align-items: flex-end;
+  display: flex;
+  gap: 4px;
+  width: 100%;
+}
+
+// The charts have two lives. They DRAW IN once, when the section is first
+// reached (.alive) — bars grow up from the baseline, fills sweep along their
+// tracks — which lands on the same beat as the figures counting up. After that
+// they respond to hover, lifting and gaining colour, rippling left to right.
+//
+// Everything is transform + background/opacity, so nothing ever reflows: the
+// bar heights and fill widths are the design's own inline values.
+.chartBar {
+  border-radius: 2px;
+  flex: 1 0 0;
+  min-width: 0;
+  // Collapsed until the section is reached.
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1), background 0.4s ease;
+}
+
+.alive .chartBar {
+  transform: scaleY(1);
+}
+
+.alive .hero:hover .chartBar,
+.alive .card:hover .chartBar {
+  transform: scaleY(1.14);
+}
+
+// 35ms apart, so both the draw-in and the hover lift travel across the chart
+// rather than popping all at once. 12 covers the hero chart; the small chart
+// only ever uses the first 10.
+@for $i from 1 through 12 {
+  .chartBar:nth-child(#{$i}) {
+    transition-delay: #{($i - 1) * 35}ms;
+  }
+}
+
+.chartBarViolet {
+  background: #8b5cf6;
+}
+
+.chartBarVioletFaint {
+  background: rgba(139, 92, 246, 0.2);
+
+  .hero:hover & {
+    background: rgba(139, 92, 246, 0.45);
+  }
+}
+
+.chartBarBlue {
+  background: #0284c7;
+}
+
+.chartBarBlueFaint {
+  background: rgba(2, 132, 199, 0.2);
+
+  .card:hover & {
+    background: rgba(2, 132, 199, 0.45);
+  }
+}
+
+// The two leading bars of each chart breathe, slowly and out of step with each
+// other. It is the one thing on the page that never settles — enough to read as
+// live data, small enough to ignore. Opacity only, so it never fights the
+// transform the hover and draw-in share.
+@keyframes chartPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.68;
+  }
+}
+
+.alive .chartBarViolet,
+.alive .chartBarBlue {
+  animation: chartPulse 3.2s ease-in-out infinite;
+}
+
+.alive .chartBarViolet:nth-last-child(2),
+.alive .chartBarBlue:nth-last-child(2) {
+  animation-delay: 1.6s;
+}
+
+// Progress fills sweep in, then creep a little further on hover. The track
+// clips, so the extra never spills past its end.
+.trackFill {
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.alive .trackFill {
+  transform: scaleX(1);
+}
+
+.alive .card:hover .trackFill {
+  transform: scaleX(1.08);
+}
+
+// The booking-rate card has no bar chart to breathe, so its two accent fills do
+// it instead — same pulse, same rhythm as the charts either side of it.
+.alive .trackFillAccent {
+  animation: chartPulse 3.2s ease-in-out infinite;
+
+  &:nth-of-type(2) {
+    animation-delay: 1.6s;
+  }
+}
+
+// The source-markets card has no chart at all — its rows are the chart. They
+// deal in from the left on arrival and lean into a hover.
+.marketRow {
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.alive .marketRow {
+  opacity: 1;
+  transform: none;
+}
+
+.alive .card:hover .marketRow {
+  transform: translateX(4px);
+}
+
+// Dealt one after another, top to bottom.
+@for $i from 1 through 6 {
+  .marketRow:nth-child(#{$i}) {
+    transition-delay: #{($i - 1) * 70}ms;
+  }
+}
+
+// The two stat underlines on the hero card sweep in with everything else, but
+// they deliberately do not answer a hover — the bar chart below is the only
+// thing that moves on that card, so the hover reads as one gesture instead of
+// the whole panel twitching.
+.fullBar {
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.alive .fullBar {
+  transform: scaleX(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chartBar,
+  .trackFill,
+  .fullBar,
+  .marketRow {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .alive .chartBar,
+  .alive .chartBarViolet,
+  .alive .chartBarBlue,
+  .alive .trackFillAccent {
+    animation: none;
+  }
+
+  .alive .hero:hover .chartBar,
+  .alive .card:hover .chartBar,
+  .alive .card:hover .trackFill,
+  .alive .card:hover .marketRow {
+    transform: none;
+  }
+}
+
+.settlement {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.settlementRow {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.settlementText {
+  flex: 1 0 0;
+  min-width: 0;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.headNumber {
+  color: #111928;
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.64px;
+  line-height: 36px;
+}
+
+.headLabel {
+  color: #4b5563;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.16px;
+  line-height: 24px;
+}
+
+// White wash over the lower half of the mock panel. Starts 189px down the card
+// (24px padding + 165px of panel) and runs the panel out to its 245px cut.
+.heroFade {
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.156) 25%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0.844) 75%,
+    rgb(255, 255, 255) 100%
+  );
+  height: 80px;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 189px;
+}
+
+/* ---------------------------------------------------------------- stat grid */
+
+.grid {
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+
+.gridRow {
+  display: flex;
+  flex: 1 0 0;
+  gap: 24px;
+  min-height: 0;
+  width: 100%;
+}
+
+.card {
+  background: #f7f7f7;
+  border-radius: 20px;
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+  overflow: hidden;
+  padding: 24px;
+  position: relative;
+}
+
+// Same trick as the hero panel, at the smaller 107px cut.
+.cardPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 107px;
+  width: 100%;
+}
+
+.markets {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
+}
+
+.cardHead {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.cardNumber {
+  color: #111928;
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.64px;
+  line-height: 36px;
+}
+
+// Secondary/Blue/600 — only the headline "2x" figure takes it.
+.cardNumberBlue {
+  color: #1c64f2;
+}
+
+.cardLabel {
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 22px;
+}
+
+.cardFade {
+  background-image: linear-gradient(
+    180deg,
+    rgba(247, 247, 247, 0) 0%,
+    rgba(247, 247, 247, 0.156) 25%,
+    rgba(247, 247, 247, 0.5) 50%,
+    rgba(247, 247, 247, 0.844) 75%,
+    rgb(247, 247, 247) 100%
+  );
+  height: 84px;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 47px;
+}
+
+.photo {
+  border-radius: 20px;
+  flex: 1 0 0;
+  min-width: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.photoImage {
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  position: absolute;
+  width: 100%;
+}
+
+@media (max-width: 1100px) {
+  .bento {
+    flex-direction: column;
+  }
+
+  .photo {
+    min-height: 232px;
+  }
+}

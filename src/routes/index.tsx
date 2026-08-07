@@ -28,6 +28,14 @@ const AsyncScholarshipV2Page = loadable(() => import("@Pages/ScholarshipV2"), {
   fallback: <FullPageLoader />,
 });
 
+const AsyncListWithUsPage = loadable(() => import("@Pages/ListWithUs"), {
+  fallback: <FullPageLoader />,
+});
+
+const AsyncPartnerWithUsPage = loadable(() => import("@Pages/PartnerWithUs"), {
+  fallback: <FullPageLoader />,
+});
+
 const AsyncIndexPage = loadable(() => import("@Pages/Index"), {
   fallback: <FullPageLoader />,
 });
@@ -76,6 +84,16 @@ const routes: RouteConfig[] = [
         path: "/scholarship-v2",
         exact: true,
         component: AsyncScholarshipV2Page,
+      },
+      {
+        path: "/list-with-us",
+        exact: true,
+        component: AsyncListWithUsPage,
+      },
+      {
+        path: "/partner-with-us",
+        exact: true,
+        component: AsyncPartnerWithUsPage,
       },
       {
         path: "/",

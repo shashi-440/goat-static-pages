@@ -1,0 +1,125 @@
+// Rail + navbar move as one fixed block. The shared navbar module positions the
+// <nav> itself `fixed; top: 0`, which would slide it over the rail — .navbar
+// below hands positioning back to this stack.
+// The whole stack slides up by the rail's height on the first scroll, so the
+// rail travels out through the top of the viewport and the navbar lands on the
+// top edge. Scroll back to 0 and it rides down again. The offset is set inline
+// from the rail's measured height (see Header.tsx).
+.stack {
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  transform: translateY(0);
+  transition: transform 0.35s ease;
+  z-index: 100;
+}
+
+.navbar {
+  position: relative;
+}
+
+// Announcement rail — Figma node 2456:6003.
+.rail {
+  align-items: center;
+  background: #f7f7f7;
+  display: flex;
+  gap: 8px;
+  height: 42px;
+  justify-content: center;
+  padding: 12px 24px;
+  width: 100%;
+}
+
+.railText {
+  color: #111928;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.railStrong {
+  font-weight: 600;
+}
+
+.railCta {
+  color: #1466ff !important;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover,
+  &:active,
+  &:focus {
+    color: #1466ff !important;
+    text-decoration: underline;
+  }
+}
+
+// The design's nav links are 14px medium rather than the shared 16px/600.
+// The colour is pinned on every state because the site's global
+// `a:hover/active/focus` rule would otherwise turn them red, and this page
+// carries no red at all.
+.link {
+  color: #111928 !important;
+  font-size: 14px;
+  font-weight: 500;
+
+  &:hover,
+  &:active,
+  &:focus {
+    color: #111928 !important;
+  }
+}
+
+// "List on amber" in the bar. Collapsed to nothing at the top of the page so the
+// nav sits exactly as designed, then it opens out as the rail slides away.
+//
+// The class is doubled on purpose: it shares the hero's `.cta` class and both
+// are single-class selectors, so without the extra specificity which one wins
+// would depend on CSS-module bundle order.
+.navCta.navCta {
+  margin-left: 0;
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  padding-left: 0;
+  padding-right: 0;
+  pointer-events: none;
+  transition: max-width 0.35s ease, padding 0.35s ease, margin-left 0.35s ease,
+    opacity 0.25s ease 0.08s;
+}
+
+// Tighter than the hero's 32px — the bar's pill sits against the nav links, so
+// it reads better a little more compact.
+.navCta.navCtaShown {
+  margin-left: 8px;
+  max-width: 200px;
+  opacity: 1;
+  padding-left: 20px;
+  padding-right: 20px;
+  pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stack,
+  .navCta.navCta {
+    transition: none;
+  }
+}
+
+// Below 1180px the full rail sentence no longer fits on one line; drop the
+// nowrap and let it wrap rather than overflow the viewport.
+@media (max-width: 1180px) {
+  .rail {
+    height: auto;
+  }
+
+  .railText {
+    white-space: normal;
+  }
+}

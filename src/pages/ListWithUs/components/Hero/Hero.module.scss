@@ -1,0 +1,165 @@
+// Figma: 120px gutters (wider than the 80px the rest of the page uses), 48px
+// top / 96px bottom, 56px between the copy, the photo and the logo wall.
+.hero {
+  align-items: center;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+  padding: 48px 120px 96px;
+  width: 100%;
+}
+
+.heroRow {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 1200px;
+  width: 100%;
+}
+
+.title {
+  color: #111928;
+  font-size: 56px;
+  font-weight: 600;
+  letter-spacing: -1.12px;
+  line-height: 1.12;
+  margin: 0;
+  text-align: center;
+}
+
+/* --------------------------------------------------------- avatar cluster */
+
+// Sits inline on the second line of the headline. 3 x 44px overlapping by 20px
+// = 92px wide, matching the node.
+.avatars {
+  display: inline-flex;
+  margin: 0 6px;
+  vertical-align: middle;
+}
+
+.avatar {
+  border: 2px solid #fff;
+  border-radius: 999px;
+  display: block;
+  flex-shrink: 0;
+  height: 44px;
+  overflow: hidden;
+  position: relative;
+  width: 44px;
+
+  & + & {
+    margin-left: -20px;
+  }
+}
+
+// Position and size come from the node's own per-avatar crop (set inline).
+.avatarImage {
+  max-width: none;
+  position: absolute;
+}
+
+/* ------------------------------------------------------------ lede + CTA */
+
+.lede {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.subtitle {
+  color: #4b5563;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 28px;
+  margin: 0;
+  text-align: center;
+}
+
+// Primary pill CTA — Secondary/Blue/600 with the L4/Emphasised label style.
+// `!important` on colour: the site's global `a:hover/active/focus` rule turns
+// link text red otherwise.
+.cta {
+  align-items: center;
+  background: #1c64f2;
+  border-radius: 999px;
+  color: #fff !important;
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 600;
+  justify-content: center;
+  line-height: 1.25;
+  padding: 11px 32px;
+  text-decoration: none;
+  transition: background 0.2s ease;
+  white-space: nowrap;
+
+  &:hover,
+  &:active,
+  &:focus {
+    background: #1550c9;
+    color: #fff !important;
+  }
+}
+
+/* ---------------------------------------------------------------- photo */
+
+// 1200 x 717 in the design; the source is wider than that, so it crops.
+//
+// Scroll interaction, same as the About Us hero: --shrink goes 0 (full-bleed,
+// edge-to-edge, square corners) → 1 (contained in the 1200px column, 24px
+// radius), set by JS over the first 420px of scroll. It defaults to 0 so the
+// first paint is edge-to-edge.
+//
+// The photo is centred in the hero's padded content column, and that column is
+// itself centred in the viewport — so a box of width 100vw centred here spans
+// edge to edge with no offset needed. We just ease the width from the full
+// viewport down to the contained column width. `.page` carries overflow-x:
+// hidden, which absorbs the scrollbar's worth of 100vw overhang.
+.photo {
+  --shrink: 0;
+  // Contained target — the 1200px column, or the available width if narrower.
+  --contained: min(1200px, 100vw - 240px);
+
+  aspect-ratio: 1200 / 717;
+  border-radius: calc(24px * var(--shrink));
+  overflow: hidden;
+  position: relative;
+  width: calc(100vw - (100vw - var(--contained)) * var(--shrink));
+}
+
+.photoImage {
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  position: absolute;
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .hero {
+    padding: 48px 24px 64px;
+  }
+
+  // Match the narrower gutter so the contained state still lines up with the
+  // copy above it.
+  .photo {
+    --contained: min(1200px, 100vw - 48px);
+  }
+
+  .title {
+    font-size: 38px;
+    letter-spacing: -0.76px;
+  }
+
+  .avatar {
+    height: 34px;
+    width: 34px;
+
+    & + & {
+      margin-left: -15px;
+    }
+  }
+}

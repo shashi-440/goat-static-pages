@@ -1,0 +1,539 @@
+.section {
+  align-items: center;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 0 80px 120px;
+  width: 100%;
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+  max-width: 1280px;
+  width: 100%;
+}
+
+.heading {
+  color: #111928;
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -1px;
+  line-height: 48px;
+  margin: 0;
+}
+
+.body {
+  align-items: flex-start;
+  display: flex;
+  gap: 56px;
+  width: 100%;
+}
+
+/* --------------------------------------------------------------- tab column */
+
+// The list holds its place while the panels scroll past it. `top` clears the
+// navbar, which is all that stays fixed once the announcement rail has slid out.
+.rail {
+  align-self: flex-start;
+  flex-shrink: 0;
+  position: sticky;
+  top: 104px;
+  width: 424px;
+}
+
+.tabs {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+// Every entry is the same height whether it is the active one or not, and no
+// property that changes between the two states affects layout: the label swaps
+// size inside a fixed 24px line box, and the description only changes colour.
+// That is what keeps the column still — an entry that grew or collapsed as the
+// active one moved would shove the entries below it and read as a bounce.
+.tab {
+  background: none;
+  border: 0;
+  color: #9ca3af;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  // The extra bottom pixel is the rule's own: the track is positioned rather
+  // than a border, so without it the row would swallow the design's 112 + 1.
+  padding: 20px 0 21px;
+  position: relative;
+  text-align: left;
+  transition: color 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  width: 100%;
+}
+
+// The column's box already lines up with the panels, but the first row's top
+// padding pushed its label 20px below the top edge of the image beside it.
+// Dropping it sits the first label on that edge; the rows below keep the
+// design's 20px, which is the breathing room between entries rather than a
+// leading indent. Row heights stay fixed per row, so this costs no movement.
+.tab:first-child {
+  padding-top: 0;
+}
+
+.tabLabel {
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.2px;
+  line-height: 24px;
+  transition: font-size 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tabBody {
+  color: #9ca3af;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  transition: color 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tabActive {
+  color: #111928;
+
+  .tabLabel {
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .tabBody {
+    color: #4b5563;
+  }
+}
+
+// The design's 1px divider, doubling as the progress readout: it fills across
+// while its panel travels past the sticky line, so an entry shows how far
+// through its own section the reader is. Entries already passed sit full,
+// entries still to come sit empty.
+.tabTrack {
+  background: #e5e7eb;
+  bottom: 0;
+  height: 1px;
+  left: 0;
+  overflow: hidden;
+  position: absolute;
+  right: 0;
+}
+
+// Driven by transform rather than width so tracking the scroll costs no layout.
+// Only opacity is transitioned — the width has to track the scroll exactly, so
+// easing it would make the line lag the page.
+.tabFill {
+  background: #1466ff;
+  height: 100%;
+  left: 0;
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: opacity 0.3s ease;
+  width: 100%;
+}
+
+/* ------------------------------------------------------------- media panel */
+
+.panels {
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  gap: 48px;
+  min-width: 0;
+}
+
+.panel {
+  align-items: center;
+  border-radius: 24px;
+  display: flex;
+  flex-shrink: 0;
+  height: 500px;
+  justify-content: center;
+  overflow: hidden;
+  padding: 40px;
+  position: relative;
+  width: 100%;
+}
+
+.panelImage {
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  position: absolute;
+  width: 100%;
+}
+
+.panelWash {
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  background: rgba(0, 0, 0, 0.05);
+  inset: 0;
+  position: absolute;
+}
+
+.bezel {
+  border-radius: 24px;
+  position: relative;
+}
+
+.card {
+  background: #fff;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  width: 319px;
+}
+
+// The design spaces the card internals with explicit spacer frames of three
+// different heights. They were collapsed to one 12px margin here, which was
+// right in only two of the nine places it was used — so each height is its own
+// class now, named after the frame it stands in for.
+.sp10 {
+  margin-top: 10px;
+}
+
+.sp12 {
+  margin-top: 12px;
+}
+
+.sp14 {
+  margin-top: 14px;
+}
+
+// The 8px spacer between a column header and the first row rule. On the header
+// rather than the row because `:first-of-type` on the row groups resolves
+// against the card's first div — the crumb — and so never matched.
+.thSpaced {
+  margin-bottom: 8px;
+}
+
+.stats {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+.fullBar {
+  display: block;
+  width: 100%;
+}
+
+.sectionLabel {
+  color: #a3a3a3;
+  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  line-height: 13px;
+}
+
+.cardCta {
+  color: #0284c7;
+  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  line-height: 13px;
+}
+
+/* ---------------------------------------------------- analytics card pieces */
+
+.cardTabs {
+  display: flex;
+  gap: 18px;
+  margin: 12px 0 0;
+  width: 100%;
+}
+
+.cardTab {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cardTabInner {
+  align-items: center;
+  display: flex;
+  gap: 5px;
+}
+
+.cardTabIcon {
+  height: 10px;
+  width: 9px;
+}
+
+.cardTabLabel,
+.cardTabLabelActive {
+  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  line-height: 13px;
+  white-space: nowrap;
+}
+
+.cardTabLabel {
+  color: #a3a3a3;
+}
+
+.cardTabLabelActive {
+  color: #0a0a0a;
+}
+
+.cardTabUnderline {
+  background: #1466ff;
+  height: 2px;
+  width: 100%;
+}
+
+.chart {
+  align-items: flex-end;
+  display: flex;
+  height: 108px;
+  justify-content: space-between;
+  margin-top: 12px;
+  width: 100%;
+}
+
+.chartBar {
+  border-radius: 4px 4px 0 0;
+  flex-shrink: 0;
+  width: 24px;
+}
+
+.chartBarOn {
+  background: #1466ff;
+}
+
+.chartBarOff {
+  background: rgba(20, 102, 255, 0.28);
+}
+
+.months {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.month {
+  color: #a3a3a3;
+  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 12px;
+  text-align: center;
+  width: 24px;
+}
+
+/* ------------------------------------------------------- promos card pieces */
+
+.promoCrumb {
+  align-items: center;
+  display: flex;
+  height: 20px;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.promoLabel {
+  color: #737373;
+  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.6px;
+  line-height: 13px;
+  white-space: nowrap;
+}
+
+.promoNew {
+  align-items: center;
+  background: #1466ff;
+  border-radius: 8px;
+  color: #fff;
+  display: flex;
+  font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 14px;
+  padding: 3px 8px;
+}
+
+.featured {
+  background: #fafafa;
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 12px;
+  width: 100%;
+}
+
+.featuredLabel {
+  color: #a3a3a3;
+  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  line-height: 13px;
+}
+
+.featuredValue {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+}
+
+.featuredNote {
+  color: #737373;
+  font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 15px;
+}
+
+/* ------------------------------------------------- shared list rows (2 & 3) */
+
+.listGroup {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.listRow {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  width: 100%;
+}
+
+.stars {
+  align-items: center;
+  display: flex;
+  gap: 2px;
+}
+
+.star {
+  height: 10px;
+  width: 10px;
+}
+
+.ratingValue {
+  align-items: center;
+  display: flex;
+  gap: 4px;
+}
+
+.ratingStar {
+  height: 13px;
+  width: 13px;
+}
+
+// Reduced motion keeps the active entry switching and the line filling — both
+// are information, not decoration — but drops the easing between states.
+@media (prefers-reduced-motion: reduce) {
+  .tab,
+  .tabLabel,
+  .tabBody {
+    transition: none;
+  }
+}
+
+// Stacked: the list sits above the panels, so there is nothing for it to stick
+// to and the progress line has nothing to report.
+/* ------------------------------------------- mock reveal, once per page load */
+
+// The first time a panel is reached, the contents of its mock come to life: the
+// stat underlines sweep, the chart columns grow from the baseline and the rows
+// deal in behind them. The card itself does not move — animating the whole
+// panel in was too much on top of this, and it reads better as a card that was
+// already there filling with its data. Everything is opacity and transform, so
+// nothing reflows and the card's measured geometry is untouched.
+//
+// Every rule below hangs off `.alive`, which the observer adds when the panel
+// is reached and clears once the section has fully left, so it plays again on
+// the next visit. `--i` carries each item's place in its queue so the stagger
+// reads left to right, and top to bottom, rather than everything landing flat.
+//
+// The lead-in before each group is small and deliberate: enough that the pieces
+// do not all start on the same frame, without a wait for anything to arrive.
+
+$reveal-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+.fullBar {
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.7s $reveal-ease 0.04s;
+}
+
+.alive .fullBar {
+  transform: scaleX(1);
+}
+
+.chartBar {
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.55s $reveal-ease;
+  transition-delay: calc(0.06s + var(--i, 0) * 45ms);
+}
+
+.alive .chartBar {
+  transform: scaleY(1);
+}
+
+.featured {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.45s $reveal-ease 0.05s, transform 0.45s $reveal-ease 0.05s;
+}
+
+.alive .featured {
+  opacity: 1;
+  transform: none;
+}
+
+.listRow {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.45s $reveal-ease, transform 0.45s $reveal-ease;
+  transition-delay: calc(0.08s + var(--i, 0) * 55ms);
+}
+
+.alive .listRow {
+  opacity: 1;
+  transform: none;
+}
+
+// Under reduced motion the panels are marked revealed on mount rather than by
+// the observer, so these are already in their finished state — this only drops
+// the easing so nothing slides.
+@media (prefers-reduced-motion: reduce) {
+  .fullBar,
+  .chartBar,
+  .featured,
+  .listRow {
+    transition: none;
+  }
+}
+
+@media (max-width: 1100px) {
+  .body {
+    flex-direction: column;
+  }
+
+  .rail {
+    position: static;
+    width: 100%;
+  }
+}
