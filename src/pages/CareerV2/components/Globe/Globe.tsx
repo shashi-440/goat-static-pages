@@ -3,7 +3,6 @@ import createGlobe from "cobe";
 import Image from "@Components/Image";
 import wrapperHOC from "@Utils/wrapperHOC";
 import Reveal from "../../../AboutUsV2/components/Reveal/Reveal";
-import RolesButton from "../RolesButton/RolesButton";
 import styles from "./Globe.module.scss";
 // Reuses AboutUsV2's postage-stamp frame and city photos — the country card here
 // is the same cutout treatment as the hero title stamp there.
@@ -293,10 +292,20 @@ const Globe = () => {
     // setState would thrash React for no visible gain.
     let lastSync = 0;
 
+    // COBE's `width`/`height` are NOT the CSS box — they become the resolution
+    // uniform the shader sizes the sphere against, in DEVICE pixels. The actual
+    // drawing buffer is sized by COBE's renderer (phenomenon) as
+    // `clientWidth * devicePixelRatio`. So these two must be derived from the same
+    // ratio: hardcoding `SIZE * 2` while passing the display's real ratio meant the
+    // shader drew for a 1244px viewport into a 622px buffer on any 1x display —
+    // the sphere came out at double scale, clipped to the canvas corner, with the
+    // HTML pins (positioned in CSS px) no longer on it. Correct only at exactly 2x.
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
     const globe = createGlobe(canvas, {
-      devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
-      width: SIZE * 2,
-      height: SIZE * 2,
+      devicePixelRatio: dpr,
+      width: SIZE * dpr,
+      height: SIZE * dpr,
       phi: phiRef.current,
       theta: thetaRef.current,
       // Starts zoomed in; the reveal effect below eases it out to ZOOM_TO.
@@ -345,6 +354,15 @@ const Globe = () => {
         state.phi = phiRef.current;
         state.theta = thetaRef.current;
         state.scale = scaleRef.current;
+
+        // Keep the resolution uniform pinned to the real drawing buffer. COBE reads
+        // width/height off this state object every frame, and phenomenon rewrites
+        // canvas.width/height on window resize (and the buffer changes outright if
+        // the window moves to a display with a different pixel ratio). Without this
+        // the pair silently desyncs again and the sphere goes back to being drawn at
+        // the wrong scale.
+        state.width = canvas.width;
+        state.height = canvas.height;
 
         if (now - lastSync > 32) {
           lastSync = now;
@@ -412,7 +430,7 @@ const Globe = () => {
         <Reveal className={styles.copy}>
           <h2 className={styles.title}>A team creating tremendous value</h2>
           <p className={styles.lede}>
-            Amber is built for the world, from India. 7 offices, 20 nationalities on the team, and a
+            amber is built for the world, from India. 7 offices, 20 nationalities on the team, and a
             business that touches nearly every country on the map. It’s a rare vantage point, and a
             rare chance to build at global scale without any geographic constraints.
           </p>
@@ -435,10 +453,6 @@ const Globe = () => {
               </li>
             ))}
           </ul>
-
-          <div className={styles.cta}>
-            <RolesButton variant="dark" />
-          </div>
         </Reveal>
 
         {/* Pointer handlers sit on the wrapper so a drag can start anywhere over

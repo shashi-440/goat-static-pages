@@ -1,0 +1,21 @@
+// Host for a Lottie inside a line of text. inline-flex so it sits in the run
+// rather than breaking it, and the injected <svg> is stretched to the host's box —
+// lottie-web sizes the svg to the comp otherwise.
+//
+// The magnification lives HERE, on our own element, not on the svg. lottie-web
+// writes `transform: translate3d(0,0,0)` as an inline style on the svg it injects,
+// and an inline style beats a stylesheet rule — a `transform: scale()` targeting
+// the svg is silently discarded, which is exactly what happened first time round.
+// Scaling the host sidesteps that entirely, and still costs no layout.
+.host {
+  display: inline-flex;
+  flex: none;
+  transform: scale(var(--scale, 1));
+
+  svg {
+    display: block;
+    // !important for the same reason: lottie sets these inline too.
+    height: 100% !important;
+    width: 100% !important;
+  }
+}

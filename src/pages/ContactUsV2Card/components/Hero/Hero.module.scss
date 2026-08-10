@@ -1,0 +1,59 @@
+.hero {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  // No bottom padding: the channels section below owns the gap, so the two aren't
+  // each adding their own and doubling it.
+  padding: 72px 80px 0;
+  width: 100%;
+}
+
+.header {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 48px;
+  max-width: 880px;
+  text-align: center;
+  width: 100%;
+}
+
+// Type scale shared with the other two Contact cuts, so the three read as versions
+// of one page rather than three designs.
+.title {
+  color: #111928;
+  font-size: 52px;
+  font-weight: 550;
+  letter-spacing: -1.04px;
+  line-height: 56px;
+  margin: 0;
+  max-width: 813px;
+  // Lifts the title above the subtitle so the avatar cluster can grow down over it
+  // on hover.
+  position: relative;
+  z-index: 1;
+}
+
+.subtitle {
+  color: #636363;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.5;
+  margin: 20px 0 0;
+  max-width: 620px;
+}
+
+.media {
+  border-radius: 24px;
+  height: 420px;
+  max-width: 1360px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.image {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}

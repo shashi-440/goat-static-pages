@@ -1,0 +1,161 @@
+.section {
+  align-items: center;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 104px 80px 120px;
+  width: 100%;
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  max-width: 1280px;
+  width: 100%;
+}
+
+// Heading in its own column, list in the other. The 1fr/2fr split gives the rows
+// the room — the headings only need to hold the left edge, and matching column
+// widths would leave the values crowding the chevron.
+.group {
+  align-items: start;
+  column-gap: 64px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  width: 100%;
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  // Aligns the title's cap height with the first row's label rather than its box,
+  // which otherwise sits the heading visibly high.
+  padding-top: 2px;
+}
+
+// Short rule above the title — the section's only ornament.
+.dash {
+  background: #111928;
+  height: 3px;
+  margin-bottom: 22px;
+  width: 40px;
+}
+
+.title {
+  color: #111928;
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  line-height: 38px;
+  margin: 0;
+}
+
+// Full-width rule between the groups, with the section's rhythm either side of it.
+.rule {
+  background: #e5e7eb;
+  height: 1px;
+  margin: 72px 0;
+  width: 100%;
+}
+
+.rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+// The hairline is drawn on the row rather than between list items so the hover
+// tint can cover it, and so the last row can drop it without a sibling selector
+// fighting the group's own spacing.
+.row {
+  align-items: center;
+  color: #111928 !important;
+  display: flex;
+  gap: 24px;
+  padding: 22px 0;
+  position: relative;
+  text-decoration: none;
+  transition: background 0.2s ease;
+
+  &::after {
+    background: #e5e7eb;
+    bottom: 0;
+    content: "";
+    height: 1px;
+    left: 0;
+    position: absolute;
+    right: 0;
+  }
+
+  &:hover,
+  &:active,
+  &:focus {
+    // The site-wide `a:hover` rule tints link text, so every state pins its own.
+    color: #111928 !important;
+  }
+
+  &:hover .chevron {
+    color: #636363;
+    transform: translateX(3px);
+  }
+
+  &:hover .name {
+    color: #e53762;
+  }
+}
+
+// The group's own spacing closes the list; a rule under the last row would read as
+// the start of another one.
+.rows li:last-child .row::after {
+  display: none;
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.name {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 24px;
+  transition: color 0.2s ease;
+}
+
+.detail {
+  align-items: center;
+  color: #636363;
+  display: flex;
+  font-size: 15px;
+  font-weight: 400;
+  gap: 8px;
+  line-height: 22px;
+}
+
+.dot {
+  color: #d1d5db;
+}
+
+.meta {
+  color: #9ca3af;
+}
+
+.chevron {
+  color: #c9cfd8;
+  flex: none;
+  height: 18px;
+  margin-left: auto;
+  transition: color 0.2s ease, transform 0.2s ease;
+  width: 18px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row,
+  .name,
+  .chevron {
+    transition: none;
+  }
+}

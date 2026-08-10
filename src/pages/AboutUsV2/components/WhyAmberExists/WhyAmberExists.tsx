@@ -10,7 +10,7 @@ import wrapperHOC from "@Utils/wrapperHOC";
 interface FlipCardProps {
   /** front-of-card question */
   question: string;
-  /** back-of-card answer (JSX to allow the gradient "Amber." highlight) */
+  /** back-of-card answer (JSX to allow the gradient "amber." highlight) */
   answer: JSX.Element;
   /** card height variant */
   size: "tall" | "short";
@@ -86,10 +86,13 @@ const FlipCard = ({ question, answer, size, align }: FlipCardProps) => {
   );
 };
 
+// No data-nav-theme="dark" here, unlike CrewCTA: the band is light grey now, so the
+// Navbar must keep its dark logo and dark links over it. Marking it would swap the
+// header to its light treatment and leave a white logo on a near-white ground.
 const WhyAmberExists = () => (
-  <section className={styles.section} data-nav-theme="dark">
+  <section className={styles.section}>
     <Reveal as="h2" className={styles.heading}>
-      Why Amber Exists
+      Why amber Exists
     </Reveal>
 
     <div className={styles.grid}>
@@ -149,7 +152,7 @@ const WhyAmberExists = () => (
           question="What if moving abroad felt like coming home?"
           answer={
             <>
-              That&apos;s why we built <span className={styles.amber}>Amber.</span> Verified homes,
+              That&apos;s why we built <span className={styles.amber}>amber.</span> Verified homes,
               transparent pricing, and real people to help—so students feel at home before they even
               arrive.
             </>

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 682.667 682.667" fill="none">
+  <!--
+    Recoloured to the main codebase's pink duotone convention (src/icons/*.tsx
+    there): a solid blush fill, #FDC8D3, behind a dark outline. That set carries the
+    pink at full strength — 44 of its 45 uses put no opacity on it at all — so the
+    fill is opaque here rather than dropped back.
+
+    The outline takes #202020, the ink the other three icons in this band already
+    use, rather than the codebase's own #111928. Matching the neighbours matters
+    more here than matching a value from another repo.
+
+    Geometry is the supplied icon untouched — the 1.33333 flip transform maps the
+    512 drawing space onto the 682.667 viewBox and every coordinate depends on it.
+  -->
+  <g transform="matrix(1.33333 0 0 -1.33333 0 682.667)">
+    <!-- The two page blocks: the blush layer. -->
+    <path d="M226 231H81v190h145zM431 231H286v190h145z" fill="#FDC8D3" />
+
+    <g
+      fill="none"
+      stroke="#202020"
+      stroke-width="20"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-miterlimit="10"
+    >
+      <path d="M0 0h-40v-370h490V0h-40" transform="translate(51 421)" />
+      <path
+        d="M0 0v355.5C0 385.6-24.4 410-54.5 410H-205V60h60.147A204.85 204.85 0 0 0 0 0M0 0a204.85 204.85 0 0 0 144.853 60H205v350H54.5C24.4 410 0 385.6 0 355.5z"
+        transform="translate(256 51)"
+      />
+      <path d="M0 0h125" transform="translate(91 201)" />
+      <path d="M0 0h125" transform="translate(91 161)" />
+      <path d="M0 0h125" transform="translate(296 201)" />
+      <path d="M0 0h125" transform="translate(296 161)" />
+    </g>
+  </g>
+</svg>

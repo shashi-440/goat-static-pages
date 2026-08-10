@@ -15,7 +15,7 @@ import styles from "./ListWithUs.module.scss";
 
 const ListWithUs = () => (
   <div className={styles.page}>
-    <Helmet title="List your property with amber | Amber">
+    <Helmet title="List your property with amber | amber">
       <meta
         name="description"
         content="List your property in front of millions of students. Zero listing fees, a dedicated account team and student demand from 160+ countries."

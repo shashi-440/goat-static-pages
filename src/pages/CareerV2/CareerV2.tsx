@@ -15,10 +15,10 @@ import styles from "./CareerV2.module.scss";
 
 const CareerV2 = () => (
   <div className={styles.page}>
-    <Helmet title="Careers | Amber">
+    <Helmet title="Careers | amber">
       <meta
         name="description"
-        content="We help students find home, before they find everything else. Explore open roles at Amber — a team of curious builders across 80+ countries helping students find a place to call home."
+        content="We help students find home, before they find everything else. Explore open roles at amber — a team of curious builders across 80+ countries helping students find a place to call home."
       />
       <meta name="robots" content="index,follow" />
       {/* Instrument Sans — the design font, loaded only on this page */}

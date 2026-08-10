@@ -1,0 +1,47 @@
+// Sits on the same 700px measure as the document, so the rule starts and ends on
+// the text's own left and right edges rather than the full page width.
+.section {
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  padding: 56px 80px 88px;
+  width: 100%;
+}
+
+.inner {
+  align-items: center;
+  display: flex;
+  gap: 1px;
+  max-width: 700px;
+  width: 100%;
+}
+
+.rule {
+  background: #d1d5db;
+  flex: 1 1 0;
+  height: 1px;
+  min-width: 0;
+}
+
+// Figma: a 147 × 151 slot — which is exactly the bounding box of the 122 × 128
+// still once it's tilted, so the rule stays vertically centred on the seal.
+.sealBox {
+  align-items: center;
+  display: flex;
+  flex-shrink: 0;
+  height: 151px;
+  justify-content: center;
+  width: 147px;
+}
+
+.tilt {
+  display: block;
+  transform: rotate(-12.17deg);
+}
+
+.sealImg {
+  display: block;
+  height: 128px;
+  object-fit: contain;
+  width: 122px;
+}

@@ -11,10 +11,10 @@ import styles from "./HowItWorksV2.module.scss";
 
 const HowItWorksV2 = () => (
   <div className={styles.page}>
-    <Helmet title="How It Works | Amber">
+    <Helmet title="How It Works | amber">
       <meta
         name="description"
-        content="See how Amber works — search verified student homes, book in minutes, and move in with support at every step."
+        content="See how amber works — search verified student homes, book in minutes, and move in with support at every step."
       />
       <meta name="robots" content="index,follow" />
       {/* Instrument Sans — the design font, loaded only on this page */}

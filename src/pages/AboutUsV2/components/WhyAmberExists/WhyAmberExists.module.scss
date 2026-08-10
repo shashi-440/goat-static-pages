@@ -1,6 +1,10 @@
+// #f7f7f7 — the section grey used across the v2 set (ListWithUs Faq/Testimonials),
+// replacing the flat #000 this band used to be. The white flip cards still separate
+// from the ground, and the section no longer opts into the navbar's dark treatment:
+// see the note in WhyAmberExists.tsx.
 .section {
   align-items: center;
-  background: #000;
+  background: #f7f7f7;
   display: flex;
   flex-direction: column;
   gap: 56px;
@@ -8,8 +12,10 @@
   width: 100%;
 }
 
+// #202020, matching the Amber Story heading directly below it — the two 40px section
+// headings on this page should be the same colour.
 .heading {
-  color: #fff;
+  color: #202020;
   font-size: 40px;
   font-weight: 550;
   letter-spacing: -0.72px;

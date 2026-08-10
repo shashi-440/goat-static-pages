@@ -23,7 +23,7 @@ import styles from "./PartnerWithUs.module.scss";
  */
 const PartnerWithUs = () => (
   <div className={styles.page}>
-    <Helmet title="Partner with amber | Amber">
+    <Helmet title="Partner with amber | amber">
       <meta
         name="description"
         content="Become an official amber partner and give your students global access to 1M+ beds across 16,000+ properties in 25+ countries — with a dedicated dashboard, white-label booking and amber Plus services."

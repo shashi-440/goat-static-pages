@@ -4,7 +4,12 @@
   // to the whole page so it stays scoped here (site default is unchanged).
   font-family: "Instrument Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
     Arial, sans-serif;
-  overflow-x: hidden;
+  // `clip`, not `hidden`. Both stop sideways scrolling, but `hidden` makes this a
+  // scroll container — and `position: sticky` then resolves against it instead of
+  // the viewport, so the Manifesto's pinned passage silently scrolled away instead
+  // of holding. `clip` clips without creating that container, and pairs legally with
+  // `overflow-y: visible`.
+  overflow-x: clip;
   // Clear the fixed (64px) navbar so content doesn't hide behind it.
   padding-top: 64px;
   width: 100%;

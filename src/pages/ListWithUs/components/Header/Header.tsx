@@ -109,7 +109,7 @@ const Header = () => {
         >
           <Image
             src={logoDark}
-            alt="Amber"
+            alt="amber"
             className={navStyles.logo}
             width={100}
             height={24}

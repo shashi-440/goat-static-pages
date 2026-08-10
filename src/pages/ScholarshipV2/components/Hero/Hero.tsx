@@ -4,6 +4,8 @@ import Reveal from "../../../AboutUsV2/components/Reveal/Reveal";
 // rules, so the two can't drift apart. It also carries the `color: #fff
 // !important` guard the site's global `a:hover` rule needs.
 import navStyles from "../../../AboutUsV2/components/Navbar/Navbar.module.scss";
+import InlineLottie from "../InlineLottie/InlineLottie";
+import graduationFees from "../../assets/lottie/graduation-fees.json";
 import styles from "./Hero.module.scss";
 import wrapperHOC from "@Utils/wrapperHOC";
 
@@ -21,7 +23,15 @@ const Hero = () => (
       <Reveal as="h1" className={styles.title}>
         Because every big dream
         <br />
-        deserves <strong className={styles.amount}>$50,000</strong>
+        deserves
+        <span className={styles.mark}>
+          {/* 56px layout box, art scaled 2.2×. The comp's ink fills only 44% of its
+              canvas, so the multiplier does the real work; 2.2 sits the mark at
+              about the figure's own height rather than above it. The box stays 56
+              so the line box doesn't stretch. */}
+          <InlineLottie data={graduationFees} size={56} scale={2.2} delay={550} />
+        </span>
+        <strong className={styles.amount}>$50,000</strong>
       </Reveal>
       <Reveal as="p" className={styles.subtitle} delay={120}>
         For dreamers with the hunger to chase something big.

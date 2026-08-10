@@ -1,0 +1,166 @@
+// Chip size, and the rail's own width. The rail is centred on the chip, so half the
+// chip is the rail's left offset.
+//
+// 28px on an 8px radius, matching HowItWorksV2 and ScholarshipV2 — this started as a
+// 32px circle, which made the same device look like a different one across the three
+// pages.
+$chip: 28px;
+$chip-radius: 8px;
+$rail-width: 2px;
+// Gap between the chip and the copy beside it.
+$chip-gutter: 24px;
+
+// Full-bleed dark band: a graphite body angled off-axis from a cool specular wash
+// falling in from the top-right. There was also a pink accent bloom in the
+// bottom-left corner, echoing the hero ticket's own surface — removed, because on a
+// section this large it read as a stray colour cast rather than a deliberate glow.
+.section {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  // Matches the hero's 80px side padding so both sections share one content edge.
+  // Deep vertical padding is doing most of the work on "spacing" — a dark band
+  // needs more air than a white one or it reads as a cramped stripe.
+  padding: 120px 80px 128px;
+  width: 100%;
+  background: radial-gradient(120% 120% at 82% -20%, rgba(255, 255, 255, 0.07) 0%, transparent 52%),
+    linear-gradient(160deg, #191d24 0%, #0b0d12 52%, #12151b 100%);
+}
+
+// Bigger than the 40px it was on the light band: on a dark field a heading has to
+// carry more weight to hold the space, and it's now the section's only large type.
+// Centres and constrains itself.
+.heading {
+  color: #fff;
+  font-size: 48px;
+  font-weight: 550;
+  letter-spacing: -1.1px;
+  line-height: 56px;
+  margin: 0;
+  max-width: 900px;
+  text-align: center;
+}
+
+// Media left, stepper right. Held under the page's 1280 column: two columns of
+// this content at full width leave the copy running to an uncomfortable measure.
+.layout {
+  align-items: center;
+  display: grid;
+  gap: 80px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  margin-top: 72px;
+  max-width: 1120px;
+  width: 100%;
+}
+
+// PLACEHOLDER — the reserved media area. A barely-there tint and hairline rather
+// than an obvious dashed box: it should read as a quiet empty frame in a review,
+// not as a broken image. Replace with the media itself; the aspect ratio is what
+// holds the column's height.
+.mediaSlot {
+  aspect-ratio: 4 / 3;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.035);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07);
+  width: 100%;
+}
+
+.rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  width: 100%;
+}
+
+// Connector rail, centred on the chips. The effect narrows top/height to
+// chip-1 → chip-3 centres; the `top: 0; bottom: 0` default means the track still
+// connects the chips if that script never runs.
+.rail {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  bottom: 0;
+  left: calc(#{$chip * 0.5} - #{$rail-width * 0.5});
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  width: $rail-width;
+}
+
+// The progress fill. Inverted from the light version — bright on a faint track,
+// rather than near-black on grey. scaleY from the top is compositor-friendly, so
+// the scroll handler never triggers layout. Starts at 0: without JS only the track
+// shows, which is still a connected line.
+.railFill {
+  background: rgba(255, 255, 255, 0.92);
+  display: block;
+  height: 100%;
+  transform: scaleY(0);
+  transform-origin: top center;
+  width: 100%;
+}
+
+// Chip in the gutter, copy indented past it. The chip is lifted out of the flow so
+// it sits on the rail beside the title rather than above it.
+.row {
+  padding-left: calc(#{$chip} + #{$chip-gutter});
+  position: relative;
+
+  & + .row {
+    margin-top: 44px;
+  }
+}
+
+// Opaque fill so the rail reads as passing behind it; it paints after the rail, so
+// no z-index is needed.
+.marker {
+  align-items: center;
+  background: #12151b;
+  border-radius: $chip-radius;
+  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.22);
+  color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  height: $chip;
+  justify-content: center;
+  left: 0;
+  position: absolute;
+  // Centres the chip on the title's first line rather than its box: (30px line −
+  // 28px chip) / 2.
+  top: 1px;
+  width: $chip;
+  transition: background 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+}
+
+// Reached: the chip fills to match the rail's bright fill, so the numbers read as
+// completed rather than staying uniform while the line moves past them.
+.markerActive {
+  background: #fff;
+  box-shadow: inset 0 0 0 1.5px #fff;
+  color: #12151b;
+}
+
+.title {
+  color: #fff;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  line-height: 30px;
+  margin: 0;
+}
+
+.body {
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 26px;
+  margin: 8px 0 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marker {
+    transition: none;
+  }
+}
