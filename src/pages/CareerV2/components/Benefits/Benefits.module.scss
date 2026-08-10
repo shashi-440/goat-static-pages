@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   gap: 56px;
-  padding: 80px;
+  padding: 80px var(--page-gutter);
   width: 100%;
 }
 
@@ -43,6 +43,10 @@
   width: 100%;
 }
 
+// Three columns: the media is a fixed centre, with the titles and the copy taking
+// equal shares of whatever is left either side. Previously these were fixed 457px
+// and 438px with the copy on `flex: 1`, so the photo sat right of centre and the
+// two text columns were different widths.
 .grid {
   align-items: stretch;
   display: flex;
@@ -51,13 +55,14 @@
 
 .titles {
   display: flex;
+  flex: 1 1 0;
   flex-direction: column;
   gap: 20px;
   justify-content: center;
   list-style: none;
   margin: 0;
-  padding: 0 24px 0 0;
-  width: 457px;
+  min-width: 0;
+  padding: 0 40px 0 0;
 }
 
 .titleButton {
@@ -85,19 +90,37 @@
   color: #fff;
 }
 
+// Fixed centre column — `flex: 0 0 auto` so it never stretches, and the image is
+// centred within it rather than pushed to one edge.
 .mediaColumn {
   display: flex;
-  justify-content: flex-end;
-  padding: 0 40px;
-  width: 438px;
+  flex: 0 0 auto;
+  justify-content: center;
 }
 
+// Backdrop was #f0f0f0, which flashed near-white against this dark band whenever
+// an image swapped and the box was briefly empty. A dark tone matching the
+// section means any uncovered moment is invisible.
 .media {
-  background: #f0f0f0;
+  background: #1d1d1d;
   border-radius: 16px;
   height: 501px;
   overflow: hidden;
+  position: relative;
   width: 358px;
+}
+
+// Slides are stacked and cross-faded rather than swapped, so there is never a
+// frame with no image painted.
+.slide {
+  inset: 0;
+  opacity: 0;
+  position: absolute;
+  transition: opacity 0.45s ease;
+}
+
+.slideActive {
+  opacity: 1;
 }
 
 .image {
@@ -107,15 +130,17 @@
   width: 100%;
 }
 
+// Mirrors `.titles` — same flex basis and the same 40px gutter, so the photo
+// lands in the true centre of the section.
 .copy {
   align-items: flex-start;
   display: flex;
-  flex: 1 0 0;
+  flex: 1 1 0;
   flex-direction: column;
   gap: 24px;
   justify-content: center;
   min-width: 0;
-  padding: 40px 0 40px 24px;
+  padding: 40px 0 40px 40px;
 }
 
 .copyText {

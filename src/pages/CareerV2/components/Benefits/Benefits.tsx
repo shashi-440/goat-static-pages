@@ -5,41 +5,55 @@ import Reveal from "../../../AboutUsV2/components/Reveal/Reveal";
 import RolesButton from "../RolesButton/RolesButton";
 import CarouselControls from "../CarouselControls/CarouselControls";
 import styles from "./Benefits.module.scss";
-import benefitImg from "../../assets/benefit-health.png";
+import rewardsImg from "../../assets/benefit-rewards.jpg";
+import celebrateImg from "../../assets/benefit-celebrate.jpg";
+import timeImg from "../../assets/benefit-time.jpg";
+import learningImg from "../../assets/benefit-learning.jpg";
+import aiImg from "../../assets/benefit-ai.jpg";
 
 interface Benefit {
   title: string;
-  lead: string;
+  /** Bold opening sentence. Only some slides have one in the design. */
+  lead?: string;
   body: string;
+  image: string;
+  alt: string;
 }
 
-// Figma only art-directs the first slide; the remaining four reuse its layout
-// with their own copy. Titles come from Figma 2665:13577.
+// Content and per-slide art from Figma 2853:17475 — five frames, one per slide,
+// each with its own photo and copy.
 const BENEFITS: Benefit[] = [
   {
-    title: "Health & Wellbeing",
-    lead: "Your wellbeing comes first.",
-    body: "Comprehensive health coverage and mental wellness support, so you can bring your best self to work every day.",
+    title: "Rewards & Recognition",
+    lead: "We're not going to be weird about money.",
+    body: "Competitive salaries, bonuses/incentives, insurance, Meals, rewards & recognition, cab reimbursements, relocation assistance",
+    image: rewardsImg,
+    alt: "An amber team member speaking at a company meetup",
   },
   {
-    title: "Work With Flexibility",
-    lead: "Work where you do your best work.",
-    body: "Flexible hours and hybrid arrangements built on trust, so your day fits around your life rather than the reverse.",
+    title: "Celebrate Together",
+    body: "From festivals and cultural celebrations to team experiences and everyday moments, we make space for people to connect, celebrate, and enjoy the journey together.",
+    image: celebrateImg,
+    alt: "Colleagues raising a toast together at a celebration",
   },
   {
-    title: "Build with AI",
-    lead: "AI tooling from day one.",
-    body: "Every team gets the licences, budget and time to build with modern AI tools — and the freedom to ship what they learn.",
+    title: "Take your time",
+    body: "Leaves- Paternity, maternity, adoption, bereavement, wellness, period leave for female employees, flexi culture- few days work from home",
+    image: timeImg,
+    alt: "A parent and child picking strawberries in a garden",
   },
   {
     title: "Learning & Growth",
-    lead: "Grow faster than you expected.",
-    body: "A dedicated learning budget, internal mobility, and mentorship from people who have built at scale.",
+    body: "Ownership, autonomy, and a flat organisation mean you'll learn directly from leaders, take on meaningful challenges early, and grow through impact—not tenure.",
+    image: learningImg,
+    alt: "Two colleagues laughing over a laptop in a library",
   },
   {
-    title: "Grow Globally",
-    lead: "A career without borders.",
-    body: "With teams across 14 countries, there is room to relocate, lead new markets, and work with colleagues worldwide.",
+    title: "Build with AI",
+    lead: "AI is part of how we build every day.",
+    body: "Whether you're designing, coding, writing, or solving operational challenges, you'll have access to modern AI tools that help you move faster, experiment more, and focus on meaningful work.",
+    image: aiImg,
+    alt: "Someone working thoughtfully at a laptop by a window at dusk",
   },
 ];
 
@@ -63,8 +77,10 @@ const Benefits = () => {
 
   const current = BENEFITS[active];
 
+  // Solid #151515 throughout, so data-nav-theme="dark" makes the shared Navbar
+  // swap to its light logo and white links for the whole section.
   return (
-    <section className={styles.section}>
+    <section className={styles.section} data-nav-theme="dark">
       <Reveal className={styles.header}>
         <h2 className={styles.title}>Benefits of working at Amber</h2>
         <p className={styles.subtitle}>
@@ -91,19 +107,35 @@ const Benefits = () => {
 
           <div className={styles.mediaColumn}>
             <div className={styles.media}>
-              <Image
-                src={benefitImg}
-                alt={current.title}
-                className={styles.image}
-                width="100%"
-                height="100%"
-              />
+              {/* Every slide is mounted and stacked, with only the active one at
+                  full opacity. Two reasons: the images are all fetched on first
+                  paint, so no switch waits on the network (the first visit to a
+                  slide used to stall), and the outgoing photo stays put while the
+                  incoming one fades over it — previously a keyed swap unmounted
+                  the old <img> first, exposing the panel behind for a frame. */}
+              {BENEFITS.map((benefit, i) => (
+                <div
+                  key={benefit.title}
+                  className={`${styles.slide} ${i === active ? styles.slideActive : ""}`}
+                  aria-hidden={i !== active}
+                >
+                  <Image
+                    src={benefit.image}
+                    alt={i === active ? benefit.alt : ""}
+                    className={styles.image}
+                    width="100%"
+                    height="100%"
+                    isEagerLoad
+                  />
+                </div>
+              ))}
             </div>
           </div>
 
           <div className={styles.copy}>
             <p className={styles.copyText}>
-              <span className={styles.copyLead}>{current.lead} </span>
+              {/* Not every slide has a bold lead sentence in the design. */}
+              {current.lead ? <span className={styles.copyLead}>{current.lead} </span> : null}
               {current.body}
             </p>
             <RolesButton />

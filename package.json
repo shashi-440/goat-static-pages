@@ -28,6 +28,7 @@
     "@loadable/component": "^5.15.0",
     "@loadable/server": "^5.15.0",
     "chalk": "^4.1.1",
+    "cobe": "0.6.5",
     "compression": "^1.7.4",
     "express": "^4.17.1",
     "html-minifier": "^4.0.0",

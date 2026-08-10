@@ -7,6 +7,7 @@ import Navbar from "../AboutUsV2/components/Navbar/Navbar";
 import Hero from "./components/Hero/Hero";
 import Mission from "./components/Mission/Mission";
 import Benefits from "./components/Benefits/Benefits";
+import Globe from "./components/Globe/Globe";
 import CoreValues from "./components/CoreValues/CoreValues";
 import Team from "./components/Team/Team";
 import CrewCTA from "./components/CrewCTA/CrewCTA";
@@ -17,7 +18,7 @@ const CareerV2 = () => (
     <Helmet title="Careers | Amber">
       <meta
         name="description"
-        content="Build the future of student living. Explore open roles at Amber — a team of curious builders across 80+ countries helping students find a place to call home."
+        content="We help students find home, before they find everything else. Explore open roles at Amber — a team of curious builders across 80+ countries helping students find a place to call home."
       />
       <meta name="robots" content="index,follow" />
       {/* Instrument Sans — the design font, loaded only on this page */}
@@ -29,9 +30,20 @@ const CareerV2 = () => (
       />
     </Helmet>
 
-    <Navbar />
+    {/* "Career" is dropped from the links here — this *is* the career page — and
+        the CTA becomes "Apply now", secondary until the page is scrolled. */}
+    <Navbar
+      links={[
+        { label: "Blogs", href: "/blog" },
+        { label: "About Us", href: "/about-us-v2" },
+      ]}
+      ctaLabel="Apply now"
+      ctaHref="#open-roles"
+      ctaSecondaryUntilScroll
+    />
     <Hero />
     <Mission />
+    <Globe />
     <Benefits />
     <CoreValues />
     <Team />

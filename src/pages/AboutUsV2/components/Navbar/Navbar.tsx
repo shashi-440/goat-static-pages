@@ -8,12 +8,32 @@ import wrapperHOC from "@Utils/wrapperHOC";
 const logoDark = `${config.IMAGE_STATIC_ASSETS_COMPONENTS_PATH}/Header/assets/amber-logo-dark.svg`;
 const logoLight = `${config.IMAGE_STATIC_URL}/images/logo/amber-logo-light.svg`;
 
-const NAV_LINKS = [
+const DEFAULT_NAV_LINKS = [
   { label: "Blogs", href: "/blog" },
   { label: "Career", href: "/careers" },
 ];
 
-const Navbar = () => {
+interface NavbarProps {
+  /** Override the nav links. Defaults to Blogs + Career. */
+  links?: { label: string; href: string }[];
+  /** CTA label. Defaults to "Try amber". */
+  ctaLabel?: string;
+  /** CTA target. Defaults to "/". */
+  ctaHref?: string;
+  /**
+   * When true the CTA starts as a soft grey secondary pill and only turns into
+   * the pink primary gradient once the page is scrolled. Defaults to false —
+   * the CTA is the pink primary at every scroll position.
+   */
+  ctaSecondaryUntilScroll?: boolean;
+}
+
+const Navbar = ({
+  links = DEFAULT_NAV_LINKS,
+  ctaLabel = "Try amber",
+  ctaHref = "/",
+  ctaSecondaryUntilScroll = false,
+}: NavbarProps) => {
   // `true` when a dark-themed section is currently behind the header.
   const [onDark, setOnDark] = useState(false);
   // `true` once the user has scrolled past the very top — the glass effect
@@ -77,13 +97,21 @@ const Navbar = () => {
       </CustomLink>
 
       <div className={`${styles.links} ${styles.above}`}>
-        {NAV_LINKS.map((link) => (
+        {links.map((link) => (
           <CustomLink key={link.label} href={link.href} className={styles.link}>
             {link.label}
           </CustomLink>
         ))}
-        <CustomLink href="/" className={styles.tryButton} dataTestId="about-us-v2-try-amber">
-          Try amber
+        {/* Secondary-until-scroll: grey pill at the top of the page, pink primary
+            once scrolled. Without the flag the CTA is pink throughout. */}
+        <CustomLink
+          href={ctaHref}
+          className={`${styles.tryButton} ${
+            ctaSecondaryUntilScroll && !scrolled ? styles.tryButtonSecondary : ""
+          }`}
+          dataTestId="about-us-v2-try-amber"
+        >
+          {ctaLabel}
         </CustomLink>
       </div>
     </nav>

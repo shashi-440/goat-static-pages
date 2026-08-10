@@ -41,12 +41,10 @@
   height: 40px;
   justify-content: center;
   padding: 0;
-  transition: transform 0.18s ease, background-color 0.18s ease;
+  // Colour only — no lift. Buttons across this page settle on a background
+  // change for hover, so the arrows match rather than rising off the surface.
+  transition: background-color 0.18s ease;
   width: 40px;
-
-  &:hover {
-    transform: translateY(-1px);
-  }
 }
 
 .dark {

@@ -1,5 +1,4 @@
 import wrapperHOC from "@Utils/wrapperHOC";
-import CountUp from "../../../AboutUsV2/components/CountUp/CountUp";
 import Reveal from "../../../AboutUsV2/components/Reveal/Reveal";
 import ScrollText from "../ScrollText/ScrollText";
 import styles from "./Mission.module.scss";
@@ -9,15 +8,8 @@ import founderPlain from "../../assets/founder-plain.png";
 import founderShades from "../../assets/founder-shades.png";
 import signatureImg from "../../assets/signature-mask.png";
 
-const STATS = [
-  { target: 2, suffix: " Million+", label: "Beds available" },
-  { target: 250, suffix: "+", label: "Cities Worldwide" },
-  { target: 80, suffix: "+", label: "Countries Served" },
-  { target: 800, suffix: "+", label: "Partner Universities" },
-];
-
 /**
- * Founder quote and the four headline stats (Figma 2665:13560).
+ * Founder quote (Figma 2665:13560).
  *
  * The signature is a Figma mask-group: a #d9004c fill showing through the
  * signature artwork. Reproduced with a CSS mask so the ink stays the brand
@@ -31,9 +23,12 @@ const Mission = () => (
         <ScrollText
           className={styles.quote}
           text={
-            "“We learn best through osmosis. The more time we spend in each other’s presence, " +
-            "the more we grow. And the closer we are to our customers, the better work we can do. " +
-            "That’s why being in person is so important to who we are, and who we want to become.”"
+            "“The message came in at 2am — a student, four days from flying out, telling us the " +
+            "apartment she’d paid for didn’t exist. No landlord, no address, just a screenshot and " +
+            "a deposit gone. I remember thinking: she did everything right, and the system still " +
+            "failed her. That wasn’t bad luck. That was the whole industry running on trust with " +
+            "no way to verify it. So we built one. Not a mission statement — just a way to make " +
+            "sure that message never has to be sent again.”"
           }
         />
       </blockquote>
@@ -61,18 +56,6 @@ const Mission = () => (
         <p className={styles.role}>Founder and CEO at amber</p>
       </Reveal>
 
-      <hr className={styles.divider} />
-
-      <div className={styles.stats}>
-        {STATS.map((stat, i) => (
-          <Reveal key={stat.label} className={styles.stat} delay={i * 80}>
-            <span className={styles.statValue}>
-              <CountUp target={stat.target} suffix={stat.suffix} />
-            </span>
-            <span className={styles.statLabel}>{stat.label}</span>
-          </Reveal>
-        ))}
-      </div>
     </div>
   </section>
 );

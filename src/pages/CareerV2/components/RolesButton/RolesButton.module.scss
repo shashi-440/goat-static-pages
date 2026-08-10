@@ -1,12 +1,52 @@
 .button {
+  // Cursor position, written by the component on mousemove. Defaults to the
+  // centre so the first frame of a hover is never in a corner.
+  --mx: 50%;
+  --my: 50%;
+  // Per-variant highlight tint — dark buttons need a white wash, light ones a
+  // dark wash. Overridden in each variant below.
+  --spot: rgba(255, 255, 255, 0.16);
+
   align-items: center;
   border: 0;
   cursor: pointer;
   display: inline-flex;
   justify-content: center;
+  overflow: hidden;
   position: relative;
   text-decoration: none;
-  transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+  // Colour and shadow only. Hover deliberately does not lift the button — every
+  // CTA and control on this page settles on a background change instead, so the
+  // treatment is consistent wherever a button appears.
+  transition: box-shadow 0.18s ease, background-color 0.18s ease, background-image 0.18s ease;
+
+  // The highlight itself: a soft radial wash centred on the cursor. Sits above
+  // the button's background but below the label (which is z-index 1), and is
+  // clipped to the button's own radius by `overflow: hidden` above.
+  &::after {
+    background: radial-gradient(
+      circle 72px at var(--mx) var(--my),
+      var(--spot) 0%,
+      transparent 100%
+    );
+    content: "";
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    transition: opacity 0.25s ease;
+    z-index: 0;
+  }
+
+  &:hover::after {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button::after {
+    transition: none;
+  }
 }
 
 .label {
@@ -16,7 +56,16 @@
 }
 
 // Hero CTA — dark, extruded pill with an inner highlight (Figma 2671:15547).
+// `overflow: visible` overrides the base rule: this variant's outer box-shadow
+// is drawn OUTSIDE its box and would be clipped away. It keeps its own extruded
+// treatment rather than the cursor highlight, so nothing needs clipping here.
 .raised {
+  overflow: visible;
+
+  &::after {
+    content: none;
+  }
+
   background: linear-gradient(180deg, #282828 0%, #202020 100%);
   border-radius: 15.568px;
   box-shadow: 0 0 0 1.946px rgba(0, 0, 0, 0.65), 5.189px 11.676px 16.865px rgba(0, 0, 0, 0.25);
@@ -49,13 +98,66 @@
 
   &:hover {
     box-shadow: 0 0 0 1.946px rgba(0, 0, 0, 0.65), 5.189px 14px 20px rgba(0, 0, 0, 0.3);
-    transform: translateY(-1px);
+  }
+}
+
+// Hero CTA — standard rounded primary pill in the brand pink, matching the
+// header's "Apply now" gradient so the two read as the same button family.
+// Replaces the old extruded `raised` treatment.
+.primary {
+  background-image: linear-gradient(107.58deg, #ff5771 9.93%, #e53762 51.5%, #ff5771 105.98%);
+  border-radius: 999px;
+  padding: 14px 28px;
+
+  // White wash reads on the pink gradient.
+  --spot: rgba(255, 255, 255, 0.22);
+
+  .label {
+    // !important for the same reason as the navbar CTA: the site's global
+    // `a:hover/active/focus` rule turns link text red otherwise.
+    color: #fff !important;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 20px;
+  }
+
+  &:hover {
+    background-image: linear-gradient(107.58deg, #f0466a 9.93%, #d92b48 51.5%, #f0466a 105.98%);
+  }
+}
+
+// Dark CTA for the Globe section — the #222 fill from Figma 2859:18004, but on
+// the fully rounded pill the other CTAs on this page use rather than the design's
+// 12px corners.
+.dark {
+  background: #222;
+  border: 1px solid #111;
+  border-radius: 999px;
+  padding: 14px 28px;
+
+  // White wash on the near-black fill.
+  --spot: rgba(255, 255, 255, 0.14);
+
+  .label {
+    // !important for the same reason as the other variants: the site's global
+    // `a:hover/active/focus` rule turns link text red otherwise.
+    color: #fff !important;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 20px;
+  }
+
+  &:hover {
+    background: #333;
   }
 }
 
 // White pill matching AboutUsV2's CrewCTA button — taller and wider than the
 // Benefits variant, pure white rather than #f0f0f0.
 .solid {
+  // Dark wash — a white highlight would be invisible on a white button.
+  --spot: rgba(0, 0, 0, 0.07);
+
   background: #fff;
   border-radius: 999px;
   padding: 16px 24px;
@@ -75,6 +177,9 @@
 
 // Light pill used on the dark Benefits section (Figma 2665:13587).
 .light {
+  // Dark wash, as with `.solid` — this pill is near-white too.
+  --spot: rgba(0, 0, 0, 0.07);
+
   background: #f0f0f0;
   border-radius: 999px;
   height: 40px;
@@ -89,6 +194,5 @@
 
   &:hover {
     background: #fff;
-    transform: translateY(-1px);
   }
 }

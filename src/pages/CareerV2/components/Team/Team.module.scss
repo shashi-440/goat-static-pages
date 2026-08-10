@@ -16,8 +16,31 @@
   display: flex;
   flex-direction: column;
   gap: 56px;
-  padding: 80px;
+  padding: 80px var(--page-gutter);
+  // Anchors `.darkZone` below.
+  position: relative;
   width: 100%;
+}
+
+// Invisible marker for the region where the header must go white. The shared
+// Navbar looks for [data-nav-theme="dark"] and switches to its light logo + white
+// links while such an element is behind the 64px header line.
+//
+// It starts at 25%, which is where the portrait cards begin (~28% of the section:
+// 80px padding + ~91px header block + 56px gap, over a section ~820px tall). The
+// cards themselves are near black, so the header has to be white from the moment
+// they reach it — the background gradient behind them is still mid-grey at that
+// point, which is why keying off the gradient's own dark stops (the previous 65%)
+// flipped the header far too late.
+// Paints nothing and takes no clicks — it exists only to be found by the Navbar's
+// querySelectorAll, so it needs no z-index of its own.
+.darkZone {
+  bottom: 0;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 25%;
 }
 
 .header {
@@ -47,17 +70,13 @@
   text-align: center;
 }
 
-// Carousel viewport clips the track horizontally; the track slides ONE card per
-// click. Clipping must be x-only: the hover tilt rotates a card in 3D so it
-// extends past its own box, and `overflow: hidden` would slice the near edge
-// flat. `clip` (not `hidden`) on x plus `visible` on y keeps the horizontal
-// clip without scrolling, and the padding gives the tilt room to lean into.
+// Carousel viewport. Deliberately NOT clipped: the hover tilt rotates a card in
+// 3D and `perspective` magnifies its near edge, so the card paints past its own
+// box — any horizontal clip here shaved that edge flat on the outer cards. Fully
+// visible overflow was chosen over clipping, accepting that the off-track cards
+// stay visible either side of the three in view.
 .viewport {
-  overflow-x: clip;
-  overflow-y: visible;
-  // Room for the tilted card to overhang without being cut.
-  padding: 40px 0;
-  margin: -40px 0;
+  overflow: visible;
   width: 100%;
 }
 
@@ -84,6 +103,26 @@
   min-width: 0;
   // Perspective lives on this PARENT so it applies to the tilt below.
   perspective: 1000px;
+
+  // Scroll-in state. Safe to transform here: the cursor tilt lives on `.tilt`, a
+  // child, so the two never fight over the same property. The delay is set inline
+  // per card, which is what staggers them.
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+
+.cardShown {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flipCard {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
 
 // Separate from `.flipInner` so the cursor tilt never interferes with the
@@ -118,11 +157,14 @@
   position: absolute;
   width: 100%;
 
-  // `overflow: hidden` alone does NOT reliably clip children inside a
-  // `preserve-3d` ancestor — corners of the photo and the name-plate scrim leak
-  // past the rounded edge. A clip-path is applied in the same geometry and IS
-  // honoured in a 3D context, so the radius holds on all four corners.
-  clip-path: inset(0 round 24px);
+  // Deliberately no `clip-path`. It used to be `inset(0 round 24px)`, hugging the
+  // card's box to hold the rounded corners — but a clip-path is absolute, with no
+  // `overflow-clip-margin` equivalent. The hover tilt rotates the card toward the
+  // viewer and `perspective` magnifies its near edge (~9px per side), so the mask
+  // stayed put and sliced that edge flat: square corners on whichever side leaned
+  // out. The radius is carried by `border-radius` here plus the children below,
+  // matching AboutUsV2's WhyAmberExists flip cards — same preserve-3d context,
+  // plain `border-radius` + `overflow: hidden`, and the corners hold there.
 }
 
 .front {
@@ -140,6 +182,9 @@
 }
 
 .photo {
+  // Matches `.face` so the corners stay rounded even if `overflow: hidden` leaks
+  // in the preserve-3d context — the reason a clip-path was reached for before.
+  border-radius: 24px;
   display: block;
   height: 100%;
   object-fit: cover;
@@ -154,6 +199,8 @@
     rgba(0, 0, 0, 0.8) 85.521%,
     #000 100%
   );
+  // Same reason as `.photo` — keep the scrim inside the rounded corners.
+  border-radius: 24px;
   inset: 0;
   pointer-events: none;
   position: absolute;
@@ -358,8 +405,13 @@
   height: 40px;
   justify-content: center;
   padding: 0;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.2s ease, background-color 0.18s ease;
   width: 40px;
+
+  // Matches the shared CarouselControls arrows — background shift, no lift.
+  &:hover:not(:disabled) {
+    background: #fff;
+  }
 
   &:disabled {
     cursor: default;
