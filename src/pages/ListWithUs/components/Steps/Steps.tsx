@@ -11,7 +11,7 @@ import triUp from "../../assets/icons/tri-up.svg";
 import wrapperHOC from "@Utils/wrapperHOC";
 
 /**
- * "Listing With Amber In 3 Easy Steps" — Figma node 2456:6203.
+ * "Listing With amber In 3 Easy Steps" — Figma node 2456:6203.
  *
  * The rail plays itself. Each segment fills left to right, and the mock-up above
  * it plays its own beat while it does: the form types itself in under a caret,
@@ -205,7 +205,7 @@ const Steps = () => {
     <section ref={sectionRef} className={styles.section}>
       <div className={styles.inner}>
         <Reveal as="h2" className={styles.heading}>
-          Listing With Amber In 3 Easy Steps
+          Listing With amber In 3 Easy Steps
         </Reveal>
 
         <div className={styles.body}>

@@ -1,0 +1,182 @@
+// The document body. Same 700px measure and 80px gutters as the hero above, so
+// the padlock, the title and the first line of the policy share one left edge.
+.section {
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  // 64px from the hero subtitle down to the first line of the preamble — Figma
+  // measures 66px here.
+  padding: 64px 80px 0;
+  width: 100%;
+}
+
+// Figma: 40px between the top-level pieces (preamble, callout, divider, and each
+// numbered clause).
+.inner {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  max-width: 700px;
+  width: 100%;
+}
+
+// The document's own formal title, where its source has one distinct from the h1
+// (Terms opens with "TERMS AND CONDITIONS OF WEBSITE USE"). Set small and tracked
+// so it reads as a document label rather than competing with the page heading.
+.lead {
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.72px;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+// Sits closer to the paragraph it introduces than the 16px paragraph rhythm.
+.lead + .para {
+  margin-top: 14px;
+}
+
+// Block, not flex, so consecutive paragraphs can be spaced differently from the
+// heading→body step below.
+//
+// The margin reset lives HERE, on the children, rather than on .heading/.para
+// themselves: an element-level `margin: 0` carries the same specificity (0,1,0)
+// as the sibling rules that follow, and being later in the file it would
+// silently cancel them.
+.group,
+.clause {
+  display: block;
+  width: 100%;
+
+  > * {
+    margin: 0;
+  }
+}
+
+// Figma: a uniform 14px between a clause's heading, paragraphs and lists…
+.clause > * + * {
+  margin-top: 14px;
+}
+
+// …except between two consecutive paragraphs, which sit 16px apart. Two classes
+// (0,2,0) beats the rule above (0,1,0), so it wins regardless of order — and it
+// is what spaces the preamble too.
+.para + .para {
+  margin-top: 16px;
+}
+
+.heading {
+  color: #111928;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.22px;
+  line-height: 1.35;
+  overflow-wrap: break-word;
+}
+
+.para {
+  color: #1f2a37;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.7;
+  overflow-wrap: break-word;
+}
+
+// Bold runs inside a paragraph — darker ink as well as heavier, so the emphasis
+// reads at 16px.
+.strong {
+  color: #111928;
+  font-weight: 600;
+}
+
+// Links inside the prose: semibold ink with a muted underline that inks up on
+// hover. The colour is pinned on every state because the site's global `a:hover`
+// rule would otherwise tint the text.
+.link {
+  color: #111928 !important;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: rgba(17, 25, 40, 0.35);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  transition: text-decoration-color 0.2s ease;
+
+  &:hover,
+  &:active,
+  &:focus {
+    color: #111928 !important;
+    text-decoration-color: #111928;
+  }
+}
+
+// The one boxed aside in the document — the defined-terms notice.
+.callout {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px 24px;
+  width: 100%;
+}
+
+.calloutText {
+  color: #111928;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.6;
+  margin: 0;
+  overflow-wrap: break-word;
+}
+
+.divider {
+  background: #e5e7eb;
+  display: block;
+  height: 1px;
+  width: 100%;
+}
+
+// No `margin` here — the `.clause > *` reset above owns it, and re-declaring it
+// would out-order the 14px sibling rule (see the comment there).
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  list-style: none;
+  padding: 0;
+  width: 100%;
+}
+
+.item {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+// Markers sit in a fixed gutter so every item's text starts on the same line,
+// however long the marker is. Figma: 30px for "(a)", 16px for a bullet.
+.letter,
+.bullet {
+  color: #111928;
+  flex-shrink: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.7;
+}
+
+.letter {
+  width: 30px;
+}
+
+.bullet {
+  width: 16px;
+}
+
+.itemText {
+  color: #1f2a37;
+  flex: 1 1 0;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.7;
+  min-width: 0;
+  overflow-wrap: break-word;
+}

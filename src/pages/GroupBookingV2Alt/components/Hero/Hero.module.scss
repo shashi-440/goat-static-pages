@@ -1,0 +1,386 @@
+// Two columns rather than the stacked, centred block the other v2 heroes use — the
+// 80px side padding and the white ground are still shared with them, but this one
+// reads left-to-right: visual, then the pitch.
+.hero {
+  align-items: center;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 72px 80px 88px;
+  width: 100%;
+}
+
+.row {
+  align-items: center;
+  display: flex;
+  // Modest, because the comp already carries a band of empty white down its sides;
+  // a larger gap on top of that opened a hole in the middle of the hero.
+  gap: 40px;
+  // 480 video + 40 gap + 680 copy, inside the page's 1280 column. 680 fits the
+  // headline's longest line — "Friends who book together", which needs more measure
+  // than the old copy did and broke after "book" at 580. If the copy grows again,
+  // widen this rather than letting the line wrap into a third.
+  max-width: 1200px;
+  width: 100%;
+}
+
+// Left on screen, second in the DOM — see the comment in Hero.tsx.
+.videoSlot {
+  flex: none;
+  order: -1;
+  // The ring doesn't sit centred in its own frame — there's more empty white below
+  // it than above — so box-centring the video against the copy leaves it looking
+  // low. Nudged up by transform rather than margin so the row's height and the
+  // centring of everything else stay untouched.
+  transform: translateY(-34px);
+}
+
+// Ranged left, filling the rest of the row.
+.copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  text-align: left;
+}
+
+// The source is 720 × 720 and its background is the same white as the page, so it
+// needs no mask, radius or crop — it sits directly on the ground and blends.
+.video {
+  display: block;
+  height: 480px;
+  width: 480px;
+}
+
+// 62 on 52 rather than the 56 the other v2 heroes use. Those are one-liners or
+// centred; this one is two ranged-left lines carrying a large figure, and at 56 the
+// descenders of line one sat almost on the caps of line two.
+.title {
+  color: #111928;
+  font-size: 52px;
+  font-weight: 550;
+  letter-spacing: -1.04px;
+  line-height: 62px;
+  margin: 0;
+}
+
+// The live figure, back in the heading and set at the headline's own weight.
+//
+// It stays a <strong> — the element is still the semantically important bit of the
+// sentence, and a screen reader should treat it that way — but `inherit` overrides
+// the browser's bold so it doesn't stand out visually. Without this it renders at
+// 700 against the headline's 550.
+.amount {
+  font-weight: inherit;
+  // The slider retargets this on every step; without tabular figures the digits
+  // shift width and the line jitters.
+  font-variant-numeric: tabular-nums;
+}
+
+// Set down against the digits, matching the ticket card's 30-on-54. em-based so it
+// tracks the headline if the type scale changes. Sits on the baseline — raising it
+// to cap height reads as a superscript at this weight.
+.currency {
+  font-size: 0.62em;
+  letter-spacing: -0.02em;
+  padding-right: 0.02em;
+}
+
+// Held narrower than the column so it breaks into comfortable lines rather than one
+// very long measure.
+.subtitle {
+  color: #636363;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.55;
+  margin: 16px 0 0;
+  max-width: 560px;
+}
+
+// ————————————————————————————————————————————————————————————————
+// Slider
+//
+// A transparent <input type="range"> sits over everything, so the control keeps
+// native keyboard, pointer and touch behaviour while the visible parts — track,
+// fill, pips, bubble — are ordinary elements we can style and animate.
+//
+// One piece of maths is shared by the fill, the pips and the bubble: a range
+// thumb's centre travels between thumb/2 and (width − thumb/2), never the full
+// width. Anything that has to line up with the thumb must use that same mapping,
+// or it drifts by up to half a thumb at the ends.
+// ————————————————————————————————————————————————————————————————
+$thumb-size: 32px;
+$track-height: 6px;
+$accent-from: #ff5771;
+$accent-to: #e53762;
+
+@function thumb-track($p) {
+  @return calc(#{$p} * (100% - #{$thumb-size}) + #{$thumb-size * 0.5});
+}
+
+// Reads out the slider's state above the track: what's selected on the left, the
+// ceiling on the right. Held to the track's own width so both ends line up with it.
+.sliderMeta {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 32px;
+  max-width: 520px;
+  width: 100%;
+}
+
+// Faces then the number. align-items centre rather than baseline, because the
+// avatars are taller than the text and would otherwise hang below it.
+.sliderCount {
+  align-items: center;
+  color: #636363;
+  display: flex;
+  font-size: 15px;
+  font-weight: 400;
+  gap: 10px;
+  line-height: 20px;
+}
+
+.sliderCountValue {
+  color: #111928;
+  font-size: 17px;
+  font-weight: 650;
+  // The number changes on every step; tabular figures stop the word after it from
+  // shifting as digit widths change.
+  font-variant-numeric: tabular-nums;
+  margin-right: 2px;
+}
+
+.sliderMax {
+  color: #9ca3af;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.sliderRow {
+  // 0 → 1, set inline from the component.
+  --fill: 0;
+
+  align-items: center;
+  cursor: grab;
+  display: flex;
+  height: $thumb-size;
+  // Tighter than before: the meta row above now carries the 32px gap.
+  margin-top: 10px;
+  max-width: 520px;
+  position: relative;
+  width: 100%;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.track {
+  background: #eceef1;
+  border-radius: 999px;
+  height: $track-height;
+  position: relative;
+  width: 100%;
+  // Recessed rather than drawn on: a hairline top-inset reads as a groove the fill
+  // sits inside.
+  box-shadow: inset 0 1px 2px rgba(16, 24, 40, 0.07);
+}
+
+.trackFill {
+  border-radius: 999px;
+  display: block;
+  height: 100%;
+  background-image: linear-gradient(90deg, $accent-from 0%, $accent-to 100%);
+  width: #{thumb-track("var(--fill)")};
+  // Short enough that a drag still feels direct, long enough that a keyboard step
+  // or a click on the track glides instead of snapping.
+  transition: width 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+  // Colour bleeding under the bar, so the filled length reads as lit.
+  box-shadow: 0 1px 8px rgba(229, 55, 98, 0.32);
+}
+
+// ————————————————————————————————————————————————————————————————
+// Step pips
+// ————————————————————————————————————————————————————————————————
+.ticks {
+  bottom: 0;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.tick {
+  background: #d3d7dd;
+  border-radius: 50%;
+  height: 5px;
+  // --p is the pip's own 0→1 position, set inline.
+  left: #{thumb-track("var(--p)")};
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 5px;
+  transition: background 0.22s ease, opacity 0.22s ease, transform 0.22s ease;
+}
+
+// Passed by the fill: knocked out of the gradient rather than sitting on it.
+.tickOn {
+  background: rgba(255, 255, 255, 0.85);
+  transform: translate(-50%, -50%) scale(0.85);
+}
+
+// ————————————————————————————————————————————————————————————————
+// Value bubble
+// ————————————————————————————————————————————————————————————————
+.bubble {
+  background: #111928;
+  border-radius: 8px;
+  bottom: calc(100% + 12px);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  left: #{thumb-track("var(--fill)")};
+  line-height: 16px;
+  opacity: 0;
+  padding: 4px 9px;
+  pointer-events: none;
+  position: absolute;
+  transform: translateX(-50%) translateY(4px) scale(0.92);
+  transition: opacity 0.18s ease, transform 0.18s cubic-bezier(0.34, 1.4, 0.5, 1),
+    left 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+
+  // The little tail, so it reads as attached to the thumb.
+  &::after {
+    border: 4px solid transparent;
+    border-top-color: #111928;
+    content: "";
+    left: 50%;
+    position: absolute;
+    top: 100%;
+    transform: translateX(-50%);
+  }
+}
+
+// Shown while the control is being used — pointer over it, or focused by keyboard.
+.sliderRow:hover .bubble,
+.sliderRow:focus-within .bubble {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+// ————————————————————————————————————————————————————————————————
+// The real input — invisible, but it is what you actually drag.
+// ————————————————————————————————————————————————————————————————
+.slider {
+  appearance: none;
+  background: transparent;
+  cursor: inherit;
+  height: 100%;
+  left: 0;
+  margin: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+
+  &:focus {
+    outline: none;
+  }
+
+  // Native tracks are hidden — .track above is what's drawn.
+  &::-webkit-slider-runnable-track {
+    background: transparent;
+    height: 100%;
+  }
+
+  &::-moz-range-track {
+    background: transparent;
+    height: 100%;
+  }
+
+  // Layered shadows instead of one: a hairline to define the edge, a tight shadow
+  // for contact, a wide soft one for lift. A single shadow reads as a sticker.
+  &::-webkit-slider-thumb {
+    appearance: none;
+    background: #fff;
+    border: 0;
+    border-radius: 50%;
+    height: $thumb-size;
+    width: $thumb-size;
+    box-shadow: 0 0 0 1px rgba(17, 24, 39, 0.07), 0 2px 5px rgba(16, 24, 40, 0.14),
+      0 10px 22px rgba(16, 24, 40, 0.11);
+    transition: transform 0.2s cubic-bezier(0.34, 1.4, 0.5, 1), box-shadow 0.2s ease;
+  }
+
+  &::-moz-range-thumb {
+    appearance: none;
+    background: #fff;
+    border: 0;
+    border-radius: 50%;
+    height: $thumb-size;
+    width: $thumb-size;
+    box-shadow: 0 0 0 1px rgba(17, 24, 39, 0.07), 0 2px 5px rgba(16, 24, 40, 0.14),
+      0 10px 22px rgba(16, 24, 40, 0.11);
+    transition: transform 0.2s cubic-bezier(0.34, 1.4, 0.5, 1), box-shadow 0.2s ease;
+  }
+
+  // Grows a little under the pointer, and picks up an accent halo while dragging so
+  // the thumb belongs to the filled part of the track.
+  &:hover::-webkit-slider-thumb {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 1px rgba(17, 24, 39, 0.08), 0 3px 8px rgba(16, 24, 40, 0.16),
+      0 14px 28px rgba(16, 24, 40, 0.14);
+  }
+
+  &:active::-webkit-slider-thumb {
+    transform: scale(1.14);
+    box-shadow: 0 0 0 1px rgba(229, 55, 98, 0.35), 0 0 0 8px rgba(229, 55, 98, 0.12),
+      0 3px 10px rgba(16, 24, 40, 0.18);
+  }
+
+  &:hover::-moz-range-thumb {
+    transform: scale(1.08);
+  }
+
+  &:active::-moz-range-thumb {
+    transform: scale(1.14);
+    box-shadow: 0 0 0 1px rgba(229, 55, 98, 0.35), 0 0 0 8px rgba(229, 55, 98, 0.12);
+  }
+
+  // Keyboard focus needs to be visible on the thumb, since the input's own outline
+  // is suppressed above.
+  &:focus-visible::-webkit-slider-thumb {
+    box-shadow: 0 0 0 1px rgba(229, 55, 98, 0.45), 0 0 0 5px rgba(229, 55, 98, 0.22),
+      0 3px 10px rgba(16, 24, 40, 0.18);
+  }
+
+  &:focus-visible::-moz-range-thumb {
+    box-shadow: 0 0 0 1px rgba(229, 55, 98, 0.45), 0 0 0 5px rgba(229, 55, 98, 0.22);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trackFill,
+  .tick,
+  .bubble,
+  .slider::-webkit-slider-thumb,
+  .slider::-moz-range-thumb {
+    transition: none;
+  }
+}
+
+.ctaRow {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 28px;
+
+  // .tryButton carries margin-left: 8px to space it from the navbar links, which
+  // would nudge it off-centre here. Class + element beats the single class, so this
+  // wins regardless of stylesheet order.
+  > a {
+    margin-left: 0;
+  }
+}

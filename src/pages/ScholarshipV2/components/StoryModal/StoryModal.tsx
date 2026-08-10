@@ -8,6 +8,12 @@ interface StoryModalProps {
   title: string;
   /** YouTube video id. */
   videoId: string;
+  /**
+   * Start offset in seconds — the `t=` on a YouTube share link. Optional; omitted
+   * means the video plays from the beginning, which is what every existing caller
+   * gets.
+   */
+  start?: number;
   onClose: () => void;
 }
 
@@ -18,7 +24,7 @@ interface StoryModalProps {
  * requested from YouTube (and no cookie is set) until someone opens a story.
  * autoplay=1 is honoured because opening it is always a user gesture.
  */
-const StoryModal = ({ open, title, videoId, onClose }: StoryModalProps) => {
+const StoryModal = ({ open, title, videoId, start, onClose }: StoryModalProps) => {
   useEffect(() => {
     if (!open) return undefined;
 
@@ -56,7 +62,9 @@ const StoryModal = ({ open, title, videoId, onClose }: StoryModalProps) => {
         <div className={styles.frame}>
           <iframe
             className={styles.video}
-            src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`}
+            src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1${
+              start ? `&start=${start}` : ""
+            }`}
             title={`${title} — amberscholar story`}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen

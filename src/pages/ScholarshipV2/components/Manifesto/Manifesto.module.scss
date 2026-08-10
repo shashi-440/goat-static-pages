@@ -1,0 +1,149 @@
+// How dark an unread word sits. 0.16 on black was technically legible but hard
+// work — the unread half of the passage read as a smudge rather than as text you
+// haven't got to yet. 0.3 keeps the contrast between read and unread doing its job
+// while leaving the whole thing readable at a glance.
+$dim: 0.3;
+// Face cluster geometry. $step is centre-to-centre — the distance each hidden face
+// has to travel to sit on top of the first one.
+$face: 0.94em;
+$overlap: 0.28em;
+$step: 0.66em;
+// Three faces minus the two overlaps — the cluster's width once it's open.
+$cluster-open: $face * 3 - $overlap * 2;
+// Opacity gained per word of travel — the reciprocal of the ramp width in
+// Manifesto.tsx. 0.34 spreads the brightening edge over roughly three words.
+$step: 0.34;
+
+// Tall on purpose: the extra height beyond the sticky child is the scroll travel
+// the reading is mapped onto. 260vh gives the passage about 1.6 viewports of
+// scrolling — long enough to read at pace, short enough not to feel like a hostage
+// situation.
+// No closing hairline. There used to be one, because this section and Categories
+// below were both pure black and ran together as one endless field. Categories is
+// light grey now, so that edge draws itself.
+.section {
+  background: #000;
+  min-height: 260vh;
+  position: relative;
+  width: 100%;
+}
+
+// Holds the passage in the middle of the screen while the section scrolls past
+// underneath it.
+.sticky {
+  align-items: center;
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  padding: 0 80px;
+  position: sticky;
+  top: 0;
+}
+
+.text {
+  // Defaults high so the passage is fully legible before hydration and with JS
+  // disabled; the effect only ever takes brightness away from a readable baseline.
+  --lit: 999;
+
+  color: #fff;
+  font-size: 40px;
+  font-weight: 550;
+  letter-spacing: -0.6px;
+  line-height: 58px;
+  margin: 0;
+  max-width: 940px;
+  text-align: center;
+  // Prevents a lone word on the last line, which a centred passage shows up badly.
+  text-wrap: balance;
+}
+
+// Every token — word or chip — derives its own brightness from the paragraph's
+// --lit and its own index, so scrolling writes one property instead of touching
+// every span.
+//
+// No transition: --lit changes every frame with a fractional value, so the ramp is
+// already continuous. A transition on top would fight it and lag behind the scroll.
+.tok {
+  opacity: clamp(#{$dim}, calc(#{$dim} + (var(--lit) - var(--i)) * #{$step}), 1);
+}
+
+// inline-block would let each word be a line-breaking unit but also introduces the
+// inter-word spacing quirk; the trailing space in the markup handles spacing, so
+// these stay inline.
+.word {
+  // Nothing beyond .tok — kept as its own hook so word-only rules have somewhere to
+  // live.
+  display: inline;
+}
+
+// ————————————————————————————————————————————————————————————————
+// Inline art
+//
+// Sized in em so the chips scale with the passage rather than needing a second set
+// of numbers. The negative vertical-align seats them on the text's optical centre:
+// `middle` aligns to baseline + half x-height, which on a 40px face leaves them
+// visibly high.
+// ————————————————————————————————————————————————————————————————
+.chip {
+  align-items: center;
+  display: inline-flex;
+  margin: 0 0.16em;
+  vertical-align: -0.26em;
+}
+
+// The cluster carries an explicit width so it can animate between one face and
+// three. Closed it is exactly one face wide, so the sentence closes up around it and
+// there's no reserved hole; opening widens it and the words part to make room.
+//
+// This does reflow the line as it animates — the alternative was reserving the full
+// width up front, which is what left the gap.
+.faces {
+  align-items: center;
+  display: inline-flex;
+  // The hidden faces sit outside this box while closed; they're transparent, so
+  // nothing shows.
+  overflow: visible;
+  width: #{$cluster-open};
+  transition: width 0.55s cubic-bezier(0.34, 1.5, 0.5, 1);
+}
+
+.faces:not(.facesOpen) {
+  width: #{$face};
+}
+
+// Ringed in the section's own black so overlapping faces read as cut into each
+// other rather than blended.
+//
+// The cluster's layout width is always the full three faces, even while two of them
+// are hidden — they're moved with transform and faded, never unmounted or resized.
+// Anything that changed the width mid-scroll would reflow the sentence and could
+// re-break the line under the reader.
+.face {
+  border-radius: 50%;
+  box-shadow: 0 0 0 0.055em #000;
+  height: #{$face};
+  object-fit: cover;
+  width: #{$face};
+  // Arrival is a slight overshoot, which is what makes it read as landing rather
+  // than sliding. Opacity resolves faster than position so nothing fades in late.
+  transition: opacity 0.3s ease, transform 0.55s cubic-bezier(0.34, 1.5, 0.5, 1);
+  // Staggered by position in the stack, so they deal out rather than arrive at once.
+  transition-delay: calc(var(--n) * 90ms);
+
+  & + & {
+    margin-left: -#{$overlap};
+  }
+}
+
+// Closed: every face after the first is tucked exactly behind it and faded out, so
+// the cluster reads as a single portrait until the passage reaches it.
+//
+// The offset is the face's own index times the centre-to-centre step — face size
+// minus the overlap — which is what lands each one precisely on the first.
+.faces:not(.facesOpen) .face:not(:first-child) {
+  opacity: 0;
+  transform: translateX(calc(var(--n) * -#{$step})) scale(0.62);
+  // No stagger on the way back: closing should be immediate, only opening is
+  // choreographed.
+  transition-delay: 0ms;
+}

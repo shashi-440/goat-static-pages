@@ -85,11 +85,11 @@ const MEMBERS: Member[] = [
 ];
 
 // Max vertical tilt (deg) — reached near the very top / bottom edge.
-// Same hover hint as the AboutUsV2 "Why Amber Exists" flip cards.
+// Same hover hint as the AboutUsV2 "Why amber Exists" flip cards.
 const MAX_TILT = 12;
 
 // Cards visible at once; the track slides ONE card per click, matching
-// AboutUsV2's Amber Story carousel.
+// AboutUsV2's amber Story carousel.
 const PER_VIEW = 3;
 
 // Most dots the control row will ever show. Beyond this the dots window rather
@@ -223,8 +223,8 @@ const MemberCard = ({ member, delay = 0 }: MemberCardProps) => {
 };
 
 /**
- * "Meet the People Behind Amber" carousel (Figma 2675:16147). Carousel mechanics
- * mirror AboutUsV2's Amber Story: PER_VIEW cards in view, one card per step,
+ * "Meet the People Behind amber" carousel (Figma 2675:16147). Carousel mechanics
+ * mirror AboutUsV2's amber Story: PER_VIEW cards in view, one card per step,
  * arrows disable at the ends rather than wrapping.
  */
 const Team = () => {
@@ -253,7 +253,7 @@ const Team = () => {
       <div className={styles.darkZone} data-nav-theme="dark" aria-hidden="true" />
 
       <Reveal className={styles.header}>
-        <h2 className={styles.title}>Meet the People Behind Amber</h2>
+        <h2 className={styles.title}>Meet the People Behind amber</h2>
         <p className={styles.subtitle}>The people behind our vision, culture and growth.</p>
       </Reveal>
 

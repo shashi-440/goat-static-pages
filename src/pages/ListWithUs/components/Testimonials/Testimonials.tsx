@@ -14,7 +14,7 @@ import wrapperHOC from "@Utils/wrapperHOC";
  * track scrolls a card at a time, which is what the controls are for.
  */
 const QUOTE =
-  "Amber Student have supported us filling voids across the portfolio for many years. We worked closely through Covid to reduce the impact of the pandemic on our students and continue to work in partnership to provide excellent accommodation to a global audience. We look forward to a positive ongoing relationship.";
+  "amber Student have supported us filling voids across the portfolio for many years. We worked closely through Covid to reduce the impact of the pandemic on our students and continue to work in partnership to provide excellent accommodation to a global audience. We look forward to a positive ongoing relationship.";
 
 /**
  * The same case study five times, on purpose: three fit at 1440px, so the extra

@@ -1,0 +1,61 @@
+// Same geometry as the ticket version's stub row: 24px circles on an 18px step, so
+// each overlaps the one before by 6px. $step is centre-to-centre.
+$size: 24px;
+$step: 18px;
+// The ticket rings its avatars in the card's near-black; this page's ground is
+// white, so the ring follows the ground it sits on — the point is the same, that
+// overlapping faces read as cutting into each other rather than blending.
+$ring: #fff;
+
+.stack {
+  display: block;
+  flex: none;
+  height: $size;
+  position: relative;
+  // Collapsing the container's width is what keeps the count beside it from jumping
+  // when a slot leaves.
+  width: calc((var(--count) - 1) * #{$step} + #{$size});
+  transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.avatar {
+  border-radius: 50%;
+  display: block;
+  height: $size;
+  left: 0;
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  width: $size;
+  z-index: 1;
+  box-shadow: 0 0 0 2px $ring, 0 0 0 2.6px rgba(17, 25, 40, 0.07);
+  // Position comes from the index alone, so a visible avatar never moves — only
+  // arrivals and departures animate.
+  transform: translateX(calc(var(--i) * #{$step})) scale(1);
+  // Slightly staggered by index so a jump of several slots cascades in rather than
+  // popping as one block.
+  transition: opacity 0.3s ease, transform 0.45s cubic-bezier(0.34, 1.4, 0.5, 1);
+  transition-delay: calc(var(--i) * 22ms);
+}
+
+// Tucked behind whatever avatar is currently last and shrunk away. Zero delay:
+// departures should feel immediate, only arrivals benefit from the cascade.
+.avatarHidden {
+  opacity: 0;
+  transform: translateX(calc((var(--count) - 1) * #{$step})) scale(0.4);
+  transition-delay: 0ms;
+  z-index: 0;
+}
+
+.img {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stack,
+  .avatar {
+    transition: none;
+  }
+}

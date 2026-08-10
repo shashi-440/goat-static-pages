@@ -77,7 +77,7 @@ const Video = () => (
         </div>
 
         <Reveal as="p" className={styles.caption} delay={120}>
-          Gain a competitive edge in student housing with Amber&apos;s real-time analytics and
+          Gain a competitive edge in student housing with amber&apos;s real-time analytics and
           insights. List with us for hassle free tenant acquisition, higher conversions, and
           increased revenue!
         </Reveal>

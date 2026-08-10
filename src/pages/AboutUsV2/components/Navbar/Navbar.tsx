@@ -26,6 +26,18 @@ interface NavbarProps {
    * the CTA is the pink primary at every scroll position.
    */
   ctaSecondaryUntilScroll?: boolean;
+  /**
+   * Renders the "Try amber" CTA as the secondary (hairline) button instead of the
+   * gradient pill. For pages whose own hero CTA is the primary action — two filled
+   * pills on one screen leaves neither reading as the main one.
+   *
+   * Optional and defaulting to false, so every page that already renders <Navbar />
+   * keeps the gradient pill it has today.
+   *
+   * Distinct from `ctaSecondaryUntilScroll`, which is scroll-dependent: this one is
+   * secondary at every scroll position. Setting both makes this one win.
+   */
+  secondaryCta?: boolean;
 }
 
 const Navbar = ({
@@ -33,6 +45,7 @@ const Navbar = ({
   ctaLabel = "Try amber",
   ctaHref = "/",
   ctaSecondaryUntilScroll = false,
+  secondaryCta = false,
 }: NavbarProps) => {
   // `true` when a dark-themed section is currently behind the header.
   const [onDark, setOnDark] = useState(false);
@@ -42,7 +55,7 @@ const Navbar = ({
 
   useEffect(() => {
     // Sections that opt into the dark header treatment are marked with the
-    // attribute data-nav-theme="dark" (see WhyAmberExists & CrewCTA sections).
+    // attribute data-nav-theme="dark" (see the CrewCTA section).
     const darkSections = Array.from(
       document.querySelectorAll<HTMLElement>('[data-nav-theme="dark"]'),
     );
@@ -88,7 +101,7 @@ const Navbar = ({
       >
         <Image
           src={onDark ? logoLight : logoDark}
-          alt="Amber"
+          alt="amber"
           className={styles.logo}
           width={100}
           height={24}
@@ -102,13 +115,26 @@ const Navbar = ({
             {link.label}
           </CustomLink>
         ))}
-        {/* Secondary-until-scroll: grey pill at the top of the page, pink primary
-            once scrolled. Without the flag the CTA is pink throughout. */}
+        {/*
+          Three CTA treatments, in precedence order:
+
+          - `secondaryCta` — always the hairline chip. The primary is a saturated
+            gradient pill that reads on either ground, so it needs no dark variant;
+            the hairline chip's ink and ring are both near-black, so it has to invert
+            with the bar — the same switch the logo above makes.
+          - `ctaSecondaryUntilScroll` — soft grey pill at the top of the page, pink
+            primary once scrolled.
+          - neither — pink primary throughout.
+        */}
         <CustomLink
           href={ctaHref}
-          className={`${styles.tryButton} ${
-            ctaSecondaryUntilScroll && !scrolled ? styles.tryButtonSecondary : ""
-          }`}
+          className={
+            secondaryCta
+              ? `${styles.secondaryButton} ${onDark ? styles.secondaryButtonOnDark : ""}`
+              : `${styles.tryButton} ${
+                  ctaSecondaryUntilScroll && !scrolled ? styles.tryButtonSecondary : ""
+                }`
+          }
           dataTestId="about-us-v2-try-amber"
         >
           {ctaLabel}

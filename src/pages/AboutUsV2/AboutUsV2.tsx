@@ -11,10 +11,10 @@ import styles from "./AboutUsV2.module.scss";
 
 const AboutUsV2 = () => (
   <div className={styles.page}>
-    <Helmet title="About Us | Amber">
+    <Helmet title="About Us | amber">
       <meta
         name="description"
-        content="Amber is building the future of global student housing — helping millions of students find verified homes near leading universities worldwide."
+        content="amber is building the future of global student housing — helping millions of students find verified homes near leading universities worldwide."
       />
       <meta name="robots" content="index,follow" />
       {/* Instrument Sans — the design font, loaded only on this page */}

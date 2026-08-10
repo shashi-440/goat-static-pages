@@ -1,9 +1,18 @@
 // Figma 2097:3652. The design draws this section on a 1177px column (167px
 // gutters), but every other section here — and the navbar — sits on the 1280
 // grid, so the narrower column read as a misalignment. Page consistency wins.
+// #f7f7f7 — the section grey used across the v2 set. This band was pure black, and
+// everything in it was inked for that: white heading and row titles, a near-white
+// hairline, and white-stroked icons. All of those are inverted below, and the four
+// icon SVGs themselves were re-inked from #F9FAFB to #202020 at the source (this is
+// their only consumer besides the Ambassadors band, which is also light).
+//
+// The Manifesto section above stays black. It used to close itself with a hairline
+// because two black bands ran together with no boundary; the colour change is that
+// boundary now, so the rule is gone.
 .section {
   align-items: center;
-  background: #000;
+  background: #f7f7f7;
   display: flex;
   flex-direction: column;
   // 88px: the page-wide section rhythm. Figma draws 79px here, but every
@@ -38,11 +47,11 @@
   width: 100%;
 }
 
-// Two-tone: the first line white, the second dropped to #8e8e8e. Spans both
+// Two-tone: the first line dark, the second dropped to grey. Spans both
 // columns on the first row so it can centre against the whole section rather
 // than just the video column beneath it.
 .heading {
-  color: #fff;
+  color: #202020;
   font-size: 36px;
   font-weight: 550;
   grid-column: 1 / -1;
@@ -54,7 +63,7 @@
 }
 
 .headingMuted {
-  color: #8e8e8e;
+  color: #9ca3af;
 }
 
 // Media card, sized for the left column. Second row, so the list beside it
@@ -63,7 +72,9 @@
   grid-column: 1;
   grid-row: 2;
   aspect-ratio: 16 / 10;
-  background: #f7f7f7;
+  // A shade off the band, so the card reads as a frame before the photo decodes —
+  // at #f7f7f7 it was the same colour as the section behind it.
+  background: #ececec;
   border-radius: 20px;
   overflow: hidden;
   position: relative;
@@ -76,16 +87,27 @@
   width: 100%;
 }
 
-// 93px band over the foot of the image — a plain bottom-up gradient, not a
-// frosted bar.
+// Band over the foot of the image — a plain bottom-up gradient, not a frosted bar.
+//
+// Deeper and taller than the 93px / 0.5 scrim the design started from: that was
+// tuned against a photo whose lower half was already dark, and the current one has
+// a sunlit bedspread there, which left the grey meta line unreadable. The extra
+// padding-top is what gives the ramp room — at 93px a scrim this dark banded
+// visibly instead of falling off. The middle stop keeps the falloff even; two
+// stops alone read as a hard edge partway up.
 .caption {
   align-items: flex-end;
-  background-image: linear-gradient(to top, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
+  background-image: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.82) 0%,
+    rgba(0, 0, 0, 0.52) 38%,
+    rgba(0, 0, 0, 0) 100%
+  );
   bottom: 0;
   display: flex;
   justify-content: space-between;
   left: 0;
-  padding: 24px;
+  padding: 64px 24px 24px;
   position: absolute;
   right: 0;
 }
@@ -104,9 +126,14 @@
   line-height: 17px;
 }
 
+// Design specced a flat #8e8e8e here, which only held up over the dark photo it was
+// drawn against — over a bright one it dropped out entirely, and deepening the scrim
+// far enough to rescue it would have swallowed the picture. A translucent white
+// stays recessive against the near-white title the way the grey did, but rides
+// whatever is behind it instead of fighting it.
 .captionMeta {
   align-items: center;
-  color: #8e8e8e;
+  color: rgba(255, 255, 255, 0.75);
   display: flex;
   font-size: 14px;
   font-weight: 400;
@@ -121,12 +148,49 @@
 }
 
 // 36px solid white circle. Figma leaves its inner icon slot empty.
+//
+// A <button> since it opens the film, so the UA's own border and padding have to be
+// cleared or they break the circle.
 .captionAction {
+  align-items: center;
   background: #fff;
+  border: 0;
   border-radius: 999px;
+  cursor: pointer;
+  display: flex;
   flex-shrink: 0;
   height: 36px;
+  justify-content: center;
+  padding: 0;
+  transition: transform 0.2s ease, background 0.2s ease;
   width: 36px;
+
+  &:hover,
+  &:focus-visible {
+    background: #fff;
+    transform: scale(1.06);
+  }
+}
+
+// The shared triangle points up, so it gets turned a quarter turn like
+// CreatorMarquee's does — and for the same reason the rotation sits on this slot
+// rather than on the image inside it.
+//
+// The 1px shift is optical, not geometric: a triangle centred on its bounding box
+// reads as sitting left of centre inside a circle, because its visual mass is at
+// the flat edge rather than the point.
+.captionPlaySlot {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  transform: translateX(1px) rotate(90deg);
+}
+
+// preserveAspectRatio="none", so it MUST keep its intrinsic 12.6662 × 11.5 box —
+// any other ratio stretches it into a blob.
+.captionPlay {
+  height: 11.5px;
+  width: 12.6662px;
 }
 
 // Vertical list of the four categories, level with the video beside it.
@@ -141,7 +205,7 @@
 
 // Quiet eyebrow above the list.
 .listLabel {
-  color: #8e8e8e;
+  color: #6b7280;
   font-size: 12px;
   font-weight: 500;
   letter-spacing: 0.08em;
@@ -168,17 +232,18 @@
   }
 }
 
-// Divider between rows — the same gradient stroke used elsewhere in the section.
+// Divider between rows. A flat hairline, not the edge-fading gradient this used to
+// be: the gradient was drawn for the black band, where a rule had to fade out at the
+// ends to avoid reading as a hard bar, and on light grey it just looked uneven. Held
+// well under the old 0.3 midpoint so it separates the rows without drawing the eye.
 .hRule {
-  background-image: linear-gradient(
-    to right,
-    rgba(229, 231, 235, 0.1),
-    rgba(229, 231, 235, 0.3) 50%,
-    rgba(229, 231, 235, 0.1)
-  );
+  background: rgba(32, 32, 32, 0.08);
   flex-shrink: 0;
   height: 1px;
-  width: 100%;
+  // Stops short of the column's right edge rather than running the full width. At
+  // 100% it spanned further than the longest description under it, which made the
+  // rules the widest thing in the section and drew more attention than the rows.
+  width: 88%;
 }
 
 // Fixed 32px slot every icon sits in, so all four rows share one left edge and
@@ -211,7 +276,7 @@
 }
 
 .rowTitle {
-  color: #fff;
+  color: #202020;
   font-size: 18px;
   font-weight: 500;
   line-height: 24px;
@@ -219,7 +284,7 @@
 
 // Secondary/neutral/400
 .rowDesc {
-  color: #9ca3af;
+  color: #6b7280;
   font-size: 14px;
   font-weight: 400;
   line-height: 18px;

@@ -68,7 +68,7 @@
         { "label": "Blog", "href": "/blog", "gaKey": "Blog" },
         { "label": "Podcast", "href": "/podcast", "gaKey": "Podcast" },
         { "label": "Newsroom", "href": "/news", "gaKey": "Newsroom" },
-        { "label": "Amber Plus", "href": "/plus", "gaKey": "Amber Plus" },
+        { "label": "amber Plus", "href": "/plus", "gaKey": "Amber Plus" },
         { "label": "Media Mention", "href": "/media", "gaKey": "Media Mention" },
         { "label": "Ambassador", "href": "/ambassador", "gaKey": "Ambassador" },
         { "label": "Scholarships", "href": "/scholarship", "gaKey": "Scholarships", "tag": "Apply Now" },

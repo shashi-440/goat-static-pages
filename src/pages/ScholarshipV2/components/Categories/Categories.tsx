@@ -1,13 +1,26 @@
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import Image from "@Components/Image";
 import Reveal from "../../../AboutUsV2/components/Reveal/Reveal";
+// The same lightbox the winners' stories use up the page, so there is one video
+// popup on this page rather than two that behave slightly differently.
+import StoryModal from "../StoryModal/StoryModal";
 import styles from "./Categories.module.scss";
 import featureImg from "../../assets/feature.jpg";
 import iconGlobe from "../../assets/icon-globe.svg";
 import iconRocket from "../../assets/icon-rocket.svg";
 import iconCap from "../../assets/icon-cap.svg";
 import iconBulb from "../../assets/icon-bulb.svg";
+// The same triangle CreatorMarquee plays with, so the two video affordances on this
+// page are one shape rather than two near-identical ones.
+import playIcon from "../../assets/play.svg";
 import wrapperHOC from "@Utils/wrapperHOC";
+
+// The programme film behind the feature card's play button.
+// https://www.youtube.com/watch?v=UK-cAqUHllc&t=2s — the `t=2s` is carried through
+// as the embed's start offset.
+const FEATURE_VIDEO_ID = "UK-cAqUHllc";
+const FEATURE_VIDEO_START = 2;
+const FEATURE_TITLE = "amberscholar Scholarship Programme 2026-27 is HERE";
 
 /**
  * `glyph` is the icon's drawn size inside the shared 32px slot.
@@ -49,78 +62,115 @@ const CATEGORIES = [
 ];
 
 /**
- * Dark categories section — Figma node 2097:3652.
+ * Categories section — Figma node 2097:3652.
  *
- * Marked data-nav-theme="dark" so the shared Navbar swaps to its light logo
- * while this section is behind it (the same hook About Us uses).
+ * No data-nav-theme="dark": this band was black and marked itself so the shared
+ * Navbar swapped to its light logo behind it. It is light grey now, so the header
+ * has to keep its dark logo and links — marking it would put a white logo on a
+ * near-white ground.
  */
-const Categories = () => (
-  <section className={styles.section} data-nav-theme="dark">
-    <div className={styles.inner}>
-      {/* Three grid cells: heading top-left, then video and list side by side on
-          the row below — which is what lines the list up with the video. */}
-      <Reveal className={styles.top}>
-        <h2 className={styles.heading}>
-          Supporting ambitious
-          <br />
-          <span className={styles.headingMuted}>students from around the world.</span>
-        </h2>
+const Categories = () => {
+  const [playing, setPlaying] = useState(false);
 
-        <div className={styles.feature}>
-          <Image
-            src={featureImg}
-            alt="An amberscholar recipient talking about their scholarship"
-            className={styles.featureImage}
-            width="100%"
-            height="100%"
-          />
+  return (
+    <section className={styles.section}>
+      <div className={styles.inner}>
+        {/* Three grid cells: heading top-left, then video and list side by side on
+            the row below — which is what lines the list up with the video. */}
+        <Reveal className={styles.top}>
+          <h2 className={styles.heading}>
+            Supporting ambitious
+            <br />
+            <span className={styles.headingMuted}>students from around the world.</span>
+          </h2>
 
-          <div className={styles.caption}>
-            <div className={styles.captionText}>
-              <span className={styles.captionTitle}>
-                Amberscholar Scholarship Programme 2026-27 is HERE
-              </span>
-              <span className={styles.captionMeta}>
-                <span>amber | Student Accomodation</span>
-                <span className={styles.captionDot}>·</span>
-                <span>3 min</span>
-              </span>
-            </div>
+          <div className={styles.feature}>
+            <Image
+              src={featureImg}
+              alt="A student studying on their bed in sunlit accommodation"
+              className={styles.featureImage}
+              width="100%"
+              height="100%"
+            />
 
-            {/* Figma leaves the 16px icon slot inside this circle empty. */}
-            <span className={styles.captionAction} aria-hidden="true" />
-          </div>
-        </div>
+            <div className={styles.caption}>
+              <div className={styles.captionText}>
+                <span className={styles.captionTitle}>
+                  amberscholar Scholarship Programme 2026-27 is HERE
+                </span>
+                <span className={styles.captionMeta}>
+                  <span>amber | Student Accomodation</span>
+                  <span className={styles.captionDot}>·</span>
+                  <span>3 min</span>
+                </span>
+              </div>
 
-        <div className={styles.list}>
-          <span className={styles.listLabel}>Who all can apply</span>
-
-          {CATEGORIES.map((category, i) => (
-            <Fragment key={category.title}>
-              {i > 0 ? <span className={styles.hRule} aria-hidden="true" /> : null}
-              <div className={styles.row}>
-                {/* Shared 32px slot; the glyph is centred in it at its own size. */}
-                <span className={styles.iconSlot} aria-hidden="true">
+              {/* Figma leaves this circle's icon slot empty; it carries a play
+                  triangle so the card reads as a video rather than a plain dot.
+                  A real button rather than the decorative span it was, since it now
+                  opens the film — so it is focusable and answers the keyboard. */}
+              <button
+                type="button"
+                className={styles.captionAction}
+                onClick={() => setPlaying(true)}
+                aria-label={`Play: ${FEATURE_TITLE}`}
+                data-testid="scholarship-v2-feature-play"
+              >
+                {/* The rotation lives on this slot, not on the Image — Image's own
+                    `.animateOpacity.show { transform: none }` cancels a transform set
+                    on the img itself. Same reason CreatorMarquee wraps its copy. */}
+                <span className={styles.captionPlaySlot} aria-hidden="true">
                   <Image
-                    src={category.icon}
+                    src={playIcon}
                     alt=""
-                    className={styles.icon}
-                    width={category.glyph}
-                    height={category.glyph}
+                    className={styles.captionPlay}
+                    width={13}
+                    height={12}
+                    isEagerLoad
                   />
                 </span>
-                <div className={styles.rowText}>
-                  <span className={styles.rowTitle}>{category.title}</span>
-                  <span className={styles.rowDesc}>{category.description}</span>
+              </button>
+            </div>
+          </div>
+
+          <div className={styles.list}>
+            <span className={styles.listLabel}>Who all can apply</span>
+
+            {CATEGORIES.map((category, i) => (
+              <Fragment key={category.title}>
+                {i > 0 ? <span className={styles.hRule} aria-hidden="true" /> : null}
+                <div className={styles.row}>
+                  {/* Shared 32px slot; the glyph is centred in it at its own size. */}
+                  <span className={styles.iconSlot} aria-hidden="true">
+                    <Image
+                      src={category.icon}
+                      alt=""
+                      className={styles.icon}
+                      width={category.glyph}
+                      height={category.glyph}
+                    />
+                  </span>
+                  <div className={styles.rowText}>
+                    <span className={styles.rowTitle}>{category.title}</span>
+                    <span className={styles.rowDesc}>{category.description}</span>
+                  </div>
                 </div>
-              </div>
-            </Fragment>
-          ))}
-        </div>
-      </Reveal>
-    </div>
-  </section>
-);
+              </Fragment>
+            ))}
+          </div>
+        </Reveal>
+      </div>
+
+      <StoryModal
+        open={playing}
+        title={FEATURE_TITLE}
+        videoId={FEATURE_VIDEO_ID}
+        start={FEATURE_VIDEO_START}
+        onClose={() => setPlaying(false)}
+      />
+    </section>
+  );
+};
 
 export default wrapperHOC(Categories, {
   componentName: "Categories-ScholarshipV2",

@@ -52,7 +52,7 @@ const TABS = [
   },
   {
     id: "amber-plus",
-    label: "Amber Plus Services",
+    label: "amber Plus Services",
     body: "Forex, flights, SIM cards, airport pickup and student essentials, bookable alongside the room.",
     image: panelPlus,
     mockup: mockupPlus,

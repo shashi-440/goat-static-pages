@@ -1,41 +1,50 @@
 import Image from "@Components/Image";
 import Reveal from "../../../AboutUsV2/components/Reveal/Reveal";
 import styles from "./Ambassadors.module.scss";
-// The same four icons the dark section uses, recoloured for this light band —
-// identical geometry and 1.5px stroke, just inked instead of white (white would
-// be invisible on #f7f7f7). Using all four means no glyph repeats.
-import iconGlobe from "../../assets/icon-globe-ink.svg";
-import iconRocket from "../../assets/icon-rocket-ink.svg";
-import iconCap from "../../assets/icon-cap-ink.svg";
-import iconBulb from "../../assets/icon-bulb-ink.svg";
+// Line icons, borrowed wholesale from the Categories section rather than given
+// their own set — these are placeholders, and reusing that section's exact four
+// glyphs keeps the two bands reading as one family.
+//
+// They are the same files Categories imports, now inked #202020 at the source (they
+// used to be near-white for the black band Categories was). The duotone set these
+// replaced is still in ../../assets (icon-*-duo.svg) if that direction is wanted
+// back.
+import iconGlobe from "../../assets/icon-globe.svg";
+import iconRocket from "../../assets/icon-rocket.svg";
+import iconCap from "../../assets/icon-cap.svg";
+import iconBulb from "../../assets/icon-bulb.svg";
 import wrapperHOC from "@Utils/wrapperHOC";
 
-// Icon order mirrors the dark section's, so the two sets read as one family.
-// `glyph` is each icon's drawn size inside the shared 32px slot — the exports
-// have differing natural sizes, so a single 32px would scale each by a different
-// amount and they would not read as one set. Same values as the dark section.
+// Icon order mirrors the Categories section's, so the two bands read as one family.
+// `glyph` is each icon's drawn size inside the shared 44px slot.
+//
+// A flat 32 across all four. Note the exports have differing natural sizes (25.9,
+// 25.5, 32, 28.2) and differing ink-to-box ratios — the cap's artwork is only
+// 232x180 of its 256 box — so a single value renders slightly less ink for the cap
+// and bulb than for the globe and rocket. 32/32/39/36 would be the optically
+// matched equivalent at this base if they ever look uneven.
 const PERKS = [
   {
     icon: iconGlobe,
-    glyph: 24,
+    glyph: 32,
     title: "A clear dream",
     description: "We should be able to picture what you are chasing, in your own words.",
   },
   {
     icon: iconRocket,
-    glyph: 24,
+    glyph: 32,
     title: "A real reason",
     description: "Why it matters to you, and what changes for you if it happens.",
   },
   {
     icon: iconCap,
-    glyph: 29,
+    glyph: 32,
     title: "Proof you have started",
     description: "Anything that shows you are already moving — early work, small wins, first tries.",
   },
   {
     icon: iconBulb,
-    glyph: 27,
+    glyph: 32,
     title: "How you tell it",
     description: "Whether your story lands, and makes us believe in it as much as you do.",
   },

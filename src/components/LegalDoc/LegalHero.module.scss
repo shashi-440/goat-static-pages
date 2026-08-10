@@ -1,0 +1,51 @@
+// Top padding matches the other v2 heroes (About Us / Contact Us / How It Works /
+// amberscholar) so every page opens on the same rhythm. Figma sets the padlock
+// 126px below the navbar; 56px is used instead to stay in step with the rest.
+.hero {
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  padding: 56px 80px 0;
+  width: 100%;
+}
+
+// The document measure. Everything on this page — hero, policy, closing seal —
+// sits on this same 700px column, centred in the viewport.
+.inner {
+  max-width: 700px;
+  width: 100%;
+}
+
+// Figma: 112.39 × 140.43, its left edge 12px outside the text column. That offset
+// is the still's own transparent margin, so pulling it back by 12px lines the
+// padlock's ink up with the text rather than its bounding box.
+.lock {
+  display: block;
+  margin: 0 0 12px -12px;
+}
+
+.lockImg {
+  display: block;
+  height: 140px;
+  object-fit: contain;
+  width: 112px;
+}
+
+.title {
+  color: #202020;
+  font-size: 52px;
+  font-weight: 550;
+  letter-spacing: -1.04px;
+  line-height: 56px;
+  margin: 0;
+}
+
+.subtitle {
+  color: #636363;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.5;
+  // The single, explicit title→subtitle gap — same 20px the other v2 heroes use,
+  // and what Figma measures here too.
+  margin: 20px 0 0;
+}
