@@ -1,0 +1,35 @@
+// The logo wall lives inside the hero (Figma node 2483:9993) rather than in a
+// section of its own, so it brings no padding or background — just the two rows
+// on the hero's own 1200px column.
+.wall {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  max-width: 1200px;
+  width: 100%;
+}
+
+.row {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.cell {
+  align-items: center;
+  display: flex;
+  height: 36px;
+}
+
+.logo {
+  object-fit: contain;
+}
+
+@media (max-width: 900px) {
+  .row {
+    flex-wrap: wrap;
+    gap: 32px;
+    justify-content: center;
+  }
+}

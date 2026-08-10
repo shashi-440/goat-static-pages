@@ -1,0 +1,215 @@
+.section {
+  align-items: center;
+  background: #f7f7f7;
+  display: flex;
+  flex-direction: column;
+  padding: 96px 80px;
+  width: 100%;
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  max-width: 1280px;
+  width: 100%;
+}
+
+.heading {
+  color: #111928;
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -1px;
+  line-height: 48px;
+  margin: 0;
+  text-align: center;
+}
+
+/* ------------------------------------------------------------- scroll track */
+
+.viewport {
+  margin-top: 56px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  width: 100%;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.track {
+  display: flex;
+  gap: 24px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  justify-content: space-between;
+  // 1280px container minus two 24px gaps, split three ways.
+  min-height: 556px;
+  overflow: hidden;
+  width: calc((100% - 48px) / 3);
+}
+
+.cardTop {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 32px 24px;
+}
+
+.person {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.name {
+  color: #000;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 17px;
+}
+
+.role {
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 17px;
+}
+
+// The export is the full brand lock-up; the design shows a 173x28 window onto
+// it, so the crop is reproduced with the node's own percentages.
+.brand {
+  height: 28px;
+  overflow: hidden;
+  position: relative;
+  width: 173px;
+}
+
+.brandImage {
+  height: 426.67%;
+  left: -4.05%;
+  position: absolute;
+  top: -153.33%;
+  width: 103.78%;
+}
+
+.cardBottom {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+}
+
+.quote {
+  color: #000;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  margin: 0;
+}
+
+.readMore {
+  align-self: flex-start;
+  color: #1466ff !important;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.25;
+  text-decoration: none;
+
+  &:hover,
+  &:active,
+  &:focus {
+    color: #1466ff !important;
+    text-decoration: underline;
+  }
+}
+
+/* -------------------------------------------------------------- nav controls */
+
+.nav {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 32px;
+}
+
+.dots {
+  align-items: center;
+  background: #ebebeb;
+  border-radius: 999px;
+  display: flex;
+  gap: 10px;
+  height: 40px;
+  padding: 0 28px;
+}
+
+.dot {
+  background: #c9c9c9;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  height: 8px;
+  padding: 0;
+  transition: background 0.2s ease, width 0.2s ease;
+  width: 8px;
+}
+
+.dotActive {
+  background: #202020;
+  width: 26px;
+}
+
+.discs {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+// Both discs carry the same pair of looks, chosen by whether there is anywhere
+// left to go in that direction — the design's two swatches were simply the two
+// states its chevrons happened to be in. `color` drives the inline chevron.
+.disc {
+  align-items: center;
+  background: #ebebeb;
+  border: 0;
+  border-radius: 50%;
+  color: #202020;
+  cursor: pointer;
+  display: flex;
+  height: 40px;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.2s ease, color 0.2s ease;
+  width: 40px;
+
+  &:disabled {
+    background: #f1f1f1;
+    color: #c9c9c9;
+    cursor: default;
+  }
+}
+
+.chev {
+  height: 16px;
+  width: 16px;
+}
+
+@media (max-width: 1100px) {
+  .card {
+    width: calc((100% - 24px) / 2);
+  }
+}
+
+@media (max-width: 720px) {
+  .card {
+    width: 100%;
+  }
+}

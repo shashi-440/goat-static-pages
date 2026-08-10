@@ -1,0 +1,266 @@
+.section {
+  align-items: center;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 0 80px 120px;
+  width: 100%;
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+  max-width: 1280px;
+  width: 100%;
+}
+
+.heading {
+  color: #111928;
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -1px;
+  line-height: 48px;
+  margin: 0;
+}
+
+.body {
+  align-items: flex-start;
+  display: flex;
+  gap: 80px;
+  width: 100%;
+}
+
+/* --------------------------------------------------------------- tab column */
+
+// The list holds its place while the panels scroll past it. `top` clears the
+// navbar, which is all that stays fixed once the announcement rail has slid out.
+.rail {
+  align-self: flex-start;
+  flex-shrink: 0;
+  position: sticky;
+  top: 104px;
+  width: 424px;
+}
+
+.tabs {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+// Every entry is the same height whether it is the active one or not, and no
+// property that changes between the two states affects layout: the label swaps
+// size inside a fixed 24px line box, and the description only changes colour.
+// That is what keeps the column still — an entry that grew or collapsed as the
+// active one moved would shove the entries below it and read as a bounce.
+//
+// This is deliberately the List With Us behaviour rather than the Figma frame's,
+// which draws the inactive entries label-only at 64px. Every description stays
+// readable and the rail never reflows.
+.tab {
+  background: none;
+  border: 0;
+  color: #9ca3af;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  // The extra bottom pixel is the rule's own: the track is positioned rather
+  // than a border, so without it the row would swallow the design's 112 + 1.
+  padding: 20px 0 21px;
+  position: relative;
+  text-align: left;
+  transition: color 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  width: 100%;
+}
+
+// The column's box already lines up with the panels, but the first row's top
+// padding pushed its label 20px below the top edge of the image beside it.
+// Dropping it sits the first label on that edge; the rows below keep the
+// design's 20px, which is the breathing room between entries rather than a
+// leading indent. Row heights stay fixed per row, so this costs no movement.
+.tab:first-child {
+  padding-top: 0;
+}
+
+.tabLabel {
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.2px;
+  line-height: 24px;
+  transition: font-size 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tabBody {
+  color: #9ca3af;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  transition: color 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tabActive {
+  color: #111928;
+
+  .tabLabel {
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .tabBody {
+    color: #4b5563;
+  }
+}
+
+// The design's 1px divider, doubling as the progress readout: it fills across
+// while its panel travels past the sticky line, so an entry shows how far
+// through its own section the reader is. Entries already passed sit full,
+// entries still to come sit empty.
+.tabTrack {
+  background: #e5e7eb;
+  bottom: 0;
+  height: 1px;
+  left: 0;
+  overflow: hidden;
+  position: absolute;
+  right: 0;
+}
+
+// Driven by transform rather than width so tracking the scroll costs no layout.
+// Only opacity is transitioned — the width has to track the scroll exactly, so
+// easing it would make the line lag the page.
+.tabFill {
+  background: #1466ff;
+  height: 100%;
+  left: 0;
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: opacity 0.3s ease;
+  width: 100%;
+}
+
+/* ------------------------------------------------------------- media panels */
+
+.panels {
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+
+.panel {
+  align-items: center;
+  border-radius: 24px;
+  display: flex;
+  flex-shrink: 0;
+  height: 485px;
+  justify-content: center;
+  overflow: hidden;
+  padding: 40px;
+  position: relative;
+  width: 100%;
+}
+
+.panelImage {
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  position: absolute;
+  width: 100%;
+}
+
+.panelWash {
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  background: rgba(0, 0, 0, 0.05);
+  inset: 0;
+  position: absolute;
+}
+
+// 593 x 380 in the design, holding the screenshot in a 577 x 364 window. Both
+// dimensions are capped rather than fixed so the frame narrows with the column
+// below 1360px instead of overflowing its panel.
+.bezel {
+  aspect-ratio: 593 / 380;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  max-height: 380px;
+  max-width: 593px;
+  position: relative;
+  width: 100%;
+}
+
+.mockup {
+  border-radius: 8px;
+  flex: 1 0 0;
+  min-height: 0;
+  // The assets are cropped to the window's own aspect, so this only guards
+  // against the rounding either side of it — the screenshots are anchored to
+  // their top edge because that is the part of each product page the design
+  // shows.
+  object-fit: cover;
+  object-position: top;
+  width: 100%;
+}
+
+/* ------------------------------------------------- panel reveal, per visit */
+
+// The first time a panel is reached its frame settles into place. Opacity and
+// transform only, so the measured geometry the sticky rail depends on never
+// moves. `.alive` is added by the observer when the panel is reached and cleared
+// once the section has fully left, so it plays again on the next visit.
+.bezel {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.alive .bezel {
+  opacity: 1;
+  transform: none;
+}
+
+// Reduced motion keeps the active entry switching and the line filling — both
+// are information, not decoration — but drops the easing between states. The
+// panels are marked revealed on mount in that mode, so the frame is already in
+// its finished state and this only stops it sliding there.
+@media (prefers-reduced-motion: reduce) {
+  .tab,
+  .tabLabel,
+  .tabBody,
+  .bezel {
+    transition: none;
+  }
+}
+
+// Stacked: the list sits above the panels, so there is nothing for it to stick
+// to and the progress line has nothing to report.
+@media (max-width: 1100px) {
+  .body {
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .rail {
+    position: static;
+    width: 100%;
+  }
+}
+
+@media (max-width: 900px) {
+  .section {
+    padding: 0 24px 64px;
+  }
+
+  .panel {
+    height: auto;
+    padding: 24px;
+  }
+}

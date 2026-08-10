@@ -1,0 +1,484 @@
+// Rules top and bottom (Figma node 2141:3681) — the band is white, the hairlines
+// separate it from the hero above and the steps below.
+.section {
+  align-items: center;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  padding: 96px 80px;
+  width: 100%;
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+  max-width: 1280px;
+  width: 100%;
+}
+
+.heading {
+  color: #111928;
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -1px;
+  line-height: 48px;
+  margin: 0;
+}
+
+// 628 + 24 + 628 in the design: the 2x2 first, the tall card second.
+.bento {
+  align-items: stretch;
+  display: flex;
+  gap: 24px;
+  width: 100%;
+}
+
+/* ---------------------------------------------------------------- stat grid */
+
+.grid {
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+
+.gridRow {
+  display: flex;
+  flex: 1 0 0;
+  gap: 24px;
+  min-height: 0;
+  width: 100%;
+}
+
+.card {
+  background: #f7f7f7;
+  border-radius: 20px;
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+  overflow: hidden;
+  padding: 24px;
+  position: relative;
+}
+
+// Clipped to 107px in the design — the rows below the cut are faded out rather
+// than removed, which is what gives the mock its "real product" depth.
+.cardPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 107px;
+  width: 100%;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.rowLeft {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+/* ------------------------------------------------- property feed (16,000+) */
+
+.feed {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.feedItem {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.feedRow {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.feedText {
+  flex: 1 0 0;
+  min-width: 0;
+}
+
+/* ------------------------------------------------------ housing mix (70%) */
+
+// Off-campus vs on-campus as one 6px bar, 158:70 of the 230px track. flex-basis
+// carries the ratio so the pair still fills the panel at any width.
+.shareBar {
+  display: flex;
+  gap: 2px;
+  height: 6px;
+  width: 100%;
+}
+
+.shareSeg {
+  border-radius: 3px;
+  flex-grow: 0;
+  flex-shrink: 1;
+  height: 6px;
+}
+
+.shareSegOff {
+  background: #8b5cf6;
+}
+
+.shareSegOn {
+  background: #e5e5e5;
+}
+
+/* ---------------------------------------------------- students helped (300K) */
+
+// min-width lets the avatar group give way rather than pushing the +12% badge
+// past the panel's clip between 1100px and the 1440px the design is drawn at,
+// where the card is up to 50px narrower than the row's natural width.
+.avatarRow {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+// 5 x 26px overlapping by 7px = 102px wide, matching the node.
+.avatars {
+  align-items: center;
+  display: flex;
+}
+
+.avatar {
+  border: 1px solid #fff;
+  border-radius: 999px;
+  flex-shrink: 0;
+  height: 26px;
+  object-fit: cover;
+  width: 26px;
+
+  & + & {
+    margin-left: -7px;
+  }
+}
+
+.helped {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+/* ---------------------------------------------------------- card figures */
+
+.cardHead {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.cardNumber {
+  color: #111928;
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.6px;
+  line-height: 36px;
+}
+
+// Secondary/Blue/600 — only the headline "25+" figure takes it.
+.cardNumberBlue {
+  color: #1c64f2;
+}
+
+.cardLabel {
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22px;
+}
+
+.cardFade {
+  background-image: linear-gradient(
+    180deg,
+    rgba(247, 247, 247, 0) 0%,
+    rgba(247, 247, 247, 0.156) 25%,
+    rgba(247, 247, 247, 0.5) 50%,
+    rgba(247, 247, 247, 0.844) 75%,
+    rgb(247, 247, 247) 100%
+  );
+  height: 84px;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 47px;
+}
+
+// The students-helped panel is taller before it needs cutting, so its fade
+// starts lower and runs shorter (73px from 58.5px in the node).
+.cardFadeLow {
+  height: 73px;
+  top: 58.5px;
+}
+
+/* ---------------------------------------------------------- tall 1M+ card */
+
+.hero {
+  border-radius: 24px;
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  padding: 40px;
+  position: relative;
+}
+
+.heroImage {
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  position: absolute;
+  width: 100%;
+}
+
+// Sits between the photo and the glass bezel so the mock reads clearly.
+.heroWash {
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  background: rgba(0, 0, 0, 0.05);
+  inset: 0;
+  position: absolute;
+}
+
+// Darker and softer-edged than the shared bezel: rgba(0,0,0,.08) behind a
+// 55%-white hairline, at the node's 20px radius.
+.heroBezel {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(255, 255, 255, 0.55);
+  border-radius: 20px;
+  padding: 16px;
+  position: relative;
+  width: 100%;
+}
+
+.heroCard {
+  background: #fff;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow: hidden;
+  padding: 24px;
+  position: relative;
+  width: 100%;
+}
+
+// Clipped to 245px in the design.
+.heroPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: 245px;
+  opacity: 0.8;
+  padding: 16px;
+}
+
+.panelTop {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.heroStats {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+.chips {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+}
+
+// The inventory rows bring their own hairlines, so the list itself has no gap.
+.panelBottom {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.inventory {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.inventoryRow {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  padding: 8px 0;
+  width: 100%;
+}
+
+.inventoryText {
+  flex: 1 0 0;
+  min-width: 0;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.headNumber {
+  color: #111928;
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.6px;
+  line-height: 36px;
+}
+
+.headLabel {
+  color: #4b5563;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+  line-height: 24px;
+}
+
+// White wash over the lower half of the mock panel — 134px from 135px down the
+// card, which runs the panel out to its 245px cut.
+.heroFade {
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.156) 25%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0.844) 75%,
+    rgb(255, 255, 255) 100%
+  );
+  height: 134px;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 135px;
+}
+
+/* ------------------------------------------------------------------ motion */
+
+// The mocks draw themselves in once, when the section is first reached (.alive):
+// the stat underlines and progress fills sweep along their tracks and the table
+// rows deal in from the left, landing on the same beat as the figures counting
+// up. After that they respond to a hover on their own card.
+//
+// Everything is transform and opacity, so nothing ever reflows — the fill widths
+// and the share-bar ratio stay the design's own values.
+.trackFill,
+.fullBar {
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.alive .trackFill,
+.alive .fullBar {
+  transform: scaleX(1);
+}
+
+.alive .card:hover .trackFill {
+  transform: scaleX(1.08);
+}
+
+.dealRow {
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.alive .dealRow {
+  opacity: 1;
+  transform: none;
+}
+
+.alive .card:hover .dealRow,
+.alive .hero:hover .dealRow {
+  transform: translateX(4px);
+}
+
+// Dealt one after another, top to bottom. The feed and inventory rows sit one
+// level down inside their own hairline wrapper, so the delay is set on the
+// wrapper and inherited by the row.
+@for $i from 1 through 6 {
+  .rows > .dealRow:nth-child(#{$i}),
+  .feed > *:nth-child(#{$i}) .dealRow,
+  .panelBottom > *:nth-child(#{$i}) .dealRow {
+    transition-delay: #{($i - 1) * 70}ms;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trackFill,
+  .fullBar,
+  .dealRow {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .alive .card:hover .trackFill,
+  .alive .card:hover .dealRow,
+  .alive .hero:hover .dealRow {
+    transform: none;
+  }
+}
+
+@media (max-width: 1100px) {
+  .bento {
+    flex-direction: column;
+  }
+
+  .hero {
+    min-height: 489px;
+  }
+}
+
+@media (max-width: 900px) {
+  .section {
+    padding: 64px 24px;
+  }
+
+  .gridRow {
+    flex-direction: column;
+  }
+
+  .card {
+    min-height: 232px;
+  }
+
+  .hero {
+    padding: 24px;
+  }
+}

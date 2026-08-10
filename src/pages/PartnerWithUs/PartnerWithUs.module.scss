@@ -1,0 +1,31 @@
+.page {
+  background: #fff;
+  // Instrument Sans is the design font; Geist / Geist Mono are used only inside
+  // the product mock-ups. All three are loaded via Helmet <link> in
+  // PartnerWithUs.tsx so they stay scoped to this page.
+  font-family: "Instrument Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  // `clip`, not `hidden`: hidden makes this element a scroll container, which
+  // takes position:sticky away from the Benefits rail inside it. clip suppresses
+  // the same horizontal bleed without creating one.
+  overflow-x: clip;
+  // Clear the fixed header stack: 42px announcement rail + 64px navbar.
+  padding-top: 106px;
+  width: 100%;
+
+  // The app reset gives most elements `font: inherit`, so the family cascades on
+  // its own. These are the ones it misses. Deliberately NOT `*` — the mock-up
+  // panels set their own mono/Geist faces and must not be overridden.
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  button,
+  input,
+  select,
+  textarea {
+    font-family: inherit;
+  }
+}

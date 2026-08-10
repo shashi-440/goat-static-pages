@@ -13,6 +13,8 @@ const PAGES = [
   { path: "/career-v2", title: "Careers", note: "built from the Career Page Cleanup Figma" },
   { path: "/career-v3", title: "Careers v3", note: "new copy deck: origin story, world map, teams" },
   { path: "/scholarship-v2", title: "amberscholar", note: "built from Figma 2095:3370" },
+  { path: "/list-with-us", title: "List With Us", note: "built from Figma 2456:6002" },
+  { path: "/partner-with-us", title: "Partner With Us", note: "built from Figma 2141:3646" },
 ];
 
 const Index = (): JSX.Element => (

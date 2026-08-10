@@ -1,0 +1,406 @@
+.section {
+  align-items: center;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 96px 80px 120px;
+  width: 100%;
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+  max-width: 1280px;
+  width: 100%;
+}
+
+.heading {
+  color: #111928;
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -1px;
+  line-height: 48px;
+  margin: 0;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+.cols {
+  align-items: stretch;
+  display: flex;
+  gap: 24px;
+  width: 100%;
+}
+
+.col {
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+
+// Sits under its mock-up now, so it no longer needs a floor to keep the three
+// mock-ups starting on the same line — they are the first thing in each column
+// and line up on their own.
+.copy {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stepTitle {
+  color: #111928;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.4px;
+  line-height: 32px;
+  margin: 0;
+}
+
+.stepBody {
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 24px;
+  margin: 0;
+}
+
+// Grey plinth the glass bezel sits on.
+.frame {
+  background: #f7f7f7;
+  border-radius: 24px;
+  overflow: hidden;
+  padding: 32px;
+  width: 100%;
+}
+
+.card {
+  background: #fff;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 16px;
+  width: 100%;
+}
+
+// Columns 2 and 3 are pinned to the design's 226px so all three mock-ups line up.
+.cardFixed {
+  height: 226px;
+}
+
+// The design spaces the mock-up internals with explicit spacer frames; the
+// equivalent margins are gathered on the rules they surround.
+.ruleA {
+  margin: 10px 0 12px;
+}
+
+.ruleB {
+  margin: 10px 0 10px;
+}
+
+// The 8px spacer frame the design puts between the column header and the first
+// row rule. Carried on the header rather than the first row: `:first-of-type`
+// on the row groups resolves against the card's first *div* (the crumb), so it
+// never matched.
+.thSpaced {
+  margin-bottom: 8px;
+}
+
+.ruleC {
+  margin-top: 12px;
+}
+
+/* ------------------------------------------------------------ step 1 · form */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
+}
+
+.fieldSpaced {
+  margin-top: 10px;
+}
+
+.fieldLabel {
+  color: #737373;
+  font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 15px;
+}
+
+.input {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  color: #0a0a0a;
+  display: flex;
+  font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  height: 32px;
+  line-height: 16px;
+  padding: 0 10px;
+  width: 100%;
+}
+
+.submit {
+  align-items: center;
+  background: #1466ff;
+  border-radius: 10px;
+  color: #fff;
+  display: flex;
+  font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  height: 32px;
+  justify-content: center;
+  line-height: 16px;
+  margin-top: 12px;
+  width: 100%;
+}
+
+/* -------------------------------------------------------- step 2 · listings */
+
+.listingGroup {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.listingRow {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  width: 100%;
+}
+
+.listingLeft {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  min-width: 0;
+}
+
+/* -------------------------------------------------------- step 3 · bookings */
+
+.stats {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+.fullBar {
+  display: block;
+  width: 100%;
+}
+
+.bookingGroup {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.bookingRow {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  width: 100%;
+}
+
+/* -------------------------------------------------------------- progress rail */
+
+.rail {
+  display: flex;
+  gap: 24px;
+  width: 100%;
+}
+
+.railCell {
+  align-items: center;
+  display: flex;
+  flex: 1 0 0;
+  gap: 16px;
+  min-width: 0;
+}
+
+.railLabel {
+  color: #9ca3af;
+  flex-shrink: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  transition: color 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  white-space: nowrap;
+}
+
+// Every step the rail has walked so far, including the one filling now.
+.railLabelReached {
+  color: #000;
+}
+
+.railTrack {
+  background: #e5e7eb;
+  border-radius: 999px;
+  flex: 1 0 0;
+  height: 2px;
+  min-width: 0;
+  position: relative;
+}
+
+// Progress is a plain 0→1 custom property, transitioned linearly. The duration
+// comes in with it, so the restart can pass 0ms and snap back to empty rather
+// than visibly draining right to left.
+.railFill {
+  background: #1466ff;
+  border-radius: 999px;
+  height: 2px;
+  left: 0;
+  max-width: 100%;
+  position: absolute;
+  top: 0;
+  transition: width var(--d, 0s) linear;
+  width: calc(var(--p, 0) * 100%);
+}
+
+/* ------------------------------------------ card interiors, while filling */
+
+// Steps still waiting their turn sit back, so attention follows the rail. The
+// step that just finished returns to full strength.
+//
+// `flex-shrink: 0` matters as much as the transition: the card is a fixed-height
+// column whose contents deliberately run past the bottom, and without it flex
+// squeezes the 1px rules to nothing instead of letting the overflow clip. The
+// design gives every child `shrink-0` for the same reason.
+.card > * {
+  flex-shrink: 0;
+  transition: opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cardDimmed > * {
+  opacity: 0.7;
+}
+
+/* --- step 1: the form types itself in ------------------------------------ */
+
+// The value is clipped away and uncovered a character at a time — steps() with
+// one step per character is what makes it read as typing rather than a wipe.
+@keyframes typeReveal {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  to {
+    clip-path: inset(0);
+  }
+}
+
+// The caret rides along the same steps, so it always sits at the last character.
+@keyframes typeCaret {
+  from {
+    left: 0;
+  }
+
+  to {
+    left: 100%;
+  }
+}
+
+// Drops the caret the instant its field finishes, so nothing is left blinking
+// under a completed value.
+@keyframes caretHide {
+  to {
+    opacity: 0;
+  }
+}
+
+.typed {
+  display: inline-block;
+  position: relative;
+}
+
+.typedText {
+  animation: typeReveal var(--type-dur) steps(var(--type-steps), end) both;
+  display: inline-block;
+}
+
+.caret {
+  background: #0a0a0a;
+  bottom: 1px;
+  position: absolute;
+  top: 1px;
+  width: 1px;
+}
+
+// Two animations sharing one delay pair (set inline): the caret travels with
+// the text, then is hidden as the field completes.
+.caretTyping {
+  animation: typeCaret var(--type-dur) steps(var(--type-steps), end) both,
+    caretHide 1ms linear both;
+}
+
+/* --- steps 2 and 3: rows arrive ------------------------------------------ */
+
+.arrives {
+  animation: stepDeal 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+// A row arriving: lifts into place from just below. The class is applied only
+// while its step is playing, so it replays from the top every cycle.
+@keyframes stepDeal {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+// The loop never starts under reduced motion, so nothing here should run
+// either — including the caret, which would otherwise blink forever.
+@media (prefers-reduced-motion: reduce) {
+  .typedText,
+  .caret,
+  .caretTyping,
+  .arrives {
+    animation: none;
+  }
+
+  .caret {
+    display: none;
+  }
+
+  .railFill,
+  .railLabel,
+  .card > * {
+    transition: none;
+  }
+}
+
+@media (max-width: 1100px) {
+  .cols {
+    flex-direction: column;
+  }
+
+  // Stacked, the three segments would sit above a single column and say nothing
+  // about where you are in it.
+  .rail {
+    display: none;
+  }
+}
