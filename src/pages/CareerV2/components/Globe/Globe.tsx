@@ -164,6 +164,9 @@ const Globe = () => {
   // True while the globe is still travelling to the selected city. The card waits
   // for arrival rather than being dragged across the surface with the pin.
   const [travelling, setTravelling] = useState(false);
+  // Set when COBE could not start (no WebGL). The section then renders its copy and
+  // pills without the sphere, rather than the error boundary eating all of it.
+  const [globeFailed, setGlobeFailed] = useState(false);
   const [pins, setPins] = useState<Projected[]>(() =>
     OFFICES.map(() => ({ x: SIZE / 2, y: SIZE / 2, front: false })),
   );
@@ -302,86 +305,100 @@ const Globe = () => {
     // HTML pins (positioned in CSS px) no longer on it. Correct only at exactly 2x.
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-    const globe = createGlobe(canvas, {
-      devicePixelRatio: dpr,
-      width: SIZE * dpr,
-      height: SIZE * dpr,
-      phi: phiRef.current,
-      theta: thetaRef.current,
-      // Starts zoomed in; the reveal effect below eases it out to ZOOM_TO.
-      scale: scaleRef.current,
-      dark: 0,
-      diffuse: 0,
-      mapSamples: 22000,
-      mapBrightness: 1.6,
-      mapBaseBrightness: 0.06,
-      baseColor: [1, 1, 1],
-      // Unused — pins are HTML overlays — but the option is required.
-      markerColor: [1, 0.341, 0.443],
-      glowColor: [1, 1, 1],
-      markers: [],
-      onRender: (state: Record<string, any>) => {
-        const now = Date.now();
-        const tw = tweenRef.current;
+    // COBE needs WebGL. Where it is missing or blocked — old browsers, a hardened
+    // profile, software rendering disabled, GPU blocklists — createGlobe throws, and
+    // an unhandled throw in here takes the whole section down with it: wrapperHOC's
+    // error boundary catches it and renders nothing, so the heading, the lede and the
+    // office pills all disappear along with the sphere. Catching it keeps every part
+    // of the section that does not need a GPU.
+    let globe: { destroy: () => void } | null = null;
+    try {
+      globe = createGlobe(canvas, {
+        devicePixelRatio: dpr,
+        width: SIZE * dpr,
+        height: SIZE * dpr,
+        phi: phiRef.current,
+        theta: thetaRef.current,
+        // Starts zoomed in; the reveal effect below eases it out to ZOOM_TO.
+        scale: scaleRef.current,
+        dark: 0,
+        diffuse: 0,
+        mapSamples: 22000,
+        mapBrightness: 1.6,
+        mapBaseBrightness: 0.06,
+        baseColor: [1, 1, 1],
+        // Unused — pins are HTML overlays — but the option is required.
+        markerColor: [1, 0.341, 0.443],
+        glowColor: [1, 1, 1],
+        markers: [],
+        onRender: (state: Record<string, any>) => {
+          const now = Date.now();
+          const tw = tweenRef.current;
 
-        if (dragRef.current?.moved) {
-          // Hand-driven: onPointerMove already set phi/theta this frame.
-        } else if (tw) {
-          // Eased travel to the selected city. Both axes share one clock, so the
-          // globe arrives on latitude and longitude together rather than drifting
-          // into place on one axis after the other.
-          const p = Math.min(1, (now - tw.start) / TRAVEL_MS);
-          const e = easeInOut(p);
-          phiRef.current = tw.fromPhi + (tw.toPhi - tw.fromPhi) * e;
-          thetaRef.current = tw.fromTheta + (tw.toTheta - tw.fromTheta) * e;
-          if (p >= 1) tweenRef.current = null;
-        } else if (heldRef.current) {
-          // Arrived and still hovered — hold, so the card does not drift off its
-          // pin while the user reads it.
-        } else if (!still) {
-          phiRef.current += SPIN;
-          thetaRef.current += (0.2 - thetaRef.current) * 0.05;
-        }
+          if (dragRef.current?.moved) {
+            // Hand-driven: onPointerMove already set phi/theta this frame.
+          } else if (tw) {
+            // Eased travel to the selected city. Both axes share one clock, so the
+            // globe arrives on latitude and longitude together rather than drifting
+            // into place on one axis after the other.
+            const p = Math.min(1, (now - tw.start) / TRAVEL_MS);
+            const e = easeInOut(p);
+            phiRef.current = tw.fromPhi + (tw.toPhi - tw.fromPhi) * e;
+            thetaRef.current = tw.fromTheta + (tw.toTheta - tw.fromTheta) * e;
+            if (p >= 1) tweenRef.current = null;
+          } else if (heldRef.current) {
+            // Arrived and still hovered — hold, so the card does not drift off its
+            // pin while the user reads it.
+          } else if (!still) {
+            phiRef.current += SPIN;
+            thetaRef.current += (0.2 - thetaRef.current) * 0.05;
+          }
 
-        // First scroll into view: ease the zoom out from ZOOM_FROM to ZOOM_TO.
-        const rv = revealRef.current;
-        if (rv) {
-          const p = Math.min(1, (now - rv.start) / ZOOM_MS);
-          scaleRef.current = ZOOM_FROM + (ZOOM_TO - ZOOM_FROM) * easeOut(p);
-          if (p >= 1) revealRef.current = null;
-        }
+          // First scroll into view: ease the zoom out from ZOOM_FROM to ZOOM_TO.
+          const rv = revealRef.current;
+          if (rv) {
+            const p = Math.min(1, (now - rv.start) / ZOOM_MS);
+            scaleRef.current = ZOOM_FROM + (ZOOM_TO - ZOOM_FROM) * easeOut(p);
+            if (p >= 1) revealRef.current = null;
+          }
 
-        state.phi = phiRef.current;
-        state.theta = thetaRef.current;
-        state.scale = scaleRef.current;
+          state.phi = phiRef.current;
+          state.theta = thetaRef.current;
+          state.scale = scaleRef.current;
 
-        // Keep the resolution uniform pinned to the real drawing buffer. COBE reads
-        // width/height off this state object every frame, and phenomenon rewrites
-        // canvas.width/height on window resize (and the buffer changes outright if
-        // the window moves to a display with a different pixel ratio). Without this
-        // the pair silently desyncs again and the sphere goes back to being drawn at
-        // the wrong scale.
-        state.width = canvas.width;
-        state.height = canvas.height;
+          // Keep the resolution uniform pinned to the real drawing buffer. COBE reads
+          // width/height off this state object every frame, and phenomenon rewrites
+          // canvas.width/height on window resize (and the buffer changes outright if
+          // the window moves to a display with a different pixel ratio). Without this
+          // the pair silently desyncs again and the sphere goes back to being drawn at
+          // the wrong scale.
+          state.width = canvas.width;
+          state.height = canvas.height;
 
-        if (now - lastSync > 32) {
-          lastSync = now;
-          setPins(
-            OFFICES.map((o) =>
-              project(
-                o.location[0],
-                o.location[1],
-                phiRef.current,
-                thetaRef.current,
-                scaleRef.current,
+          if (now - lastSync > 32) {
+            lastSync = now;
+            setPins(
+              OFFICES.map((o) =>
+                project(
+                  o.location[0],
+                  o.location[1],
+                  phiRef.current,
+                  thetaRef.current,
+                  scaleRef.current,
+                ),
               ),
-            ),
-          );
-        }
-      },
-    });
+            );
+          }
+        },
+      });
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.warn("[Globe] WebGL unavailable — rendering the section without it.", error);
+      setGlobeFailed(true);
+      return undefined;
+    }
 
-    return () => globe.destroy();
+    return () => globe?.destroy();
   }, []);
 
   // Kick the zoom-out the first time the globe scrolls into view. Once only —
@@ -446,7 +463,7 @@ const Globe = () => {
                   onMouseLeave={() => point(null)}
                   onFocus={() => point(i)}
                   onBlur={() => point(null)}
-                  aria-label={`Show ${office.label} on the globe`}
+                  aria-label={globeFailed ? office.label : `Show ${office.label} on the globe`}
                 >
                   {office.label}
                 </button>
@@ -456,7 +473,12 @@ const Globe = () => {
         </Reveal>
 
         {/* Pointer handlers sit on the wrapper so a drag can start anywhere over
-            the globe, including on a pin. */}
+            the globe, including on a pin.
+
+            Dropped entirely when COBE could not start: the pins are HTML overlays
+            positioned from the sphere's rotation, so without it they would sit in a
+            heap in an empty box. The copy and the office pills stay either way. */}
+        {globeFailed ? null : (
         <div
           ref={wrapRef}
           className={`${styles.globeWrap} ${dragging ? styles.isDragging : ""}`}
@@ -551,6 +573,7 @@ const Globe = () => {
             </div>
           ) : null}
         </div>
+        )}
       </div>
 
       <span className={styles.preload} aria-hidden="true">

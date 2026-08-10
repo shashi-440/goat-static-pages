@@ -3,3 +3,4 @@ public/
 *.log
 .DS_Store
 loadable-stats*.json
+dist/

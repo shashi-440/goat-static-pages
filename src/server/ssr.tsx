@@ -49,11 +49,25 @@ export default async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    // Inline the page's CSS in dev only.
+    //
+    // In dev it is the simplest thing that works: webpack-dev-middleware serves the
+    // stylesheets from memory, and inlining sidesteps any question of whether a
+    // <link> resolves against that.
+    //
+    // In production it was actively harmful. getCssString() returns every rule the
+    // page's chunks carry — 139KB on the heaviest pages — and inlining it means each
+    // HTML document ships its own copy that no browser can reuse for the next page,
+    // even though the shared reset, footer and navbar rules are identical across all
+    // ten. Emitting <link> tags instead (renderHtml's other branch) lets the CSS be
+    // cached once and downloaded in parallel with the HTML.
     let inlineStyle = "";
-    try {
-      inlineStyle = await extractor.getCssString();
-    } catch {
-      inlineStyle = "";
+    if (isDev) {
+      try {
+        inlineStyle = await extractor.getCssString();
+      } catch {
+        inlineStyle = "";
+      }
     }
 
     const response = renderHtml(head, extractor, htmlContent, inlineStyle, isDev);
