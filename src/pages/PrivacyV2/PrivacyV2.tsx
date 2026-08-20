@@ -28,7 +28,12 @@ const PrivacyV2 = () => (
       />
     </Helmet>
 
-    <Navbar />
+    <Navbar
+      links={[
+        { label: "Terms", href: "/terms-v2" },
+        { label: "Support", href: "/contact-us-v2-card" },
+      ]}
+    />
     <LegalHero
       title="Privacy Policy"
       subtitle="What we collect, why we collect it, and the rights you have over it"

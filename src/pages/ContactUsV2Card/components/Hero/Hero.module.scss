@@ -43,11 +43,22 @@
   max-width: 620px;
 }
 
+// The photo, and the coordinate space the Copilot input is docked into.
+//
+// `position: relative` is what that docking needs — the input is absolutely positioned to this
+// box's bottom edge, and without it the input would escape to the nearest positioned ancestor and
+// land somewhere up the page.
+//
+// `overflow: hidden` was already here to clip the photo to the 24px radius, and it clips the
+// docked input's shadow at the box's edge too. That is why the input insets 24px from the bottom
+// rather than straddling it: a pill hanging off the photo would have its lower half cut off, not
+// overhang.
 .media {
   border-radius: 24px;
   height: 420px;
   max-width: 1360px;
   overflow: hidden;
+  position: relative;
   width: 100%;
 }
 

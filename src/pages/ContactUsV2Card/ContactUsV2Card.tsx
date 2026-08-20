@@ -37,7 +37,12 @@ const ContactUsV2Card = () => (
       />
     </Helmet>
 
-    <Navbar />
+    <Navbar
+      links={[
+        { label: "How it works", href: "/how-it-works-v2" },
+        { label: "Blogs", href: "/blog" },
+      ]}
+    />
     <Hero />
     <Channels />
     <FooterDesktop />

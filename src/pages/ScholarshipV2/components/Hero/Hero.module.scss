@@ -35,7 +35,11 @@
   text-align: center;
 }
 
-// "$50,000" is set bold within the heading.
+// "$50,000" is set bold within the SUBTITLE — it used to sit in the heading, and moved down
+// with the copy change. Weight only, no colour or size shift: at 18px in a grey paragraph,
+// bold is enough to make the figure the thing the eye lands on, and a second colour would
+// turn one sentence into two.
+
 // The animated mark that runs just ahead of the figure. Seated with a negative
 // vertical-align rather than `middle`: middle aligns to baseline + half x-height,
 // which on a 52px face leaves art sitting visibly high.
@@ -54,6 +58,7 @@
 }
 
 .amount {
+  // Inherits the subtitle's colour deliberately; see the note above.
   font-weight: 700;
 }
 

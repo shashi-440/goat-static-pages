@@ -106,8 +106,10 @@
   justify-content: center;
   left: 0;
   position: absolute;
-  // Centres the 28px chip on the title's first line (24px × 1.4 = 33.6px).
-  top: 3px;
+  // Centres the 28px chip on the title's first line, so it has to be re-derived whenever the
+  // title's metrics change: the line box is 28 × 1.34 = 37.5px, so (37.5 − 28) / 2 ≈ 5.
+  // It was 3px against the old 24 × 1.4 = 33.6px line.
+  top: 5px;
   transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
   width: 28px;
 }
@@ -128,11 +130,13 @@
 
 .cardTitle {
   color: #111928;
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 550;
   // Same -0.01em optical tracking the smaller size used, scaled up.
-  letter-spacing: -0.24px;
-  line-height: 1.4;
+  letter-spacing: -0.28px;
+  // Tightened with the size: 1.4 at 28px opens the two-line titles further than the gap to the
+  // copy beneath them, which makes the pair stop reading as one block.
+  line-height: 1.34;
   margin: 0;
 }
 

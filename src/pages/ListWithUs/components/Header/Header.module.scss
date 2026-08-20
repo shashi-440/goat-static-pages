@@ -20,9 +20,14 @@
 }
 
 // Announcement rail — Figma node 2456:6003.
+//
+// Blue tint rather than the node's neutral #f7f7f7. `#eff4ff` is the same pale blue the
+// page already uses for its quiet blue surfaces — the numbered tokens and badges in the
+// "Why partners" cards — so the rail reads as part of the palette instead of as a grey
+// strip above it, and it ties to the `#1466ff` CTA sitting in it.
 .rail {
   align-items: center;
-  background: #f7f7f7;
+  background: #eff4ff;
   display: flex;
   gap: 8px;
   height: 42px;

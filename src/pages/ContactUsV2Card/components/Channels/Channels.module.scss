@@ -1,3 +1,8 @@
+// Support channels — Figma node 2306:4048.
+//
+// Every value that looks arbitrary below is from that node. The ones worth naming: the card's
+// 14px radius, its asymmetric 20px/16px horizontal padding, the 10px between rows, the 24px
+// between groups, and the border at rgba(209,213,219,0.9) — a translucent grey, not a flat one.
 .section {
   align-items: center;
   background: #fff;
@@ -7,155 +12,257 @@
   width: 100%;
 }
 
+// The node is a component with no page frame, so this measure is the page's and not the design's.
+// 640 keeps the rows compact — the design's row proportions only work while the copy and the
+// trailing badge are within reading distance of each other.
 .inner {
   display: flex;
   flex-direction: column;
-  max-width: 1280px;
+  // Node: 24px between the two groups.
+  gap: 24px;
+  max-width: 640px;
   width: 100%;
 }
 
-// Heading in its own column, list in the other. The 1fr/2fr split gives the rows
-// the room — the headings only need to hold the left edge, and matching column
-// widths would leave the values crowding the chevron.
+/* -------------------------------------------------------------------- group */
+
 .group {
-  align-items: start;
-  column-gap: 64px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-  width: 100%;
-}
-
-.heading {
   display: flex;
   flex-direction: column;
-  // Aligns the title's cap height with the first row's label rather than its box,
-  // which otherwise sits the heading visibly high.
-  padding-top: 2px;
-}
-
-// Short rule above the title — the section's only ornament.
-.dash {
-  background: #111928;
-  height: 3px;
-  margin-bottom: 22px;
-  width: 40px;
-}
-
-.title {
-  color: #111928;
-  font-size: 30px;
-  font-weight: 600;
-  letter-spacing: -0.5px;
-  line-height: 38px;
-  margin: 0;
-}
-
-// Full-width rule between the groups, with the section's rhythm either side of it.
-.rule {
-  background: #e5e7eb;
-  height: 1px;
-  margin: 72px 0;
+  // Node: 16px from the eyebrow to the cards.
+  gap: 16px;
   width: 100%;
 }
 
-.rows {
+// Small caps with wide tracking, in place of the dash-and-title heading this section used to
+// carry. The node has no section heading at all — the eyebrow IS the label.
+.eyebrow {
+  color: #636363;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.9px;
+  line-height: 16px;
+  text-transform: uppercase;
+}
+
+/* ---------------------------------------------------------------------- rows */
+
+.grid {
+  display: flex;
+  flex-direction: column;
+  // Node: 10px, tighter than the 12 used before it.
+  gap: 10px;
   list-style: none;
   margin: 0;
   padding: 0;
   width: 100%;
 }
 
-// The hairline is drawn on the row rather than between list items so the hover
-// tint can cover it, and so the last row can drop it without a sibling selector
-// fighting the group's own spacing.
-.row {
-  align-items: center;
-  color: #111928 !important;
+// A linked row is an <li> wrapping an <a>; the anchor is the row, so the item must not add a
+// second box. An unlinked row IS the <li>, which is why both are addressed.
+.cardItem {
   display: flex;
-  gap: 24px;
-  padding: 22px 0;
-  position: relative;
-  text-decoration: none;
-  transition: background 0.2s ease;
+  width: 100%;
+}
 
-  &::after {
-    background: #e5e7eb;
-    bottom: 0;
-    content: "";
-    height: 1px;
-    left: 0;
-    position: absolute;
-    right: 0;
-  }
+.cardItem > .card {
+  flex: 1 1 auto;
+}
+
+// `color` is pinned with `!important` in every state because the site-wide `a:hover/active/focus`
+// rule tints link text red, which would recolour the label on hover.
+.card {
+  align-items: center;
+  background: #fff;
+  border: 1px solid rgba(209, 213, 219, 0.9);
+  border-radius: 14px;
+  color: #202020 !important;
+  display: flex;
+  // Node: 16px between the row's parts.
+  gap: 16px;
+  min-width: 0;
+  // Node: 16px vertical, 20px leading, 16px trailing — the chevron sits closer to the edge than
+  // the icon does, which is what keeps the row from looking lopsided.
+  padding: 16px 16px 16px 20px;
+  text-decoration: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+  width: 100%;
 
   &:hover,
   &:active,
   &:focus {
-    // The site-wide `a:hover` rule tints link text, so every state pins its own.
-    color: #111928 !important;
+    color: #202020 !important;
   }
+}
 
-  &:hover .chevron {
-    color: #636363;
+// Only rows that go somewhere react to the pointer. A row without an href is not a target, and a
+// hover state on it would be the detail that makes an unwired row look wired.
+//
+// No lift: a full-width row rising reads as the whole list twitching rather than one item
+// responding. The chevron is an exported asset with its fill baked in, so it nudges without
+// recolouring.
+//
+// Note every row now DRAWS a chevron, including the two with no href — so the hover nudge is the
+// only thing left distinguishing a row that goes somewhere from one that does not.
+a.card:hover {
+  border-color: rgba(156, 163, 175, 0.9);
+  box-shadow: 0 4px 14px rgba(17, 25, 40, 0.06);
+
+  .chevron {
     transform: translateX(3px);
   }
 
-  &:hover .name {
-    color: #e53762;
-  }
+  // The label does NOT recolour. It went to #e53762 — carried over from the row-list version this
+  // replaced, where the pink was the only hover signal there was. Here the border, the shadow and
+  // the chevron's nudge already say the row is live, and turning the label pink on top of them
+  // reads as a link inside a card rather than a card that is itself the link.
 }
 
-// The group's own spacing closes the list; a rule under the last row would read as
-// the start of another one.
-.rows li:last-child .row::after {
-  display: none;
+/* --------------------------------------------------------------------- icon */
+
+// NOT in the node — see the deviation note in the TSX.
+//
+// No tinted ground behind the icon any more. It KEEPS its 44px box though, and that is the load-
+// bearing part: the box is what holds every row's copy on the same left edge, and it matches the
+// WhatsApp tile's 44px so the column's leading edge does not step in and out. Only the fill and
+// the radius went.
+.iconWrap {
+  align-items: center;
+  color: #202020;
+  display: inline-flex;
+  flex: none;
+  height: 44px;
+  justify-content: center;
+  width: 44px;
 }
 
+// 26px, up from 20. A glyph sized to sit inside a 44px disc looks undersized once the disc is
+// gone — the circle was doing the work of occupying the slot, and now the mark has to.
+.icon {
+  display: block;
+  height: 26px;
+  width: 26px;
+}
+
+// Artwork in the icon slot — the same slot a glyph uses, so the two are interchangeable.
+//
+// 40px — the same value the identical icon family uses in WhyBook on How It Works, so the two
+// pages render this set at one size.
+//
+// Sized off the ARTWORK'S GRID rather than the slot: these are drawn on 24, so 40 is a 1.67x scale
+// and the 1.5px strokes land near 2.5px, which is about the ceiling before an outline stops
+// reading as a line drawing and starts reading as a heavy one. It went 30 (right for the Font
+// Awesome solids that were here, wrong for outlines) → 34 → 40.
+//
+// Every row uses this size now, WhatsApp included — the flat green bubble that replaced the app
+// tile has no background of its own, so it sits in the slot like the rest instead of being the
+// slot. The column's leading edge is finally uniform: five 40px marks in five 44px boxes.
+//
+// `object-fit: contain` because the viewBoxes are not all square (24x25, 24x24, 25x24) — it
+// letterboxes them instead of stretching them to fit.
+.mark {
+  display: block;
+  height: 40px;
+  object-fit: contain;
+  width: 40px;
+}
+
+/* --------------------------------------------------------------------- copy */
+
+// Node: `flex: 1 0 0`, so it takes the slack and pushes the trailing group to the row's end
+// without either needing `margin-left: auto`.
 .copy {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
-  gap: 4px;
+  // Node: 3px. Tight on purpose — the label and its value are one unit.
+  gap: 3px;
   min-width: 0;
 }
 
+// Node: 16px/22px, weight 500, #202020, tracking -0.1px.
 .name {
-  font-size: 17px;
-  font-weight: 600;
-  line-height: 24px;
-  transition: color 0.2s ease;
-}
-
-.detail {
-  align-items: center;
-  color: #636363;
-  display: flex;
-  font-size: 15px;
-  font-weight: 400;
-  gap: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.1px;
   line-height: 22px;
 }
 
-.dot {
-  color: #d1d5db;
+// Node: 14px/20px, weight 400, #636363.
+.detail {
+  color: #636363;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  // The addresses are long and a row can be narrow: wrapping is correct, overflowing is not.
+  overflow-wrap: anywhere;
 }
 
-.meta {
-  color: #9ca3af;
-}
+/* ----------------------------------------------------------------- trailing */
 
-.chevron {
-  color: #c9cfd8;
+// Node: badge and chevron grouped, 12px apart. Grouping them is what keeps the badge's right edge
+// on the same line for every row, whether or not that row's chevron is drawn.
+.trailing {
+  align-items: center;
+  display: flex;
   flex: none;
-  height: 18px;
-  margin-left: auto;
-  transition: color 0.2s ease, transform 0.2s ease;
-  width: 18px;
+  gap: 12px;
+}
+
+// Node: #f7f7f7 pill, 999px radius, 5px/10px padding, 12px/14px weight 500, #636363, tracking
+// 0.1px.
+//
+// This went to a bare dot-and-label at one point, on the reasoning that a pill beside a chevron
+// reads as a second button. The node specifies the pill, so the pill is back.
+.meta {
+  background: #f7f7f7;
+  border-radius: 999px;
+  color: #636363;
+  flex: none;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1px;
+  line-height: 14px;
+  padding: 5px 10px;
+  white-space: nowrap;
+}
+
+// The exported asset, 12x24. Rendered at 10x20 rather than the node's 12x24-inside-a-20px-box:
+// that combination relies on `overflow: clip` and trims the chevron's tips, and scaling to fit
+// keeps the whole glyph at the same 0.5 ratio.
+.chevron {
+  display: block;
+  flex: none;
+  height: 20px;
+  transition: transform 0.2s ease;
+  width: 10px;
+}
+
+/* --------------------------------------------------------------- responsive */
+
+@media (max-width: 900px) {
+  .section {
+    padding: 72px 24px 88px;
+  }
+}
+
+// Below this the badge and the value compete for the same line and the row becomes a scramble.
+// The badge is the least important of the three, so it goes.
+@media (max-width: 560px) {
+  .meta {
+    display: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .row,
-  .name,
+  .card,
   .chevron {
     transition: none;
+  }
+
+  a.card:hover .chevron {
+    transform: none;
   }
 }

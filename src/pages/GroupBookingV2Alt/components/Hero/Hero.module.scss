@@ -13,9 +13,12 @@
 .row {
   align-items: center;
   display: flex;
-  // Modest, because the comp already carries a band of empty white down its sides;
-  // a larger gap on top of that opened a hole in the middle of the hero.
-  gap: 40px;
+  // 64, up from the 40 that was right for the video. That number was chosen against a
+  // visual whose own edges were white — it faded into the gap, so the gap could be small.
+  // The Polaroid has a hard, shadowed edge AND is rotated 3°, which throws its top-right
+  // corner ~13px further right than its box: at 40 the frame's corner came within 27px of
+  // a 52px headline and the two looked stuck together.
+  gap: 64px;
   // 480 video + 40 gap + 680 copy, inside the page's 1280 column. 680 fits the
   // headline's longest line — "Friends who book together", which needs more measure
   // than the old copy did and broke after "book" at 580. If the copy grows again,
@@ -25,14 +28,14 @@
 }
 
 // Left on screen, second in the DOM — see the comment in Hero.tsx.
-.videoSlot {
+//
+// No translateY here any more. The video this replaced was a ring of cards with more
+// empty white below it than above, so box-centring it against the copy left it looking
+// low and it had to be nudged up 34px. A Polaroid is a rectangle with its weight in the
+// middle: box-centring is simply correct, and the nudge would now push it off the row.
+.photoSlot {
   flex: none;
   order: -1;
-  // The ring doesn't sit centred in its own frame — there's more empty white below
-  // it than above — so box-centring the video against the copy leaves it looking
-  // low. Nudged up by transform rather than margin so the row's height and the
-  // centring of everything else stay untouched.
-  transform: translateY(-34px);
 }
 
 // Ranged left, filling the rest of the row.
@@ -44,12 +47,131 @@
   text-align: left;
 }
 
-// The source is 720 × 720 and its background is the same white as the page, so it
-// needs no mask, radius or crop — it sits directly on the ground and blends.
-.video {
+// ── The print ──────────────────────────────────────────────────────
+//
+// A Polaroid, at the real film's proportions rather than invented ones — every number
+// below is Polaroid 600 measured in millimetres and divided by the frame's width:
+//
+//   frame 88.5 × 107.6mm   ·   image window 79 × 77mm
+//   side and top border 4.75mm  →  5.37% of width  →  21px at 400
+//   bottom border      25.85mm  →  29.2%  of width  → 117px at 400
+//   window            79 × 77mm  →  358 × 348px at 400
+//   frame height        107.6mm  →  121.6% of width  → 486px
+//
+// 400px wide because the row's other slot was a 480px video and 486px of frame keeps the
+// row's height where it was. The point of using the real ratios: the wide bottom border
+// is the ONLY thing that makes a white rectangle read as instant film rather than as a
+// card with a photo in it, and it is much wider than people guess — get it wrong and you
+// have drawn a picture frame.
+.polaroid {
+  // Not #fff — the page ground is already white, so a white frame on white has nothing but
+  // its shadow to prove it exists. But not warm either, and that is the whole point of
+  // these two numbers.
+  //
+  // Real instant film IS a warm off-white, and this was #fdfcf9 → #f7f4ee for exactly that
+  // reason. On this page it read as beige: the ground is pure #fff, the type is a cool
+  // navy and every other raised surface here is a cool grey, so the one accurate-to-film
+  // choice was the one that looked dirty. It is the same mistake the ivory postage stamp
+  // made in the headline — see the note above `.amount`. Being faithful to the object
+  // loses to being right in the palette.
+  //
+  // So: neutral, no hue at all. A 3% step from ground to the shaded corner, which is
+  // enough to read as a sheet catching the room's light and not enough to have a colour.
+  // A cool near-white (#fdfeff → #f1f4f9) was the other candidate and ties more neatly to
+  // the page's own #f6f8fb, but against a photograph this warm it reads faintly blue.
+  background: linear-gradient(168deg, #fdfdfd 0%, #f4f5f6 100%);
+  border-radius: 2px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 21px 21px 0;
+  // Contact, then lift, then a hairline to hold the edge against the white ground. Three
+  // stops rather than one: a single shadow is what makes a card look like a sticker, and
+  // this object is meant to be lying ON the page.
+  box-shadow: 0 1px 2px rgba(17, 25, 40, 0.09), 0 10px 28px rgba(17, 25, 40, 0.11),
+    0 0 0 1px rgba(17, 25, 40, 0.06);
+  height: 486px;
+  // Tilted the same way as the ticket in the headline, and further, so the two read as
+  // one hand having put both down. Counter-rotating them looked like a decision.
+  transform: rotate(-3deg);
+  width: 400px;
+}
+
+// The emulsion window. A dark ground, so the gap before the photo decodes is a print that
+// hasn't developed rather than a white hole in the frame — and neutral, for the same
+// reason the frame is.
+.print {
+  background: #e7e8ea;
+  border-radius: 1px;
   display: block;
-  height: 480px;
-  width: 480px;
+  flex: none;
+  height: 348px;
+  overflow: hidden;
+  position: relative;
+  width: 358px;
+  // Instant film sits slightly below the surface of its own border. One inset hairline
+  // says that; a heavier inner shadow would read as a bevel.
+  box-shadow: inset 0 0 0 1px rgba(17, 25, 40, 0.09);
+}
+
+.photo {
+  display: block;
+  height: 100%;
+  // The asset is already cropped to the window's ratio, so this is a guard against a
+  // future re-crop rather than the thing doing the cropping.
+  object-fit: cover;
+  width: 100%;
+}
+
+// Centred in what's left of the bottom border, which is 117px tall — so this is centred
+// by `flex: 1` on the remaining space rather than by a margin that would have to be
+// recalculated if the frame's height changed.
+.caption {
+  align-items: center;
+  display: flex;
+  // Stacked: the campus, then the label under it.
+  flex-direction: column;
+  // Centred in what's left of the bottom border by `flex: 1` on the remaining space,
+  // rather than by a margin that would need recalculating if the frame's height changed.
+  flex: 1;
+  gap: 7px;
+  justify-content: center;
+}
+
+// The fact, so it carries the weight: the darkest of the three greys, sentence case, and
+// no tracking. Held at 14px — one step up from the label and one step below the subtitle
+// beside it, so the print's caption never competes with the page's own body copy.
+.place {
+  align-items: center;
+  color: #4b5563;
+  display: flex;
+  font-size: 14px;
+  font-weight: 600;
+  gap: 5px;
+  letter-spacing: -0.01em;
+}
+
+// `flex: none` because a flex child with an intrinsic aspect ratio will otherwise be
+// squeezed by a long campus name before the text wraps.
+.pin {
+  color: #9ca3af;
+  fill: currentcolor;
+  flex: none;
+  height: 14px;
+  width: 14px;
+}
+
+// The sentiment, demoted: the page's own muted grey — the one `.sliderMax` uses — rather
+// than a warm grey, which went muddy the moment the frame stopped being cream. Tracked out
+// and set in caps, because at 10.5px that reads as something printed on the border, where
+// the same words set normally read as body copy that fell out of the paragraph.
+.captionLabel {
+  color: #9ca3af;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
 // 62 on 52 rather than the 56 the other v2 heroes use. Those are one-liners or
@@ -64,26 +186,164 @@
   margin: 0;
 }
 
-// The live figure, back in the heading and set at the headline's own weight.
+// ── The live figure, on a ticket ───────────────────────────────────
 //
-// It stays a <strong> — the element is still the semantically important bit of the
-// sentence, and a screen reader should treat it that way — but `inherit` overrides
-// the browser's bold so it doesn't stand out visually. Without this it renders at
-// 700 against the headline's 550.
+// The figure is the one thing in this hero that MOVES, so it is the one thing given a
+// material: a dark stub with the total struck out of it in white, torn along a
+// perforation, the currency sitting in the counterfoil on the far side of the tear.
+//
+// Four treatments now, and the three that were dropped are worth keeping on record,
+// because each failed for a reason about this PAGE rather than about the object:
+//
+//   · A flat pink pill. Pink is the page's ACTION colour — CTA, slider track, thumb,
+//     avatar rings — so spending it on a decorative object made the fold one wash of red
+//     and left the button nothing to be.
+//   · A postage stamp: ivory paper, four scalloped edges, printed inner frame, tilted. It
+//     is the device AboutUsV2 and HowItWorksV2 both use inline in their h1, so it looked
+//     like the safe borrow. It is not: those pages are a travel story and the stamp holds
+//     a city photograph, while this is a clean product page with a slider on it. Sepia
+//     paper and four sides of scalloping read as scrapbook next to this typography.
+//   · A pale grey card, notched on both short edges. Correct, and invisible: #f6f8fb on
+//     #fff is a two-percent step, so at a glance the headline simply had a gap in the
+//     middle of it and the figure lost the emphasis this whole hero exists to give it.
+//
+// So: INK, not paper. The chip is the headline's own colour at full strength, which makes
+// the number the darkest mass in the fold — where the eye should land — and costs the page
+// none of its pink. The ticket is then carried by geometry rather than by texture: one
+// perforation, two notches at its ends where a real tear starts, and nothing else.
 .amount {
+  display: inline-block;
   font-weight: inherit;
-  // The slider retargets this on every step; without tabular figures the digits
-  // shift width and the line jitters.
-  font-variant-numeric: tabular-nums;
+  height: 1em;
+  position: relative;
+  vertical-align: middle;
+  // Reserved inline space: 1.06em of counterfoil, three tabular digits, and their padding.
+  // The saving is always three digits (£100 at two friends, £500 at ten), so this never
+  // has to stretch and the words either side of it never move as the slider runs.
+  width: 3.35em;
+  // The lift lives HERE, on the unmasked parent, because the ticket's shape is cut with a
+  // `mask` and a mask clips everything the element paints — an outer box-shadow would be
+  // clipped away entirely. A filter on the parent traces the masked shape instead, so the
+  // shadow follows the notches round their curve.
+  //
+  // Two stops, both short: this sits INSIDE a line of type, and a soft wide shadow under
+  // it read as a glow around the words rather than as an object above the page.
+  filter: drop-shadow(0 1px 2px rgba(17, 25, 40, 0.18))
+    drop-shadow(0 4px 10px rgba(17, 25, 40, 0.14));
 }
 
-// Set down against the digits, matching the ticket card's 30-on-54. em-based so it
-// tracks the headline if the type scale changes. Sits on the baseline — raising it
-// to cap height reads as a superscript at this weight.
+.amountStamp {
+  // The tear's distance from the left edge. Read by three separate rules — the
+  // counterfoil's width, the perforation's position, and both notch masks — so the line
+  // and the bites cannot drift apart. Move the tear by changing this one number.
+  --tear: 1.06em;
+  // Notch radius: ~6.5px at the 52px headline. Tuned by eye against a render, not picked:
+  // at 0.105em the bites read as two stray dots rather than as something torn, and past
+  // ~0.14em they start to shave the rounded corners and the chip looks nibbled.
+  --notch: 0.125em;
+
+  align-items: stretch;
+  // Not flat: a few percent of lift at the top edge. Enough to read as a lit surface
+  // rather than a filled rectangle, far too little to look like a gradient.
+  background: linear-gradient(180deg, #1c2438 0%, #111928 58%);
+  border-radius: 0.2em;
+  color: #fff;
+  display: flex;
+  // 1.18em, where the parent reserves only 1em — the chip is deliberately taller than its
+  // own line. `inset: 0` + `margin: auto` centres it on that line without contributing to
+  // the line's height, so it can overhang into the leading and be rotated without moving
+  // a single word around it.
+  height: 1.18em;
+  inset: 0;
+  margin: auto;
+  position: absolute;
+  // Two operations, and the order matters — the lift is applied before the rotation, so
+  // the chip rises straight up rather than along its own tilted axis.
+  //
+  // The lift is NOT a style choice, it is an alignment fix, and it was measured rather
+  // than guessed: `vertical-align: middle` centres this box on the line's own middle,
+  // which put the figure 4px BELOW the baseline that "save" and "together" sit on. At a
+  // 52px headline that is visible, and it is exactly what makes an inline chip read as
+  // something pasted over the line instead of set into it. −0.075em is those 4px, in em
+  // so it holds if the headline size changes. Re-measure if you touch the height.
+  //
+  // The rotation is one degree: enough to say this is an object placed on the page, not
+  // enough to read as a sticker — which is where the earlier −3.2° version landed.
+  transform: translateY(-0.075em) rotate(-1deg);
+  width: 100%;
+  // The slider retargets this on every step; without tabular figures the digits change
+  // width and the ticket's contents jitter.
+  font-variant-numeric: tabular-nums;
+  // The top face of the card, caught by the light. Inset shadows are clipped by the mask,
+  // which is what we want here — the notches are holes in that face, not lit edges.
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09);
+
+  // ── The notches ────────────────────────────────────────────
+  // Two bites, top and bottom, both at the tear's x — and that placement is the point. On
+  // a real ticket the notches are where the tear STARTS, so sitting them at the ends of
+  // the perforation makes the line and the bites one idea instead of two decorations.
+  //
+  // Intersected, so each gradient's opaque area survives only where the other is opaque
+  // too. Where `mask-composite` is unsupported the two masks union instead and the chip is
+  // simply a rounded rectangle: the figure stays exactly as legible, only the bites go.
+  mask:
+    radial-gradient(var(--notch) at var(--tear) 0, #0000 98%, #000),
+    radial-gradient(var(--notch) at var(--tear) 100%, #0000 98%, #000);
+  mask-composite: intersect;
+}
+
+// The counterfoil — the narrow panel left of the tear, holding the currency and nothing
+// else. Width comes off --tear, so the panel ends exactly where the perforation is drawn.
+.stub {
+  align-items: center;
+  display: flex;
+  flex: none;
+  justify-content: center;
+  width: var(--tear);
+}
+
+// The £ is a unit mark, not a numeral: set down to 0.56em and held back to 62% white so it
+// stops competing with the figure. At full size and full white it read as a fourth digit,
+// and the eye stopped taking the number as a number.
 .currency {
-  font-size: 0.62em;
-  letter-spacing: -0.02em;
-  padding-right: 0.02em;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.56em;
+  font-weight: 600;
+  // The glyph's ink sits low in its own box next to three tall figures; this brings its
+  // optical centre up to meet theirs.
+  transform: translateY(-0.05em);
+}
+
+// The perforation. A 1px column of dashes rather than a dashed border, so the dash rhythm
+// is set in em and scales with the headline instead of staying a fixed 2px at every size.
+// Placed off the same --tear as the notches and pulled back half its own width, so the
+// line sits ON that x rather than beside it. Held clear of both bites at top and bottom:
+// dashes running into the curves made them look ragged rather than cut.
+.tear {
+  background-image: repeating-linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.32) 0 0.05em,
+    transparent 0.05em 0.115em
+  );
+  bottom: 0.19em;
+  left: var(--tear);
+  margin-left: -0.5px;
+  position: absolute;
+  top: 0.19em;
+  width: 1px;
+}
+
+.figure {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  // Optically centred, not box-centred: the padding is asymmetric because the digits have
+  // to clear the perforation on one side and the card's own edge on the other, and those
+  // are not the same distance. The 0.02em at the bottom lifts the figures off centre by a
+  // hair — lining figures have no descenders, so a box that is centred by geometry reads
+  // as bottom-heavy, and sitting them ~2px high is what makes it look centred.
+  padding: 0 0.22em 0.02em 0.18em;
 }
 
 // Held narrower than the column so it breaks into comfortable lines rather than one
@@ -375,7 +635,7 @@ $accent-to: #e53762;
 .ctaRow {
   display: flex;
   justify-content: flex-start;
-  margin-top: 28px;
+  margin-top: 32px;
 
   // .tryButton carries margin-left: 8px to space it from the navbar links, which
   // would nudge it off-centre here. Class + element beats the single class, so this
@@ -383,4 +643,23 @@ $accent-to: #e53762;
   > a {
     margin-left: 0;
   }
+}
+
+// The page's MAIN action, larger — and NOTHING else changed.
+//
+// What was here before was invented: 17px type, a tinted drop shadow and a 1px hover
+// lift. None of those exist on any CTA on this site, so the button stopped being amber's
+// primary button and became a one-off that happened to be pink. The gradient, the radius,
+// the 14px/600 label and the white-text guard all come from `.tryButton`, untouched.
+//
+// The one override is the PADDING, and it is not a number I chose: 16px 24px is what
+// amber's own primary button uses at desktop size (`.btn.desktop` in the user site's
+// Button.module.scss). So "larger" here means the site's large primary, not a bigger
+// version of the navbar's small one.
+//
+// `.ctaRow .cta` beats the single `.tryButton` on specificity, so this wins regardless of
+// stylesheet order. Do NOT move it into `.tryButton` — that class is the navbar pill on
+// every v2 page, and growing it there grows the header everywhere.
+.ctaRow .cta {
+  padding: 16px 24px;
 }

@@ -3,6 +3,7 @@ import wrapperHOC from "@Utils/wrapperHOC";
 import FooterDesktop from "@Components/FooterV2/FooterDesktop";
 import Header from "./components/Header/Header";
 import Hero from "./components/Hero/Hero";
+import GlobeTravel from "./components/GlobeTravel/GlobeTravel";
 import WhyPartners from "./components/WhyPartners/WhyPartners";
 import Steps from "./components/Steps/Steps";
 import Tools from "./components/Tools/Tools";
@@ -33,6 +34,11 @@ const ListWithUs = () => (
 
     <Header />
     {/* Hero also carries the partner logo wall — see Figma node 2483:9807. */}
+    {/* The globe lives here, not inside a section: it is a single fixed layer that
+        parks over the hero's slot and glides into the "Why partners" slot on scroll.
+        See GlobeTravel for why there is only one instance. */}
+    <GlobeTravel />
+
     <Hero />
     <WhyPartners />
     <Steps />

@@ -32,7 +32,12 @@ const ScholarshipV2 = () => (
       />
     </Helmet>
 
-    <Navbar />
+    <Navbar
+      links={[
+        { label: "Blogs", href: "/blog" },
+        { label: "About us", href: "/about-us-v2" },
+      ]}
+    />
     <Hero />
     <CreatorMarquee />
     <Intro />

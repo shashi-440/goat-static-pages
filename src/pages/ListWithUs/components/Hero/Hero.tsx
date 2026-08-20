@@ -1,12 +1,12 @@
-import { useEffect, useRef } from "react";
-import Image from "@Components/Image";
+import { useCallback, useEffect, useRef, useState } from "react";
 import CustomLink from "@Components/CustomLink";
-import Ticker from "../Ticker/Ticker";
+// Partner logo wall — temporarily off, see the note where it was rendered.
+// import Ticker from "../Ticker/Ticker";
+import { GLOBE_READY_EVENT } from "../GlobeTravel/GlobeTravel";
 // Shared with About Us / Scholarship rather than copied, so every v2 page uses
 // one scroll-reveal.
 import Reveal from "../../../AboutUsV2/components/Reveal/Reveal";
 import styles from "./Hero.module.scss";
-import heroPhoto from "../../assets/hero-bg.jpg";
 import avatar1 from "../../assets/avatar-1.png";
 import avatar2 from "../../assets/avatar-2.png";
 import avatar3 from "../../assets/avatar-3.png";
@@ -15,14 +15,41 @@ import wrapperHOC from "@Utils/wrapperHOC";
 /**
  * Hero — Figma node 2483:9807.
  *
- * Centred headline with an overlapping avatar cluster sitting inline on the
- * second line, the lede + blue pill under it, then the 1200px photo and the
- * partner logo wall. The wall lives inside the hero in this version of the
- * design rather than in a section of its own.
+ * A centred stack on white: a large headline with the avatar cluster inline in it, the lede
+ * and pill CTA under it, and the globe below — sized so it leaves through the bottom of the
+ * viewport rather than sitting politely inside the section.
+ *
+ * This replaced a two-column arrangement (copy left, globe right). Only the ARRANGEMENT
+ * changed: the ground is still white and the copy, the CTA's colour and the CTA's size are
+ * all as they were. A blue gradient with white type and a black pill was tried here from a
+ * reference and reverted — see the notes in the stylesheet for what it took and why it
+ * went.
  *
  * The design positions the avatar cluster absolutely into a run of spaces in the
  * headline; here it is a real inline element between "front of" and "millions",
  * so the gap stays correct when the headline rewraps.
+ *
+ * The globe is `DemandGlobe`, a Mapbox 3D globe of the demand arriving into amber-listed
+ * cities, and it does NOT live in this component — it is a single fixed layer owned by
+ * `GlobeTravel` that parks over the empty slot below and later glides into "Why partners".
+ * `hero-bg.jpg` survives as that component's fallback.
+ *
+ * `DemandMap` is the flat-projection version of the same network, still wired, though its
+ * hand-authored label layout is stale for the current city list.
+ *
+ * ── The entrance ────────────────────────────────────────────────────────────
+ * On landing, the globe holds the centre of the viewport on its own; then it settles
+ * down into its place in the layout; then the headline and CTA rise in above it.
+ *
+ * The sequence is driven from the globe's `onReady`, NOT from a fixed CSS delay.
+ * Mapbox takes a variable 1–3s to fetch its style and first tiles and the stage stays
+ * transparent until then, so a timed animation would have played the whole entrance to
+ * an empty box. There is also a hard fallback timer, because a hero whose copy is
+ * gated on a third-party CDN is a hero that can fail to have any copy.
+ *
+ * The lift is a TRANSFORM, never a layout change: the copy keeps its space in the
+ * document the whole time (hidden by opacity, as `Reveal` already does), so nothing
+ * reflows and the entrance costs no layout shift.
  */
 const AVATARS = [
   // Each avatar carries its own crop from the node — the source photos are not
@@ -32,50 +59,102 @@ const AVATARS = [
   { src: avatar3, alt: "", left: "0.18%", top: "2.56%", size: "100%" },
 ];
 
-// Distance (px) over which the hero image eases from full-bleed to contained.
-// Same value as the About Us hero, so the two pages scroll identically.
-const SHRINK_DISTANCE = 420;
+// The header watches for the `data-lwu-hero` attribute to know when the hero is
+// half past, which is when its CTA appears in the bar. Same trick as the About Us
+// navbar's data-nav-theme sections.
+/**
+ * How long the globe holds the centre before it starts moving down, measured from
+ * `onReady`.
+ *
+ * 900ms rather than 650 because `onReady` fires when Mapbox's style loads, not when the
+ * globe is actually on screen: the stage then fades in, and on a cold load the main
+ * thread is busy enough decoding first tiles that the fade lags. Measured at 650ms, the
+ * globe was visible for 62ms before it began to move — the pause at centre, which is the
+ * whole first beat, had effectively disappeared.
+ */
+const HOLD_MS = 900;
+/** How long the copy waits after the globe starts moving, so they overlap slightly. */
+const COPY_AFTER_MS = 450;
+/**
+ * Longest the globe's own entrance will wait on Mapbox before starting anyway. Only
+ * matters if `onReady` never arrives at all; a blocked CDN or refused token calls it
+ * immediately via the failure path.
+ */
+const FALLBACK_MS = 2600;
+
+/**
+ * Hard cap on how long the HEADLINE will wait, measured from mount and independent of
+ * the globe.
+ *
+ * This exists because the choreography and the page's job disagree. Measured cold,
+ * Mapbox needed ~2.5s to fetch its style and first tiles; hanging the copy off that put
+ * the H1 — the entire value proposition — at opacity 0 for 3.3 seconds. The globe still
+ * gets its centre-hold-and-settle beat whenever it loads, but the copy stops waiting
+ * eventually regardless, so a broken CDN cannot leave the hero wordless.
+ *
+ * 3.2s, not the 1.9s tried first: at 1.9s the cap was firing BEFORE the globe was
+ * drawable on a cold load, which inverted the whole sequence — copy first, globe
+ * afterwards. Paired with the `preconnect` in DemandGlobe, which cuts the real wait,
+ * this is high enough that the designed order holds unless something is actually wrong.
+ */
+const COPY_CAP_MS = 3400;
 
 const Hero = () => {
-  const mediaRef = useRef<HTMLDivElement>(null);
+  /** Set once the globe is drawable (or has fallen back to the photo). */
+  const [ready, setReady] = useState(false);
+  /** Copy may appear. */
+  const [copyIn, setCopyIn] = useState(false);
+  const startedRef = useRef(false);
+  /** The absolute safety timer, so the real sequence can cancel it. */
+  const capRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Hero image: starts full-bleed (edge-to-edge) and eases to its contained,
-  // rounded size as the user scrolls down the first ~420px. Driven by a CSS
-  // variable so the interpolation lives in CSS; rAF-throttled for smoothness.
-  // Ported from AboutUsV2's Hero — same effect, this page's own column width.
-  useEffect(() => {
-    const node = mediaRef.current;
-    if (!node) return undefined;
-    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      node.style.setProperty("--shrink", "1");
-      return undefined;
-    }
-
-    let raf = 0;
-    const update = () => {
-      raf = 0;
-      const progress = Math.min(1, Math.max(0, window.scrollY / SHRINK_DISTANCE));
-      node.style.setProperty("--shrink", String(progress));
-    };
-    const onScroll = () => {
-      if (!raf) raf = window.requestAnimationFrame(update);
-    };
-
-    update();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      if (raf) window.cancelAnimationFrame(raf);
-    };
+  const begin = useCallback(() => {
+    if (startedRef.current) return;
+    startedRef.current = true;
+    setReady(true);
   }, []);
 
+  // Reduced motion skips the entrance outright: everything is simply present.
+  useEffect(() => {
+    const still =
+      typeof window !== "undefined" &&
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (still) {
+      startedRef.current = true;
+      setReady(true);
+      setCopyIn(true);
+      return undefined;
+    }
+    // The globe is no longer a child of this component, so readiness arrives as an
+    // event from GlobeTravel rather than a callback.
+    window.addEventListener(GLOBE_READY_EVENT, begin);
+    const fallback = setTimeout(begin, FALLBACK_MS);
+    capRef.current = setTimeout(() => setCopyIn(true), COPY_CAP_MS);
+    return () => {
+      window.removeEventListener(GLOBE_READY_EVENT, begin);
+      clearTimeout(fallback);
+      if (capRef.current) clearTimeout(capRef.current);
+    };
+  }, [begin]);
+
+  useEffect(() => {
+    if (!ready || copyIn) return undefined;
+    // The globe made it in time, so the real sequence owns the copy from here. Without
+    // cancelling the cap it could still fire mid-entrance and show the copy BEFORE the
+    // globe had started moving, inverting the whole thing.
+    if (capRef.current) {
+      clearTimeout(capRef.current);
+      capRef.current = null;
+    }
+    const copy = setTimeout(() => setCopyIn(true), HOLD_MS + COPY_AFTER_MS);
+    return () => clearTimeout(copy);
+  }, [ready, copyIn]);
+
   return (
-    // The header watches for this attribute to know when the hero is half past,
-    // which is when its CTA appears in the bar. Same trick as the About Us
-    // navbar's data-nav-theme sections.
     <section className={styles.hero} data-lwu-hero>
-      <div className={styles.heroRow}>
-        <Reveal as="h1" className={styles.title}>
+      <div className={styles.copy}>
+        <Reveal as="h1" className={styles.title} hold={!copyIn}>
           List your property in
           <br />
           front of{" "}
@@ -100,28 +179,34 @@ const Hero = () => {
           millions of students
         </Reveal>
 
-        <Reveal className={styles.lede} delay={120}>
+        <Reveal className={styles.lede} delay={120} hold={!copyIn}>
           <p className={styles.subtitle}>
             Make the most out of this partnership and avail the benefits
           </p>
-          <CustomLink href="/" className={styles.cta} dataTestId="list-with-us-hero-cta">
+          <CustomLink
+            href="/"
+            className={styles.cta}
+            dataTestId="list-with-us-hero-cta"
+          >
             List on amber
           </CustomLink>
         </Reveal>
       </div>
 
-      <div ref={mediaRef} className={styles.photo}>
-        <Image
-          src={heroPhoto}
-          alt="A property team working together around a table"
-          className={styles.photoImage}
-          width="100%"
-          height="100%"
-          isEagerLoad
-        />
+      {/* Reserves the globe's space. The globe itself lives in `GlobeTravel`, a single
+          fixed layer that parks over this slot and later glides into the "Why partners"
+          section — see the note at the top of that component. This box therefore holds
+          layout only and is deliberately empty.
+
+          It sits in a wrapper rather than being the flex child directly so the slot keeps
+          its own width against `align-items: center` on the section. */}
+      <div className={styles.stage}>
+        <div className={styles.globeSlot} data-globe-slot="hero" />
       </div>
 
-      <Ticker />
+      {/* Partner logo wall, turned off for now. The component and its assets are
+          untouched — restore by uncommenting this and the import at the top. */}
+      {/* <Ticker /> */}
     </section>
   );
 };

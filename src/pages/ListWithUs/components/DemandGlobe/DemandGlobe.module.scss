@@ -1,0 +1,262 @@
+// Hero globe. Occupies the slot the hero photo used to hold.
+//
+// The stage is squarer than the flat map's letterbox: a sphere needs height, and at
+// the flat map's 360:130 the globe was a circle with two thirds of the frame empty
+// either side.
+// Just the globe now — the headline stat row above it was removed, so there is
+// nothing to space against.
+.box {
+  display: flex;
+  flex-direction: column;
+  max-width: 1200px;
+  width: 100%;
+}
+
+.fallback {
+  aspect-ratio: 1200 / 717;
+  border-radius: 24px;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* ------------------------------------------------------------------ stage */
+
+// A sphere in a wide frame leaves most of it empty, so the stage is narrower than the
+// page column and centred.
+//
+// Both the cap and the aspect are CSS variables so the HOST can size the globe: the
+// hero's two-column layout gives it a narrower, square column, where an 880px cap and a
+// 880:620 letterbox would shrink the sphere for no reason. Defaults are the values for a
+// full-width, stacked layout.
+.stageWrap {
+  margin: 0 auto;
+  max-width: var(--globe-max-width, 880px);
+  position: relative;
+  width: 100%;
+}
+
+// Mapbox sizes itself to this element, so it needs real dimensions before the map
+// is created — a zero-height container makes Mapbox initialise at 0x0 and never
+// recover without an explicit resize().
+.stage {
+  aspect-ratio: var(--globe-aspect, 880 / 620);
+  // Standard paints deep space behind the globe, which lands as a hard black
+  // rectangle in a white hero. Rounded to the same 24px the hero photo used, so it
+  // reads as a panel rather than an unfinished crop.
+  border-radius: 24px;
+  overflow: hidden;
+  // NO fade-in, deliberately.
+  //
+  // There was one — 500ms, then 200ms — to cover Mapbox painting a grey canvas before any
+  // tile arrived. Two things retired it. Space is white now and so is the page, so there
+  // is nothing to hide: an unpainted canvas is invisible. And the fade actively broke the
+  // hero's entrance, which holds the globe still for a fixed time after Mapbox reports
+  // ready: while Mapbox's first render saturates the main thread the class change and
+  // transition are starved, so the globe did not actually appear until ~840ms after the
+  // hold had started, leaving a 60ms pause out of 900ms. Triggering on Mapbox's `idle`
+  // event fixed the pause instead but cost ~1.5s waiting for every tile and pushed the
+  // headline to 4.9s. With no fade, "Mapbox reports ready" and "you can see it" are the
+  // same moment, which is what the entrance needs.
+  width: 100%;
+
+  // The radius has to be repeated on Mapbox's canvas and its container. A WebGL
+  // canvas gets its own compositing layer, and a composited layer is not clipped by
+  // an ancestor's border-radius — the stage measured as `border-radius: 24px;
+  // overflow: hidden` while the dark corners rendered square anyway.
+  :global(.mapboxgl-canvas-container),
+  :global(.mapboxgl-canvas) {
+    border-radius: 24px;
+  }
+
+  // Mapbox's own chrome.
+  //
+  // ⚠️ ATTRIBUTION — READ BEFORE SHIPPING ⚠️
+  //
+  // This map currently shows NO attribution of any kind, by request, for this prototype:
+  // the Mapbox wordmark is hidden by the rule below, and the compact ⓘ toggle that
+  // carried "© Mapbox © OpenStreetMap" is no longer created at all (see
+  // `attributionControl: false` in the component, and the note where the control used to
+  // be added).
+  //
+  // Both are obligations, and they are separate ones. Mapbox's terms require the wordmark
+  // for any map served from their APIs; removing it is only permitted on specific plans
+  // and with written permission from Mapbox. The text attribution is what satisfies
+  // OpenStreetMap's ODbL requirement for the underlying data. Neither is a styling
+  // question — they need confirming for amber's account before this goes to production.
+  //
+  // If a genuinely attribution-free hero is needed, the clean answer is the
+  // self-contained flat map in ../DemandMap: it draws its own coastlines from a
+  // committed land mask, calls no vendor API, and owes nobody an attribution.
+  //
+  // Kept in case the control is restored — it styles the ⓘ toggle to sit quietly on
+  // white rather than on the dark slab Standard used to paint behind it.
+  :global(.mapboxgl-ctrl-attrib) {
+    background: transparent;
+    border-radius: 4px 0 0 0;
+    font-size: 10px;
+  }
+
+  :global(.mapboxgl-ctrl-attrib a) {
+    color: #6b7280;
+  }
+
+  // Hidden by request — see the attribution note above. One line to restore.
+  :global(.mapboxgl-ctrl-logo) {
+    display: none;
+  }
+
+  // The canvas must not show a focus ring in a hero; the globe is decorative and
+  // every fact on it is also in the text below.
+  :global(.mapboxgl-canvas:focus) {
+    outline: none;
+  }
+}
+
+/* ---------------------------------------------------------- hover card */
+
+// Our own DOM rather than a mapboxgl.Popup: a Popup brings its own tip, padding and
+// close affordances, and fights the styling more than it saves. Positioned from
+// map.project(), and hidden entirely when its city rotates to the far side.
+.card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(17, 25, 40, 0.16);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  // 244, up from 168: it is the width the three-up figure row needs at 11px labels
+  // without any of them wrapping. Half the sphere's width at the size the "Why partners"
+  // panel draws it, which is acceptable for something that only exists while a pointer is
+  // held on a pin.
+  min-width: 244px;
+  padding: 10px 12px;
+  pointer-events: none;
+  position: absolute;
+  // Above and right of the node, clear of its halo.
+  transform: translate(18px, -100%);
+  z-index: 5;
+}
+
+.cardHead {
+  align-items: center;
+  color: #111928;
+  display: flex;
+  font-size: 14px;
+  gap: 6px;
+  line-height: 1;
+}
+
+.cardFlag {
+  background: #fff;
+  border-radius: 999px;
+  flex-shrink: 0;
+  height: 14px;
+  object-fit: cover;
+  width: 14px;
+}
+
+.cardCountry {
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.cardStat {
+  color: #4b5563;
+  font-size: 12px;
+  line-height: 1;
+
+  b {
+    // Blue, matching the destination pins it describes.
+    color: #1a56db;
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+// The three figures, as a 3-up with rules between — the same arrangement the stat cards
+// in "Why partners" use, so a city reads as a local instance of the section's claims.
+//
+// `1fr` columns and not `auto`: equal thirds keep the two rules at fixed positions, so the
+// row does not re-proportion itself as the pointer moves between cities whose numbers are
+// different lengths ("4" against "97%" against "$2.4k").
+.cardGrid {
+  border-top: 1px solid #f3f4f6;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding-top: 8px;
+}
+
+.cardCell {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-left: 10px;
+
+  // Rules BETWEEN, not around: the first cell sits flush with the card's own padding so
+  // its figure lines up with the city name above it.
+  & + & {
+    border-left: 1px solid #f3f4f6;
+  }
+
+  &:first-child {
+    padding-left: 0;
+  }
+
+  b {
+    color: #111928;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  i {
+    color: #6b7280;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 500;
+    letter-spacing: -0.05px;
+    line-height: 1.1;
+  }
+}
+
+.cardPartners {
+  align-items: center;
+  border-top: 1px solid #f3f4f6;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 8px;
+}
+
+.cardLogo {
+  display: block;
+  height: 17px;
+  width: auto;
+}
+
+/* ------------------------------------------------------------ a11y only */
+
+.srOnly {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+/* ---------------------------------------------------------- responsive */
+
+@media (max-width: 900px) {
+  // Squarer still on a phone: at 880:620 the sphere shrinks with the width and
+  // leaves the frame mostly empty.
+  .stage {
+    aspect-ratio: var(--globe-aspect-mobile, 1 / 1);
+  }
+}

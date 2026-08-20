@@ -4,3 +4,8 @@ public/
 .DS_Store
 loadable-stats*.json
 dist/
+
+# Local environment. Holds the Mapbox token — see src/config/index.ts.
+.env
+.env.*
+!.env.example

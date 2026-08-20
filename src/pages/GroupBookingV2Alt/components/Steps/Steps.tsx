@@ -53,16 +53,17 @@ const offsetTopWithin = (el: HTMLElement, ancestor: HTMLElement): number => {
 };
 
 /**
- * How it works — HowItWorksV2's vertical stepper, on this page's dark band.
+ * How it works — HowItWorksV2's vertical stepper, on this page's grey band.
  *
  * A rail connects the numbered chips: a faint track with a bright fill that grows
  * as you scroll, so the line doubles as a progress indicator and each chip lights
  * as the fill reaches it. The rail spans chip-1-centre to chip-3-centre, measured
  * from layout, and the chips paint over it so it reads as passing behind them.
  *
- * Inverted for the dark ground rather than reused as-is: on the light page the
- * fill is near-black on grey, here it's white on a low-opacity white track, and a
- * reached chip fills white with dark type instead of the other way round.
+ * Same values as that page, not an inversion of them: this band was graphite and has
+ * been made grey, so the near-black fill on a grey track and the white chip that
+ * fills dark when reached are shared with it again. See the palette block at the top
+ * of the stylesheet.
  *
  * Media sits left of the stepper in a reserved slot. HowItWorksV2 pairs a clip
  * with every row; this is one slot for the whole section, held empty until there's
@@ -167,13 +168,13 @@ const Steps = () => {
     };
   }, []);
 
-  // data-nav-theme="dark" is how the shared Navbar knows to swap to its light logo
-  // and white links while this band is behind it — without it the header keeps its
-  // dark type and disappears against the section. Same opt-in the other dark
-  // sections use (AboutUsV2's WhyAmberExists, CareerV2's CrewCTA, ScholarshipV2's
-  // Categories).
+  // No data-nav-theme: the band is grey now, so the navbar keeps its dark logo and
+  // dark links over it. That attribute is the opt-in the shared Navbar reads to go
+  // white (AboutUsV2's WhyAmberExists, CareerV2's CrewCTA, ScholarshipV2's
+  // Categories still use it) — left on a light band it would make the header
+  // invisible.
   return (
-    <section className={styles.section} data-nav-theme="dark">
+    <section className={styles.section}>
       <Reveal as="h2" className={styles.heading}>
         {HEADING}
       </Reveal>
