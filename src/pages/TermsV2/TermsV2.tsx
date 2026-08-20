@@ -27,7 +27,12 @@ const TermsV2 = () => (
       />
     </Helmet>
 
-    <Navbar />
+    <Navbar
+      links={[
+        { label: "Privacy", href: "/privacy-v2" },
+        { label: "Support", href: "/contact-us-v2-card" },
+      ]}
+    />
     <LegalHero
       title="Terms and Conditions"
       subtitle="The terms that apply when you browse, enquire or book through amber"

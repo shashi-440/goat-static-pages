@@ -1,0 +1,401 @@
+// Hero demand map. Sits in the slot the 1200x717 hero photo used to hold.
+//
+// Height is NOT fixed to the photo's 717px: the map's own aspect comes from its
+// latitude clip (360:130), and the stats line above it adds its own height. Fixing
+// the outer box would either letterbox the map or crop it.
+.box {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  max-width: 1200px;
+  width: 100%;
+}
+
+.fallback {
+  aspect-ratio: 1200 / 717;
+  border-radius: 24px;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* ------------------------------------------------------------------ stats */
+
+// The figures do the work the graphic cannot: a volume, a reach, a footprint,
+// readable in one glance before any geography is parsed. Laid out as one baseline
+// row so it reads as a sentence rather than as a dashboard.
+.stats {
+  align-items: baseline;
+  color: #4b5563;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 12px;
+  justify-content: center;
+  margin: 0;
+}
+
+.statBig {
+  color: #111928;
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -0.8px;
+  line-height: 1;
+}
+
+.statLabel {
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+// Vertical hairline between the headline figure and the secondary one. Sized in em
+// so it tracks the text it separates.
+.statRule {
+  align-self: center;
+  background: #e5e7eb;
+  height: 1.15em;
+  width: 1px;
+}
+
+.statMinor {
+  font-size: 16px;
+  line-height: 1.4;
+
+  b {
+    color: #111928;
+    font-weight: 600;
+  }
+}
+
+/* -------------------------------------------------------------------- map */
+
+.map {
+  position: relative;
+  width: 100%;
+}
+
+.landCanvas,
+.arcCanvas {
+  display: block;
+  left: 0;
+  position: absolute;
+  top: 0;
+}
+
+.arcCanvas {
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------- origins */
+
+// Origins are the QUIET end of the network. They read as "the world" — present
+// everywhere, individually unimportant until one is actually sending. Deliberately
+// smaller and lower-contrast than a destination node; if the two ever look
+// comparable the arcs stop having a direction.
+.origin {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  transition: opacity 0.25s ease;
+}
+
+.originDot {
+  background: #1c64f2;
+  border-radius: 999px;
+  // A white ring so a dot over land dots still separates from them.
+  box-shadow: 0 0 0 1.5px #fff;
+  display: block;
+  height: 8px;
+  position: absolute;
+  width: 8px;
+  // Opacity and scale come from the render loop; both are transitioned so the
+  // 80ms state sync does not read as stepping.
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+// Flag + country name, mounted ONLY while this origin has an arc in the air. That
+// is the whole clutter fix: thirteen permanent flags were decoration, whereas a
+// flag that appears as its line leaves is the map naming what just happened.
+.originTag {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.94);
+  border-radius: 999px;
+  box-shadow: 0 1px 4px rgba(17, 25, 40, 0.12);
+  color: #1f2a37;
+  display: flex;
+  font-size: 11px;
+  font-weight: 600;
+  gap: 5px;
+  line-height: 1;
+  padding: 3px 7px 3px 4px;
+  position: absolute;
+  // Above and right of the dot, clear of its own ring.
+  transform: translate(6px, -150%);
+  transition: opacity 0.2s ease;
+  white-space: nowrap;
+}
+
+.originFlag {
+  background: #fff;
+  border-radius: 999px;
+  flex-shrink: 0;
+  height: 12px;
+  object-fit: cover;
+  width: 12px;
+}
+
+/* -------------------------------------------------------- destinations */
+
+// Positioned overlay filling the map, NOT a plain wrapper — two load-bearing
+// reasons:
+//   · `z-index` only applies to positioned elements. Without this the per-city
+//     z-index was silently ignored, and since the four UK nodes overlap within
+//     9px, whichever came last in the DOM took the pointer — hovering London
+//     actually hit Coventry.
+//   · `inset: 0` makes this box exactly the map, so absolutely positioned children
+//     keep using map coordinates.
+.city {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  transition: opacity 0.25s ease;
+}
+
+.leader {
+  height: 100%;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
+// The destination node. Bigger than an origin, darker, and wearing a halo — the
+// arcs have to land on something that looks like a terminus.
+.node {
+  appearance: none;
+  background: #ed3a56;
+  border: 0;
+  border-radius: 999px;
+  box-shadow: 0 0 0 2px #fff, 0 1px 4px rgba(17, 25, 40, 0.18);
+  cursor: pointer;
+  padding: 0;
+  // Opts back in to the pointer, which `.city` turns off for its whole frame.
+  pointer-events: auto;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  transition: background 0.18s ease, transform 0.18s ease;
+
+  &:focus-visible {
+    outline: 2px solid #1c64f2;
+    outline-offset: 4px;
+  }
+}
+
+.cityOn .node {
+  background: #d20034;
+  transform: translate(-50%, -50%) scale(1.2);
+}
+
+// Static halo, always on. This is most of what makes a destination outrank an
+// origin at a glance, without having to make the node itself large enough to
+// swamp the small cities.
+.halo {
+  background: rgba(237, 58, 86, 0.16);
+  border-radius: 999px;
+  height: 220%;
+  left: 50%;
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 220%;
+}
+
+// Arrival ring. Opacity and scale both come from the pulse value, so it expands
+// out of the node as an arc lands and fades as it goes.
+.ring {
+  border: 1.25px solid #ed3a56;
+  border-radius: 999px;
+  height: 100%;
+  left: 50%;
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  width: 100%;
+}
+
+/* ------------------------------------------------------------- labels */
+
+// Name + count, at authored offsets from network.ts. Only four are permanent; the
+// rest are mounted by an arrival or a hover, which is what keeps twelve labels
+// from being on screen at once.
+.label {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 6px;
+  display: flex;
+  gap: 6px;
+  line-height: 1;
+  padding: 3px 6px;
+  pointer-events: none;
+  position: absolute;
+  transform: translateY(-50%);
+  transition: opacity 0.35s ease;
+  white-space: nowrap;
+}
+
+// Labels left of their node are right-aligned to the anchor, so text grows away
+// from the map rather than back across it.
+.labelRight {
+  transform: translate(-100%, -50%);
+}
+
+// Only permanent labels take the pointer — see the note on the handler.
+.labelHit {
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.labelName {
+  color: #111928;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+// The count is what a landlord scans for, so it takes the accent.
+.labelCount {
+  color: #d20034;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------- hover card */
+
+// The only place partner logos appear. Previously they were a permanent column of
+// eight wordmarks beside London — the densest thing on the map and the least
+// spatial. Someone asking "who else lists here?" is asking about a city, so the
+// answer lives on the city.
+.card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(17, 25, 40, 0.14);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 168px;
+  padding: 10px 12px;
+  pointer-events: none;
+  position: absolute;
+  // Offset clear of the node's halo, vertically centred on it.
+  transform: translate(18px, -50%);
+  z-index: 50;
+}
+
+// Mirrored for nodes whose labels sit to the left, so the card opens into the
+// map's empty side and not off the frame.
+.cardRight {
+  transform: translate(calc(-100% - 18px), -50%);
+}
+
+.cardHead {
+  align-items: center;
+  color: #111928;
+  display: flex;
+  font-size: 14px;
+  gap: 6px;
+  line-height: 1;
+}
+
+.cardFlag {
+  background: #fff;
+  border-radius: 999px;
+  flex-shrink: 0;
+  height: 14px;
+  object-fit: cover;
+  width: 14px;
+}
+
+.cardCountry {
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.cardStat {
+  color: #4b5563;
+  font-size: 12px;
+  line-height: 1;
+
+  b {
+    color: #d20034;
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+// Partner wordmarks for this city, wrapped. Height-constrained so every mark
+// carries the same optical weight regardless of how wide its artwork is.
+.cardPartners {
+  align-items: center;
+  border-top: 1px solid #f3f4f6;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 8px;
+}
+
+.cardLogo {
+  display: block;
+  height: 17px;
+  width: auto;
+}
+
+/* ------------------------------------------------------------ a11y only */
+
+.srOnly {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+/* ---------------------------------------------------------- responsive */
+
+@media (max-width: 900px) {
+  .box {
+    gap: 20px;
+  }
+
+  .statBig {
+    font-size: 32px;
+  }
+
+  .statLabel,
+  .statMinor {
+    font-size: 14px;
+  }
+
+  // The hairline reads as clutter once the row wraps onto two lines.
+  .statRule {
+    display: none;
+  }
+}
+
+// Below this the authored label layout cannot hold — labels are sized in CSS px
+// and do not shrink with the map, so the UK stack overlaps itself. The network
+// itself still reads: nodes, origin dots and arcs, with the same content
+// available as text underneath. Origin tags go too; at this size they cover the
+// arcs they are meant to annotate.
+@media (max-width: 700px) {
+  .label,
+  .leader,
+  .originTag {
+    display: none;
+  }
+}

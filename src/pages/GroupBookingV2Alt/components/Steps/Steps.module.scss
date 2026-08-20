@@ -10,28 +10,43 @@ $rail-width: 2px;
 // Gap between the chip and the copy beside it.
 $chip-gutter: 24px;
 
-// Full-bleed dark band: a graphite body angled off-axis from a cool specular wash
-// falling in from the top-right. There was also a pink accent bloom in the
-// bottom-left corner, echoing the hero ticket's own surface — removed, because on a
-// section this large it read as a stray colour cast rather than a deliberate glow.
+// ── Ground ─────────────────────────────────────────────────────────────────────
+// GREY, and light. This band was graphite — a near-black body with a cool specular
+// wash falling in from the top-right — and a black stripe between a white hero and a
+// white footer was the heaviest thing on the page by a distance.
+//
+// Grey also puts this stepper back where it started: it is HowItWorksV2's component,
+// inverted for the dark ground when it came over. Every value below is now that
+// page's own again (#111928 ink, #e5e7eb track, white chips), so the same device
+// reads the same way on both pages.
+//
+// The whole palette is these five values. To go back to a dark band, invert them
+// here and restore `data-nav-theme="dark"` on the section in Steps.tsx — the shared
+// navbar reads that attribute to swap to its light logo, and without it a dark band
+// would sit behind dark header type.
+$ground: #f7f8f9;
+$ink: #111928;
+$ink-dim: #6b7280;
+$track: #e5e7eb;
+$slot: #ededf0;
+
 .section {
   align-items: center;
   display: flex;
   flex-direction: column;
   // Matches the hero's 80px side padding so both sections share one content edge.
-  // Deep vertical padding is doing most of the work on "spacing" — a dark band
-  // needs more air than a white one or it reads as a cramped stripe.
+  // Deep vertical padding is doing most of the work on "spacing": the band is only a
+  // shade off the hero's white, so the air around the content is what separates the
+  // two sections rather than the contrast between them.
   padding: 120px 80px 128px;
   width: 100%;
-  background: radial-gradient(120% 120% at 82% -20%, rgba(255, 255, 255, 0.07) 0%, transparent 52%),
-    linear-gradient(160deg, #191d24 0%, #0b0d12 52%, #12151b 100%);
+  background: $ground;
 }
 
-// Bigger than the 40px it was on the light band: on a dark field a heading has to
-// carry more weight to hold the space, and it's now the section's only large type.
-// Centres and constrains itself.
+// 48, up from the 40 this stepper uses on How It Works: it is the section's only
+// large type, and it has a much taller band to hold. Centres and constrains itself.
 .heading {
-  color: #fff;
+  color: $ink;
   font-size: 48px;
   font-weight: 550;
   letter-spacing: -1.1px;
@@ -60,8 +75,10 @@ $chip-gutter: 24px;
 .mediaSlot {
   aspect-ratio: 4 / 3;
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.035);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07);
+  // A step DOWN from the ground, not up: on a light band the empty frame has to be
+  // the darker of the two or it disappears into the section.
+  background: $slot;
+  box-shadow: inset 0 0 0 1px rgba(17, 25, 40, 0.06);
   width: 100%;
 }
 
@@ -77,7 +94,7 @@ $chip-gutter: 24px;
 // chip-1 → chip-3 centres; the `top: 0; bottom: 0` default means the track still
 // connects the chips if that script never runs.
 .rail {
-  background: rgba(255, 255, 255, 0.14);
+  background: $track;
   border-radius: 999px;
   bottom: 0;
   left: calc(#{$chip * 0.5} - #{$rail-width * 0.5});
@@ -87,12 +104,11 @@ $chip-gutter: 24px;
   width: $rail-width;
 }
 
-// The progress fill. Inverted from the light version — bright on a faint track,
-// rather than near-black on grey. scaleY from the top is compositor-friendly, so
-// the scroll handler never triggers layout. Starts at 0: without JS only the track
-// shows, which is still a connected line.
+// The progress fill: near-black on the grey track. scaleY from the top is
+// compositor-friendly, so the scroll handler never triggers layout. Starts at 0:
+// without JS only the track shows, which is still a connected line.
 .railFill {
-  background: rgba(255, 255, 255, 0.92);
+  background: $ink;
   display: block;
   height: 100%;
   transform: scaleY(0);
@@ -115,10 +131,12 @@ $chip-gutter: 24px;
 // no z-index is needed.
 .marker {
   align-items: center;
-  background: #12151b;
+  // White, not the ground's grey: the chip has to be opaque so the rail reads as
+  // passing behind it, and a chip in the ground's own colour reads as a hole.
+  background: #fff;
   border-radius: $chip-radius;
-  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.22);
-  color: rgba(255, 255, 255, 0.6);
+  box-shadow: inset 0 0 0 1.5px rgba(17, 25, 40, 0.14);
+  color: $ink-dim;
   display: flex;
   font-size: 13px;
   font-weight: 600;
@@ -137,13 +155,13 @@ $chip-gutter: 24px;
 // Reached: the chip fills to match the rail's bright fill, so the numbers read as
 // completed rather than staying uniform while the line moves past them.
 .markerActive {
-  background: #fff;
-  box-shadow: inset 0 0 0 1.5px #fff;
-  color: #12151b;
+  background: $ink;
+  box-shadow: inset 0 0 0 1.5px $ink;
+  color: #fff;
 }
 
 .title {
-  color: #fff;
+  color: $ink;
   font-size: 22px;
   font-weight: 600;
   letter-spacing: -0.3px;
@@ -152,7 +170,7 @@ $chip-gutter: 24px;
 }
 
 .body {
-  color: rgba(255, 255, 255, 0.58);
+  color: $ink-dim;
   font-size: 16px;
   font-weight: 400;
   line-height: 26px;

@@ -8,15 +8,19 @@ import wrapperHOC from "@Utils/wrapperHOC";
 const logoDark = `${config.IMAGE_STATIC_ASSETS_COMPONENTS_PATH}/Header/assets/amber-logo-dark.svg`;
 const logoLight = `${config.IMAGE_STATIC_URL}/images/logo/amber-logo-light.svg`;
 
+// Fallback only. Every v2 page now passes its own `links` — the two most useful next
+// reads from wherever you are — because one shared pair meant the nav said the same thing
+// on all ten and told you nothing about where you were. Kept as a default so a new page
+// that forgets to pass links still renders something sane rather than an empty bar.
 const DEFAULT_NAV_LINKS = [
   { label: "Blogs", href: "/blog" },
-  { label: "Career", href: "/careers" },
+  { label: "Career", href: "/career-v2" },
 ];
 
 interface NavbarProps {
   /** Override the nav links. Defaults to Blogs + Career. */
   links?: { label: string; href: string }[];
-  /** CTA label. Defaults to "Try amber". */
+  /** CTA label. Defaults to "Visit amber". */
   ctaLabel?: string;
   /** CTA target. Defaults to "/". */
   ctaHref?: string;
@@ -27,7 +31,7 @@ interface NavbarProps {
    */
   ctaSecondaryUntilScroll?: boolean;
   /**
-   * Renders the "Try amber" CTA as the secondary (hairline) button instead of the
+   * Renders the "Visit amber" CTA as the secondary (hairline) button instead of the
    * gradient pill. For pages whose own hero CTA is the primary action — two filled
    * pills on one screen leaves neither reading as the main one.
    *
@@ -42,7 +46,7 @@ interface NavbarProps {
 
 const Navbar = ({
   links = DEFAULT_NAV_LINKS,
-  ctaLabel = "Try amber",
+  ctaLabel = "Visit amber",
   ctaHref = "/",
   ctaSecondaryUntilScroll = false,
   secondaryCta = false,
@@ -135,7 +139,7 @@ const Navbar = ({
                   ctaSecondaryUntilScroll && !scrolled ? styles.tryButtonSecondary : ""
                 }`
           }
-          dataTestId="about-us-v2-try-amber"
+          dataTestId="v2-navbar-cta"
         >
           {ctaLabel}
         </CustomLink>

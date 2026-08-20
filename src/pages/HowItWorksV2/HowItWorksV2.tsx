@@ -7,6 +7,7 @@ import FooterDesktop from "@Components/FooterV2/FooterDesktop";
 import Navbar from "../AboutUsV2/components/Navbar/Navbar";
 import Hero from "./components/Hero/Hero";
 import Steps from "./components/Steps/Steps";
+import WhyBook from "./components/WhyBook/WhyBook";
 import styles from "./HowItWorksV2.module.scss";
 
 const HowItWorksV2 = () => (
@@ -26,9 +27,15 @@ const HowItWorksV2 = () => (
       />
     </Helmet>
 
-    <Navbar />
+    <Navbar
+      links={[
+        { label: "Blogs", href: "/blog" },
+        { label: "About us", href: "/about-us-v2" },
+      ]}
+    />
     <Hero />
     <Steps />
+    <WhyBook />
     <FooterDesktop />
   </div>
 );

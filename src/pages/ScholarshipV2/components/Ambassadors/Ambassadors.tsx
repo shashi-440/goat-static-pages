@@ -16,35 +16,39 @@ import iconBulb from "../../assets/icon-bulb.svg";
 import wrapperHOC from "@Utils/wrapperHOC";
 
 // Icon order mirrors the Categories section's, so the two bands read as one family.
-// `glyph` is each icon's drawn size inside the shared 44px slot.
+// `glyph` is each icon's drawn size inside the shared 56px slot.
 //
-// A flat 32 across all four. Note the exports have differing natural sizes (25.9,
-// 25.5, 32, 28.2) and differing ink-to-box ratios — the cap's artwork is only
-// 232x180 of its 256 box — so a single value renders slightly less ink for the cap
-// and bulb than for the globe and rocket. 32/32/39/36 would be the optically
-// matched equivalent at this base if they ever look uneven.
+// NOT a flat value, and that is the point. The exports have differing natural sizes
+// (25.9, 25.5, 32, 28.2) and differing ink-to-box ratios — the cap's artwork is only
+// 232x180 of its 256 box — so one number renders visibly less ink for the cap and the
+// bulb than for the globe and the rocket.
+//
+// These were a flat 32 with a note that 32/32/39/36 was the optically matched
+// equivalent. Scaling up was the moment to actually apply it: 40 base, with the cap and
+// bulb carrying their correction, gives 40/40/49/45. The slot grew 44 → 56 to hold the
+// 49 without clipping.
 const PERKS = [
   {
     icon: iconGlobe,
-    glyph: 32,
+    glyph: 40,
     title: "A clear dream",
     description: "We should be able to picture what you are chasing, in your own words.",
   },
   {
     icon: iconRocket,
-    glyph: 32,
+    glyph: 40,
     title: "A real reason",
     description: "Why it matters to you, and what changes for you if it happens.",
   },
   {
     icon: iconCap,
-    glyph: 32,
+    glyph: 49,
     title: "Proof you have started",
     description: "Anything that shows you are already moving — early work, small wins, first tries.",
   },
   {
     icon: iconBulb,
-    glyph: 32,
+    glyph: 45,
     title: "How you tell it",
     description: "Whether your story lands, and makes us believe in it as much as you do.",
   },

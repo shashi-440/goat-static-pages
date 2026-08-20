@@ -39,7 +39,13 @@ const GroupBookingV2Alt = () => (
 
     {/* Secondary, so the hero's "Claim group discount" is the only filled pill on
         screen — two of them competed and neither read as the main action. */}
-    <Navbar secondaryCta />
+    <Navbar
+      links={[
+        { label: "How it works", href: "/how-it-works-v2" },
+        { label: "Support", href: "/contact-us-v2-card" },
+      ]}
+      secondaryCta
+    />
     <Hero />
     <Steps />
     {/* Remaining sections to come. */}

@@ -10,17 +10,30 @@ $overlap: 0.28em;
 $step: 0.66em;
 // Three faces minus the two overlaps — the cluster's width once it's open.
 $cluster-open: $face * 3 - $overlap * 2;
-// Opacity gained per word of travel — the reciprocal of the ramp width in
-// Manifesto.tsx. 0.34 spreads the brightening edge over roughly three words.
-$step: 0.34;
+// Opacity gained per word of travel — the reciprocal of the ramp width in Manifesto.tsx.
+// 0.34 spreads the brightening edge over roughly three words.
+//
+// ⚠️ NAMED `$ramp` and not `$step`. It was `$step`, which silently redeclared the face
+// cluster's `$step` above (0.66em → 0.34, unitless) — so the closed cluster's
+// `translateX(calc(var(--n) * -0.34))` was an invalid length, Chrome dropped that whole
+// transform declaration, and the faces never tucked behind the first or scaled down. The
+// deal-out was dead and looked merely subtle. Two different quantities cannot share a name.
+$ramp: 0.34;
+// How fast a word fades back OUT once the erase edge passes it. Steeper than the ramp in:
+// the first passage is being cleared to make room, not read.
+$erase: 0.5;
 
-// Tall on purpose: the extra height beyond the sticky child is the scroll travel
-// the reading is mapped onto. 260vh gives the passage about 1.6 viewports of
-// scrolling — long enough to read at pace, short enough not to feel like a hostage
-// situation.
-// No closing hairline. There used to be one, because this section and Categories
-// below were both pure black and ran together as one endless field. Categories is
-// light grey now, so that edge draws itself.
+// Tall on purpose: the extra height beyond the sticky child is the scroll travel the
+// reading is mapped onto.
+//
+// The real height is set INLINE from Manifesto.tsx, derived from the passages' own token
+// count (see `SECTION_VH`) — so editing the copy moves the travel with it instead of
+// leaving the reveal to finish early or run on until someone re-tunes a number here. This
+// value is only the floor for the case where that style never lands.
+//
+// No closing hairline. There used to be one, because this section and Categories below
+// were both pure black and ran together as one endless field. Categories is light grey
+// now, so that edge draws itself.
 .section {
   background: #000;
   min-height: 260vh;
@@ -28,8 +41,11 @@ $step: 0.34;
   width: 100%;
 }
 
-// Holds the passage in the middle of the screen while the section scrolls past
-// underneath it.
+// Holds the passages in the middle of the screen while the section scrolls past
+// underneath them.
+//
+// `position: relative` because the two passages are absolutely stacked inside it — they
+// occupy the same screen space and cross over, so neither can be in flow.
 .sticky {
   align-items: center;
   display: flex;
@@ -41,9 +57,26 @@ $step: 0.34;
 }
 
 .text {
-  // Defaults high so the passage is fully legible before hydration and with JS
-  // disabled; the effect only ever takes brightness away from a readable baseline.
+  // Defaults high so the passage is fully legible before hydration and with JS disabled;
+  // the effect only ever takes brightness away from a readable baseline.
   --lit: 999;
+  --out: -9999;
+
+  opacity: 1;
+
+  // Stacked, not sequential. The two passages take turns in one frame, so they share the
+  // same box and cross over inside it; laid out in flow they would be two paragraphs one
+  // above the other and there would be nothing to cross.
+  //
+  // The JS also flips `visibility` on whichever is faded out — opacity alone still leaves
+  // it catching pointer events and joining text selections dragged across it.
+  left: 50%;
+  // Above the ground and nothing more; the two only ever need to beat the section, not
+  // each other, because exactly one of them is visible at a time.
+  z-index: 0;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
 
   color: #fff;
   font-size: 40px;
@@ -51,10 +84,44 @@ $step: 0.34;
   letter-spacing: -0.6px;
   line-height: 58px;
   margin: 0;
-  max-width: 940px;
+  // 1040, up from 940.
+  //
+  // Measured, not nudged: with the face cluster now holding its full width at all times,
+  // the first passage set in THREE lines at 940 and two at anything from 1000 up. 1040
+  // takes the two-line setting with 40px of headroom, so a small font or tracking change
+  // will not flip it back. The second passage is unaffected — it holds its eight lines
+  // from 940 all the way to 1060, so this buys the first passage its line break for free.
+  max-width: 1040px;
   text-align: center;
   // Prevents a lone word on the last line, which a centred passage shows up badly.
   text-wrap: balance;
+  width: 100%;
+}
+
+// EVERY passage after the first starts hidden.
+//
+// This is the baseline the server ships, and it has to be right on its own: both paragraphs
+// are absolutely stacked in the same box, so with both at `opacity: 1` they rendered on top
+// of each other as one unreadable overlap until the script ran. Written as a stylesheet rule
+// rather than an inline style so the reduced-motion block below can still override it — an
+// inline default would win over any media query.
+// `visibility` only, NOT opacity.
+//
+// The words carry their own brightness now, so the paragraph's opacity is never written by
+// the script — leaving `opacity: 0` here would hide the second passage permanently. Hiding
+// it by visibility still fixes what this rule is for: both paragraphs are absolutely stacked
+// in the same box, and shipped visible they render on top of each other as one unreadable
+// overlap until the script runs.
+.text + .text {
+  visibility: hidden;
+}
+
+// An authored line break between stanzas. A `<br>` would work, but this carries its own
+// spacing — the three sentences need air between them or they read as one slab, and a bare
+// break gives exactly one line height and no more.
+.break {
+  display: block;
+  height: 0.42em;
 }
 
 // Every token — word or chip — derives its own brightness from the paragraph's
@@ -64,7 +131,23 @@ $step: 0.34;
 // No transition: --lit changes every frame with a fractional value, so the ramp is
 // already continuous. A transition on top would fight it and lag behind the scroll.
 .tok {
-  opacity: clamp(#{$dim}, calc(#{$dim} + (var(--lit) - var(--i)) * #{$step}), 1);
+  // TWO edges, multiplied.
+  //
+  // The first (`--lit`) brings a word up from the dim floor as the reading reaches it — the
+  // original effect. The second (`--out`) takes it back to nothing as the ERASE edge passes,
+  // which is how the first passage leaves: word by word, in the same direction it arrived,
+  // rather than the whole paragraph cross-fading as one block.
+  //
+  // That matters because the two passages are wildly different sizes — two lines against
+  // eight. Cross-fading them meant a small slab and a large slab both half-present at once,
+  // which reads as a glitch however long you give it. Erasing word by word means the screen
+  // is only ever clearing or filling, never showing two things.
+  //
+  // `--out` defaults far below any index, so nothing is erased until the edge is driven.
+  opacity: calc(
+    clamp(#{$dim}, #{$dim} + (var(--lit) - var(--i)) * #{$ramp}, 1) *
+      clamp(0, 1 - (var(--out) - var(--i)) * #{$erase}, 1)
+  );
 }
 
 // inline-block would let each word be a line-breaking unit but also introduces the
@@ -91,24 +174,28 @@ $step: 0.34;
   vertical-align: -0.26em;
 }
 
-// The cluster carries an explicit width so it can animate between one face and
-// three. Closed it is exactly one face wide, so the sentence closes up around it and
-// there's no reserved hole; opening widens it and the words part to make room.
+// The cluster's width is FIXED at all three faces, open or closed.
 //
-// This does reflow the line as it animates — the alternative was reserving the full
-// width up front, which is what left the gap.
+// It used to animate from one face to three, so the sentence closed up around it while
+// the cluster was shut and the words parted as it opened. That re-wraps the line at the
+// exact moment the reader is looking at it: this passage sets in two lines with the
+// cluster closed and three with it open, so scrolling past it re-flowed the sentence
+// under the reader. It was survivable in the much longer passage this section used to
+// carry, where the shift was one word moving between two of five lines. On a
+// two-line sentence it is a jump.
+//
+// This is only sound because the closed faces stay VISIBLE (see the rule further down).
+// Reserving the width while hiding them left the space standing empty — a two-face hole in
+// the middle of the sentence until the reading reached it, which is the other half of this
+// problem and was worse than the reflow it fixed.
+//
+// This is also what the `.face` note below already assumed: "the cluster's layout width
+// is always the full three faces". The width transition contradicted it.
 .faces {
   align-items: center;
   display: inline-flex;
-  // The hidden faces sit outside this box while closed; they're transparent, so
-  // nothing shows.
   overflow: visible;
   width: #{$cluster-open};
-  transition: width 0.55s cubic-bezier(0.34, 1.5, 0.5, 1);
-}
-
-.faces:not(.facesOpen) {
-  width: #{$face};
 }
 
 // Ringed in the section's own black so overlapping faces read as cut into each
@@ -135,15 +222,59 @@ $step: 0.34;
   }
 }
 
-// Closed: every face after the first is tucked exactly behind it and faded out, so
-// the cluster reads as a single portrait until the passage reaches it.
+// Closed: the faces after the first are drawn IN, slightly, and scaled down — but they
+// stay visible.
 //
-// The offset is the face's own index times the centre-to-centre step — face size
-// minus the overlap — which is what lands each one precisely on the first.
+// They used to be hidden (opacity 0) and tucked fully behind the first, which left the
+// cluster's reserved width standing empty: a visible two-face hole in the sentence until
+// the reading reached it. Not hiding them is not a compromise either, because it is what
+// the rest of the section already does — every word sits at a dim floor and brightens as
+// the edge arrives, and the cluster is itself a `.tok`, so it is already on that same ramp.
+// The faces come up with the words around them, which is more consistent than appearing
+// from nowhere.
+//
+// So the arrival is a settle, not an entrance: a small draw-in of 0.14em per face plus a
+// scale, which reads as the group closing up without ever leaving a gap or moving a
+// character of text. The full centre-to-centre tuck (`$step`) is what created the hole; a
+// fraction of it gives the same gesture at a tenth of the distance.
 .faces:not(.facesOpen) .face:not(:first-child) {
-  opacity: 0;
-  transform: translateX(calc(var(--n) * -#{$step})) scale(0.62);
+  transform: translateX(calc(var(--n) * -0.14em)) scale(0.86);
   // No stagger on the way back: closing should be immediate, only opening is
   // choreographed.
   transition-delay: 0ms;
+}
+
+// ————————————————————————————————————————————————————————————————
+// Reduced motion
+//
+// Nothing is pinned and nothing crosses over, so the whole conceit is gone — which means
+// the two passages cannot stay stacked on top of each other. They become what they would
+// have been without the effect: two paragraphs, one after the other, in a section only as
+// tall as they need. The JS hands both a finished `--lit` under the same query.
+// ————————————————————————————————————————————————————————————————
+@media (prefers-reduced-motion: reduce) {
+  .section {
+    min-height: 0;
+  }
+
+  .sticky {
+    flex-direction: column;
+    gap: 64px;
+    height: auto;
+    padding: 140px 80px;
+    position: static;
+  }
+
+  .text,
+  .text + .text {
+    left: auto;
+    position: static;
+    top: auto;
+    transform: none;
+    visibility: visible;
+  }
+
+  .face {
+    transition: none;
+  }
 }

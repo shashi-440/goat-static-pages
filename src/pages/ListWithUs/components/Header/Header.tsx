@@ -6,7 +6,7 @@ import config from "@Config/index";
 // same 1280px-aligned gutter, same frosted-glass-on-scroll treatment — so this
 // page reads as part of the set. Only the contents are this page's own:
 // the announcement rail above it, and Support / Login instead of Blogs /
-// Career / Try amber.
+// Career / Visit amber.
 import navStyles from "../../../AboutUsV2/components/Navbar/Navbar.module.scss";
 // The bar's CTA IS the hero's CTA — same class, not a copy of its rules, so the
 // two pills can't drift apart.
@@ -42,8 +42,9 @@ const Header = () => {
   const [railHeight, setRailHeight] = useState(0);
 
   useEffect(() => {
-    // Read live rather than cached: the hero's own scroll effect changes its
-    // height over the first 420px, so a value measured on mount would be stale.
+    // Measured live rather than cached on mount: the hero's height still moves
+    // after first paint — the headline rewraps at narrow widths, and the globe's
+    // box is sized from the container by a ResizeObserver.
     const hero = document.querySelector<HTMLElement>("[data-lwu-hero]");
 
     let raf = 0;

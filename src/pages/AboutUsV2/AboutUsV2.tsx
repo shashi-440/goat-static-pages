@@ -26,7 +26,12 @@ const AboutUsV2 = () => (
       />
     </Helmet>
 
-    <Navbar />
+    <Navbar
+      links={[
+        { label: "How it works", href: "/how-it-works-v2" },
+        { label: "Career", href: "/career-v2" },
+      ]}
+    />
     <Hero />
     <Mission />
     <WhyAmberExists />

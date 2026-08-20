@@ -72,12 +72,31 @@ const getFileName = (filePath: string): string =>
 
 const getPlugins = (isWeb: boolean) => [
   new RspackManifestPlugin({
-    fileName: path.resolve(process.cwd(), getFileName("public/webpack-assets")),
+    fileName: path.resolve(
+      process.cwd(),
+      getFileName(isWeb ? "public/webpack-assets" : "public/webpack-assets-server"),
+    ),
     filter: (file: any) => file.isInitial,
   }),
+  // ⚠️ The client and server builds MUST NOT write the same stats file.
+  //
+  // `public/loadable-stats-desktop.json` is what the SSR ChunkExtractor reads at
+  // request time, so it has to hold the CLIENT stats — that is where the <script>
+  // tags and (in dev) the CSS to inline come from. In dev the client compiler runs
+  // in-process inside the express server (see src/server/devServer) and writes it.
+  //
+  // Both configs used to point here, which is harmless only because `yarn dev` runs
+  // the server build once BEFORE the dev server starts. It stops being harmless the
+  // moment a server build runs alongside it — e.g.
+  //   rspack build --watch --config ./webpack/server.config.ts
+  // which is the fast way to get SSR rebuilds without a 60s `yarn dev:build` per edit.
+  // That watcher overwrote this file with the server bundle's stats, which list no CSS
+  // and no client chunks: the page then rendered with zero stylesheets and no client
+  // JS at all, so it looked unstyled and never hydrated. Nothing reads the server
+  // build's own stats, so it gets a separate name.
   new LoadablePlugin({
     writeToDisk: true,
-    filename: getFileName("../loadable-stats"),
+    filename: getFileName(isWeb ? "../loadable-stats" : "../loadable-stats-server"),
   }),
   new rspack.DefinePlugin({
     __CLIENT__: isWeb,
@@ -93,6 +112,7 @@ const getPlugins = (isWeb: boolean) => [
     "process.env.LOCAL_PORT": JSON.stringify(process.env.LOCAL_PORT),
     "process.env.IMAGE_STATIC_ASSETS_URL": JSON.stringify(process.env.IMAGE_STATIC_ASSETS_URL),
     "process.env.IMAGE_ASSETS_URL": JSON.stringify(process.env.IMAGE_ASSETS_URL),
+    "process.env.MAPBOX_ACCESS_TOKEN": JSON.stringify(process.env.MAPBOX_ACCESS_TOKEN),
   }),
 ];
 

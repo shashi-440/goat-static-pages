@@ -6,7 +6,7 @@ import config from "@Config/index";
 // same 1280px-aligned gutter, same frosted-glass-on-scroll treatment — so this
 // page reads as part of the set. Only the contents are this page's own:
 // the announcement rail above it, and Support / Login instead of Blogs /
-// Career / Try amber.
+// Career / Visit amber.
 import navStyles from "../../../AboutUsV2/components/Navbar/Navbar.module.scss";
 // The bar's CTA IS the hero's CTA — same class, not a copy of its rules, so the
 // two pills can't drift apart.

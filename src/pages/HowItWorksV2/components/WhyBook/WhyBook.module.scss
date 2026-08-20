@@ -1,0 +1,237 @@
+// "Why book with amber". Left-aligned header, then a flat row of icon columns.
+//
+// Gutters, grid width and type sizes are taken from Steps.module.scss on purpose: this
+// section sits directly under it, and any drift would read as two sections designed at
+// different times. What deliberately differs is the ALIGNMENT — see the note in the TSX.
+
+// Top padding is 0, not the 100px Steps uses: Steps already ends on 120px of its own
+// bottom padding, and stacking the two gave 220px of white between the last step and this
+// heading — enough that the section read as belonging to the footer.
+.section {
+  align-items: center;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 0 80px 120px;
+  width: 100%;
+}
+
+// The 1280px content grid, so this section's left edge lands on the same line as the
+// steps' numbered chips and the navbar logo.
+.inner {
+  max-width: 1280px;
+  width: 100%;
+}
+
+/* --------------------------------------------------------------- header */
+
+// Centred, and the second line grey — the page's own heading pattern, shared verbatim
+// with Hero and Steps so all three read as one design.
+//
+// There was a left-aligned variant here with a supporting paragraph and an underlined
+// "Learn more", following the reference this section's column layout came from. Both are
+// gone: the heading's grey line is the support, and the links had nowhere real to point.
+.headingBlock {
+  text-align: center;
+}
+
+.heading {
+  color: #111928;
+  font-size: 40px;
+  font-weight: 550;
+  letter-spacing: -0.72px;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.headingMuted {
+  color: #9ca3af;
+}
+
+/* ----------------------------------------------------------------- grid */
+
+// Four columns, one per reason, with a wide gutter and no fill. The gutter is what
+// separates them — the reference uses the same device, and it is why the columns need no
+// borders or cards.
+//
+// `align-items: start` matters: without it the grid stretches every item to the row's
+// height, which pushes each column's link to a different place relative to its own text
+// and makes the row look misaligned.
+// Four columns divided by full-height hairlines.
+//
+// The rules sit ON the column boundaries now, so they are real `border-left`s rather than
+// pseudo-elements floated in a gutter: `column-gap` is 0 and each column pays for its own
+// breathing room with padding. That is the only way to get a rule that runs the WHOLE
+// height of the column — a gutter rule can only ever be as tall as the item it hangs off.
+//
+// `align-items: stretch` (the default, stated because it is load-bearing) gives every
+// column the full row height, so the four rules are the same length whichever column has
+// the longest copy.
+.grid {
+  align-items: stretch;
+  column-gap: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  list-style: none;
+  margin: 88px 0 0;
+  padding: 0;
+  row-gap: 56px;
+  width: 100%;
+}
+
+// The columns stay LEFT-aligned under the centred heading. Centring three lines of body
+// copy gives every line a different start point, which is the ragged edge that makes a row
+// of four hard to scan — the heading is a single statement and can be centred; the reasons
+// are copy and cannot.
+// Content runs straight down from the icon; nothing is anchored to the bottom. The vertical
+// padding is what gives the rules a little air above the icon and below the last line of
+// copy — without it they start and stop exactly on the ink, which reads as clipped.
+.item {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 22px 40px 30px;
+}
+
+// Rules go BETWEEN the four, not around them: a leading rule would read as the grid
+// having a left edge that the centred heading above it does not.
+//
+// Every column keeps the SAME padding though, including the first. It used to be flush
+// left, to line its text up with the grid edge, and that made its inner width 40px wider
+// than the other three — which in turn made figure 01 render visibly larger than the rest,
+// for a reason that had nothing to do with the drawing. Identical columns are worth more
+// here than a flush left edge, especially with the heading centred and nothing above the
+// column to align to.
+.item + .item {
+  border-left: 1px solid #e5e7eb;
+}
+
+/* ----------------------------------------------------------------- icon */
+
+// Small, monoline, ink — not a large drawing on a stage.
+//
+// This replaced a 210px illustration stage per column (plus a mono `FIG 0x` plate number
+// above it). Two things were wrong with that: the stage set the section's height, so four
+// short promises occupied 390px of column each, and the plate numbers implied a numbered
+// sequence that these four claims do not have — they are all true at once.
+//
+// 40px.
+//
+// Sized off the ARTWORK'S OWN GRID, not the slot: the set is drawn on 24, so this is a 1.67x scale
+// and its 1.5px strokes render at 2.5px. That is the ceiling worth having — the tradeoff runs the
+// other way from most icons, because scaling a LINE icon up thickens its strokes, and past about
+// here it stops reading as a line drawing and starts reading as a heavy one. It was 32 (a touch
+// small next to 16px titles) and 46 before that, which is where the strokes hit ~3px.
+//
+// The placeholder shares these dimensions exactly, so an unset icon leaves the column's rhythm
+// unchanged.
+.icon,
+.iconPlaceholder {
+  display: block;
+  flex-shrink: 0;
+  height: 40px;
+  width: 40px;
+}
+
+.icon {
+  // For an SVG with its own viewBox; harmless on a raster.
+  color: #111928;
+  object-fit: contain;
+}
+
+// Deliberately unmistakable as temporary. A dashed empty square cannot be confused for a
+// finished mark, which is the failure mode of a "nice" placeholder — it ships.
+.iconPlaceholder {
+  border: 1px dashed #cbd5e1;
+  border-radius: 9px;
+}
+
+/* ----------------------------------------------------------------- copy *//* ----------------------------------------------------------------- copy */
+
+// The title is the SAME SIZE as the body it sits above — 16px, both of them.
+//
+// This is the reference's whole typographic move and it is worth stating, because the
+// instinct is to make a heading bigger. It was 20px against a 16px body, and that size
+// jump is what made the row read as generic marketing: two sizes plus two weights plus two
+// colours is three signals doing one job. One size, with weight and colour carrying the
+// hierarchy, reads as considered — and it keeps the four titles from competing with the
+// 40px section heading above them.
+//
+// It also fixes the longest title. "100% Verified Listings" and "Instant & Easy Bookings"
+// both ran to two lines at 20px in a 240px column while the other two stayed on one, so
+// the row's baselines never matched.
+.itemTitle {
+  color: #111928;
+  font-size: 16px;
+  font-weight: 600;
+  // Almost none: the optical tracking that helps at 40px closes up the counters at 16px.
+  letter-spacing: -0.08px;
+  line-height: 1.45;
+  // The whole gap between icon and title lives here now that the icon has no stage of its
+  // own. Large relative to the 6px under the title on purpose: the title and its copy are
+  // one block, so the space around the pair has to be clearly bigger than the space inside
+  // it.
+  margin: 44px 0 0;
+}
+
+.itemText {
+  color: #6b7280;
+  font-size: 16px;
+  font-weight: 400;
+  // Looser than the title's 1.45. At the same size and the same measure, line spacing is
+  // the only thing left that distinguishes a heading from a paragraph.
+  line-height: 1.65;
+  // Tight to the title on purpose: the two are one block, and the 52px above the title is
+  // what separates that block from the drawing. 14px here left the paragraph reading as a
+  // separate item rather than as the title's own copy — the gap inside the pair has to be
+  // clearly smaller than the gap around it.
+  margin: 6px 0 0;
+}
+
+/* ------------------------------------------------------------ responsive */
+
+@media (max-width: 1200px) {
+  // Two columns: below this the four sit under ~250px, which is too narrow for the body
+  // copy to set in fewer than six lines.
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 64px;
+  }
+
+  // At two columns the third item starts a NEW ROW, and `.item + .item` knows nothing
+  // about rows — it would draw a rule down the outside left edge of the grid. Items in the
+  // first column are odd-numbered, so those are the ones to drop.
+  .item:nth-child(odd) {
+    border-left: 0;
+  }
+}
+
+@media (max-width: 1024px) {
+  .section {
+    padding: 0 24px 88px;
+  }
+
+  .heading {
+    font-size: 32px;
+    letter-spacing: -0.58px;
+  }
+}
+
+@media (max-width: 720px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 56px;
+  }
+
+  // Stacked, the columns are as wide as the page and the title needs to hold its own
+  // against a full-measure paragraph rather than a 240px one.
+  .itemTitle {
+    margin-top: 36px;
+  }
+
+  // One column: nothing to divide horizontally, and the row gap already does the work.
+  .item {
+    border-left: 0;
+    padding: 0;
+  }
+}

@@ -41,3 +41,14 @@ declare module "*.gif" {
   const src: string;
   export default src;
 }
+
+/**
+ * Mapbox GL JS, injected from api.mapbox.com at runtime rather than bundled.
+ *
+ * Declared exactly as amber-user-website declares it (`declare const mapboxgl:
+ * any`) so a component using the globe typechecks identically in both repos.
+ * Typing it properly would mean depending on @types/mapbox-gl, which the main app
+ * does not have — and a mismatch there is the kind of thing that breaks the
+ * paste-back property.
+ */
+declare const mapboxgl: any;
