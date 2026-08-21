@@ -8,14 +8,6 @@ const AsyncAboutUsV2Page = loadable(() => import("@Pages/AboutUsV2"), {
   fallback: <FullPageLoader />,
 });
 
-const AsyncAboutUsContentUpdatedPage = loadable(() => import("@Pages/AboutUsContentUpdated"), {
-  fallback: <FullPageLoader />,
-});
-
-const AsyncContactUsV2Page = loadable(() => import("@Pages/ContactUsV2"), {
-  fallback: <FullPageLoader />,
-});
-
 const AsyncHowItWorksV2Page = loadable(() => import("@Pages/HowItWorksV2"), {
   fallback: <FullPageLoader />,
 });
@@ -24,7 +16,31 @@ const AsyncCareerV2Page = loadable(() => import("@Pages/CareerV2"), {
   fallback: <FullPageLoader />,
 });
 
-const AsyncCareerV3Page = loadable(() => import("@Pages/CareerV3"), {
+const AsyncScholarshipV2Page = loadable(() => import("@Pages/ScholarshipV2"), {
+  fallback: <FullPageLoader />,
+});
+
+const AsyncListWithUsPage = loadable(() => import("@Pages/ListWithUs"), {
+  fallback: <FullPageLoader />,
+});
+
+const AsyncPartnerWithUsPage = loadable(() => import("@Pages/PartnerWithUs"), {
+  fallback: <FullPageLoader />,
+});
+
+const AsyncPrivacyV2Page = loadable(() => import("@Pages/PrivacyV2"), {
+  fallback: <FullPageLoader />,
+});
+
+const AsyncTermsV2Page = loadable(() => import("@Pages/TermsV2"), {
+  fallback: <FullPageLoader />,
+});
+
+const AsyncGroupBookingV2AltPage = loadable(() => import("@Pages/GroupBookingV2Alt"), {
+  fallback: <FullPageLoader />,
+});
+
+const AsyncContactUsV2CardPage = loadable(() => import("@Pages/ContactUsV2Card"), {
   fallback: <FullPageLoader />,
 });
 
@@ -32,7 +48,7 @@ const AsyncCareerFinalPage = loadable(() => import("@Pages/CareerFinal"), {
   fallback: <FullPageLoader />,
 });
 
-const AsyncScholarshipV2Page = loadable(() => import("@Pages/ScholarshipV2"), {
+const AsyncAboutUsContentUpdatedPage = loadable(() => import("@Pages/AboutUsContentUpdated"), {
   fallback: <FullPageLoader />,
 });
 
@@ -65,16 +81,6 @@ const routes: RouteConfig[] = [
         component: AsyncAboutUsV2Page,
       },
       {
-        path: "/about-us-content-updated",
-        exact: true,
-        component: AsyncAboutUsContentUpdatedPage,
-      },
-      {
-        path: "/contact-us-v2",
-        exact: true,
-        component: AsyncContactUsV2Page,
-      },
-      {
         path: "/how-it-works-v2",
         exact: true,
         component: AsyncHowItWorksV2Page,
@@ -85,9 +91,39 @@ const routes: RouteConfig[] = [
         component: AsyncCareerV2Page,
       },
       {
-        path: "/career-v3",
+        path: "/scholarship-v2",
         exact: true,
-        component: AsyncCareerV3Page,
+        component: AsyncScholarshipV2Page,
+      },
+      {
+        path: "/list-with-us",
+        exact: true,
+        component: AsyncListWithUsPage,
+      },
+      {
+        path: "/partner-with-us",
+        exact: true,
+        component: AsyncPartnerWithUsPage,
+      },
+      {
+        path: "/privacy-v2",
+        exact: true,
+        component: AsyncPrivacyV2Page,
+      },
+      {
+        path: "/terms-v2",
+        exact: true,
+        component: AsyncTermsV2Page,
+      },
+      {
+        path: "/group-booking-v2-alt",
+        exact: true,
+        component: AsyncGroupBookingV2AltPage,
+      },
+      {
+        path: "/contact-us-v2-card",
+        exact: true,
+        component: AsyncContactUsV2CardPage,
       },
       {
         path: "/career-finals",
@@ -95,9 +131,9 @@ const routes: RouteConfig[] = [
         component: AsyncCareerFinalPage,
       },
       {
-        path: "/scholarship-v2",
+        path: "/about-us-content-updated",
         exact: true,
-        component: AsyncScholarshipV2Page,
+        component: AsyncAboutUsContentUpdatedPage,
       },
       {
         path: "/essentials",

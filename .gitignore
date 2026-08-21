@@ -12,3 +12,10 @@ skills-lock.json
 
 # This repo uses yarn; a stray npm lockfile would let the two drift apart.
 package-lock.json
+
+dist/
+
+# Local environment. Holds the Mapbox token — see src/config/index.ts.
+.env
+.env.*
+!.env.example

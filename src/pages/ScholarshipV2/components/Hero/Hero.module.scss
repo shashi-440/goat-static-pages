@@ -35,8 +35,30 @@
   text-align: center;
 }
 
-// "$50,000" is set bold within the heading.
+// "$50,000" is set bold within the SUBTITLE — it used to sit in the heading, and moved down
+// with the copy change. Weight only, no colour or size shift: at 18px in a grey paragraph,
+// bold is enough to make the figure the thing the eye lands on, and a second colour would
+// turn one sentence into two.
+
+// The animated mark that runs just ahead of the figure. Seated with a negative
+// vertical-align rather than `middle`: middle aligns to baseline + half x-height,
+// which on a 52px face leaves art sitting visibly high.
+//
+// Spacing is set here rather than with a JSX space: at 52px a word-space is ~13px,
+// which stacked on top of the margin and left the mark marooned. The margins are
+// symmetrical and measured against the visible ink, not the box — the artwork is
+// scaled by transform, so the box is not what you see.
+//
+// -0.26em rather than -0.34em: 0.08em is ~4px at this face, lifting the mark off
+// the baseline so it centres against the digits.
+.mark {
+  display: inline-flex;
+  margin: 0 10px;
+  vertical-align: -0.26em;
+}
+
 .amount {
+  // Inherits the subtitle's colour deliberately; see the note above.
   font-weight: 700;
 }
 

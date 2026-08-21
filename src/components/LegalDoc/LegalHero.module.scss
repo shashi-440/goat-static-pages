@@ -1,0 +1,68 @@
+// Top padding matches the other v2 heroes (About Us / Contact Us / How It Works /
+// amberscholar) so every page opens on the same rhythm. Figma sets the mark
+// 126px below the navbar; 56px is used instead to stay in step with the rest.
+.hero {
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  padding: 56px 80px 0;
+  width: 100%;
+}
+
+// The document measure. Everything on this page — hero, policy, closing seal —
+// sits on this same 700px column, centred in the viewport.
+.inner {
+  max-width: 700px;
+  width: 100%;
+}
+
+// The document mark above the title, on the text column's own left edge.
+//
+// The negative pull is BACK, and for the reason the padlock originally had one. The PNG in
+// between was cropped tight to its ink, so box edge and ink edge were the same thing and any
+// pull pushed the artwork out past the title. This SVG is a composition again: the document
+// sits centre-right in its square, with a sparkle hanging off to its left. Aligning the BOX
+// left-aligns empty space, and the document reads as indented against the title under it.
+//
+// So the pull lines up the sheet-behind's left edge — the object's real left edge — with the
+// title, and lets the sparkle overhang into the page's 80px padding, where there is room. The
+// number is measured off a render rather than chosen; re-measure if the artwork changes.
+//
+// Square at 112, where the PNG was 102 x 140 — deliberately smaller than what it replaced. The
+// document occupies only the middle of this viewBox, so the ARTWORK lands at about 99px tall:
+// roughly twice the title's cap height, which is the relationship a mark above a heading wants.
+// At the 140 the PNG and the padlock both used, this illustration read as a piece of art the page
+// was built around rather than a mark introducing it — it has far more detail than the flat
+// padlock did, so it carries at a smaller size and needs less room.
+//
+// The pull scales with the box: -14 is -20 at 160, which was -22 at 176.
+.mark {
+  display: block;
+  margin: 0 0 12px -14px;
+}
+
+.markImg {
+  display: block;
+  height: 112px;
+  object-fit: contain;
+  width: 112px;
+}
+
+.title {
+  color: #202020;
+  font-size: 52px;
+  font-weight: 550;
+  letter-spacing: -1.04px;
+  line-height: 56px;
+  margin: 0;
+}
+
+.subtitle {
+  color: #636363;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.5;
+  // The single, explicit title→subtitle gap — same 20px the other v2 heroes use,
+  // and what Figma measures here too.
+  margin: 20px 0 0;
+}

@@ -1,0 +1,70 @@
+.hero {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  // No bottom padding: the channels section below owns the gap, so the two aren't
+  // each adding their own and doubling it.
+  padding: 72px 80px 0;
+  width: 100%;
+}
+
+.header {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 48px;
+  max-width: 880px;
+  text-align: center;
+  width: 100%;
+}
+
+// Type scale shared with the other two Contact cuts, so the three read as versions
+// of one page rather than three designs.
+.title {
+  color: #111928;
+  font-size: 52px;
+  font-weight: 550;
+  letter-spacing: -1.04px;
+  line-height: 56px;
+  margin: 0;
+  max-width: 813px;
+  // Lifts the title above the subtitle so the avatar cluster can grow down over it
+  // on hover.
+  position: relative;
+  z-index: 1;
+}
+
+.subtitle {
+  color: #636363;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.5;
+  margin: 20px 0 0;
+  max-width: 620px;
+}
+
+// The photo, and the coordinate space the Copilot input is docked into.
+//
+// `position: relative` is what that docking needs — the input is absolutely positioned to this
+// box's bottom edge, and without it the input would escape to the nearest positioned ancestor and
+// land somewhere up the page.
+//
+// `overflow: hidden` was already here to clip the photo to the 24px radius, and it clips the
+// docked input's shadow at the box's edge too. That is why the input insets 24px from the bottom
+// rather than straddling it: a pill hanging off the photo would have its lower half cut off, not
+// overhang.
+.media {
+  border-radius: 24px;
+  height: 420px;
+  max-width: 1360px;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.image {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}

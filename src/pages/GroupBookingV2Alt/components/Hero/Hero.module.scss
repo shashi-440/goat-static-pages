@@ -1,0 +1,665 @@
+// Two columns rather than the stacked, centred block the other v2 heroes use — the
+// 80px side padding and the white ground are still shared with them, but this one
+// reads left-to-right: visual, then the pitch.
+.hero {
+  align-items: center;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 72px 80px 88px;
+  width: 100%;
+}
+
+.row {
+  align-items: center;
+  display: flex;
+  // 64, up from the 40 that was right for the video. That number was chosen against a
+  // visual whose own edges were white — it faded into the gap, so the gap could be small.
+  // The Polaroid has a hard, shadowed edge AND is rotated 3°, which throws its top-right
+  // corner ~13px further right than its box: at 40 the frame's corner came within 27px of
+  // a 52px headline and the two looked stuck together.
+  gap: 64px;
+  // 480 video + 40 gap + 680 copy, inside the page's 1280 column. 680 fits the
+  // headline's longest line — "Friends who book together", which needs more measure
+  // than the old copy did and broke after "book" at 580. If the copy grows again,
+  // widen this rather than letting the line wrap into a third.
+  max-width: 1200px;
+  width: 100%;
+}
+
+// Left on screen, second in the DOM — see the comment in Hero.tsx.
+//
+// No translateY here any more. The video this replaced was a ring of cards with more
+// empty white below it than above, so box-centring it against the copy left it looking
+// low and it had to be nudged up 34px. A Polaroid is a rectangle with its weight in the
+// middle: box-centring is simply correct, and the nudge would now push it off the row.
+.photoSlot {
+  flex: none;
+  order: -1;
+}
+
+// Ranged left, filling the rest of the row.
+.copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  text-align: left;
+}
+
+// ── The print ──────────────────────────────────────────────────────
+//
+// A Polaroid, at the real film's proportions rather than invented ones — every number
+// below is Polaroid 600 measured in millimetres and divided by the frame's width:
+//
+//   frame 88.5 × 107.6mm   ·   image window 79 × 77mm
+//   side and top border 4.75mm  →  5.37% of width  →  21px at 400
+//   bottom border      25.85mm  →  29.2%  of width  → 117px at 400
+//   window            79 × 77mm  →  358 × 348px at 400
+//   frame height        107.6mm  →  121.6% of width  → 486px
+//
+// 400px wide because the row's other slot was a 480px video and 486px of frame keeps the
+// row's height where it was. The point of using the real ratios: the wide bottom border
+// is the ONLY thing that makes a white rectangle read as instant film rather than as a
+// card with a photo in it, and it is much wider than people guess — get it wrong and you
+// have drawn a picture frame.
+.polaroid {
+  // Not #fff — the page ground is already white, so a white frame on white has nothing but
+  // its shadow to prove it exists. But not warm either, and that is the whole point of
+  // these two numbers.
+  //
+  // Real instant film IS a warm off-white, and this was #fdfcf9 → #f7f4ee for exactly that
+  // reason. On this page it read as beige: the ground is pure #fff, the type is a cool
+  // navy and every other raised surface here is a cool grey, so the one accurate-to-film
+  // choice was the one that looked dirty. It is the same mistake the ivory postage stamp
+  // made in the headline — see the note above `.amount`. Being faithful to the object
+  // loses to being right in the palette.
+  //
+  // So: neutral, no hue at all. A 3% step from ground to the shaded corner, which is
+  // enough to read as a sheet catching the room's light and not enough to have a colour.
+  // A cool near-white (#fdfeff → #f1f4f9) was the other candidate and ties more neatly to
+  // the page's own #f6f8fb, but against a photograph this warm it reads faintly blue.
+  background: linear-gradient(168deg, #fdfdfd 0%, #f4f5f6 100%);
+  border-radius: 2px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 21px 21px 0;
+  // Contact, then lift, then a hairline to hold the edge against the white ground. Three
+  // stops rather than one: a single shadow is what makes a card look like a sticker, and
+  // this object is meant to be lying ON the page.
+  box-shadow: 0 1px 2px rgba(17, 25, 40, 0.09), 0 10px 28px rgba(17, 25, 40, 0.11),
+    0 0 0 1px rgba(17, 25, 40, 0.06);
+  height: 486px;
+  // Tilted the same way as the ticket in the headline, and further, so the two read as
+  // one hand having put both down. Counter-rotating them looked like a decision.
+  transform: rotate(-3deg);
+  width: 400px;
+}
+
+// The emulsion window. A dark ground, so the gap before the photo decodes is a print that
+// hasn't developed rather than a white hole in the frame — and neutral, for the same
+// reason the frame is.
+.print {
+  background: #e7e8ea;
+  border-radius: 1px;
+  display: block;
+  flex: none;
+  height: 348px;
+  overflow: hidden;
+  position: relative;
+  width: 358px;
+  // Instant film sits slightly below the surface of its own border. One inset hairline
+  // says that; a heavier inner shadow would read as a bevel.
+  box-shadow: inset 0 0 0 1px rgba(17, 25, 40, 0.09);
+}
+
+.photo {
+  display: block;
+  height: 100%;
+  // The asset is already cropped to the window's ratio, so this is a guard against a
+  // future re-crop rather than the thing doing the cropping.
+  object-fit: cover;
+  width: 100%;
+}
+
+// Centred in what's left of the bottom border, which is 117px tall — so this is centred
+// by `flex: 1` on the remaining space rather than by a margin that would have to be
+// recalculated if the frame's height changed.
+.caption {
+  align-items: center;
+  display: flex;
+  // Stacked: the campus, then the label under it.
+  flex-direction: column;
+  // Centred in what's left of the bottom border by `flex: 1` on the remaining space,
+  // rather than by a margin that would need recalculating if the frame's height changed.
+  flex: 1;
+  gap: 7px;
+  justify-content: center;
+}
+
+// The fact, so it carries the weight: the darkest of the three greys, sentence case, and
+// no tracking. Held at 14px — one step up from the label and one step below the subtitle
+// beside it, so the print's caption never competes with the page's own body copy.
+.place {
+  align-items: center;
+  color: #4b5563;
+  display: flex;
+  font-size: 14px;
+  font-weight: 600;
+  gap: 5px;
+  letter-spacing: -0.01em;
+}
+
+// `flex: none` because a flex child with an intrinsic aspect ratio will otherwise be
+// squeezed by a long campus name before the text wraps.
+.pin {
+  color: #9ca3af;
+  fill: currentcolor;
+  flex: none;
+  height: 14px;
+  width: 14px;
+}
+
+// The sentiment, demoted: the page's own muted grey — the one `.sliderMax` uses — rather
+// than a warm grey, which went muddy the moment the frame stopped being cream. Tracked out
+// and set in caps, because at 10.5px that reads as something printed on the border, where
+// the same words set normally read as body copy that fell out of the paragraph.
+.captionLabel {
+  color: #9ca3af;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+// 62 on 52 rather than the 56 the other v2 heroes use. Those are one-liners or
+// centred; this one is two ranged-left lines carrying a large figure, and at 56 the
+// descenders of line one sat almost on the caps of line two.
+.title {
+  color: #111928;
+  font-size: 52px;
+  font-weight: 550;
+  letter-spacing: -1.04px;
+  line-height: 62px;
+  margin: 0;
+}
+
+// ── The live figure, on a ticket ───────────────────────────────────
+//
+// The figure is the one thing in this hero that MOVES, so it is the one thing given a
+// material: a dark stub with the total struck out of it in white, torn along a
+// perforation, the currency sitting in the counterfoil on the far side of the tear.
+//
+// Four treatments now, and the three that were dropped are worth keeping on record,
+// because each failed for a reason about this PAGE rather than about the object:
+//
+//   · A flat pink pill. Pink is the page's ACTION colour — CTA, slider track, thumb,
+//     avatar rings — so spending it on a decorative object made the fold one wash of red
+//     and left the button nothing to be.
+//   · A postage stamp: ivory paper, four scalloped edges, printed inner frame, tilted. It
+//     is the device AboutUsV2 and HowItWorksV2 both use inline in their h1, so it looked
+//     like the safe borrow. It is not: those pages are a travel story and the stamp holds
+//     a city photograph, while this is a clean product page with a slider on it. Sepia
+//     paper and four sides of scalloping read as scrapbook next to this typography.
+//   · A pale grey card, notched on both short edges. Correct, and invisible: #f6f8fb on
+//     #fff is a two-percent step, so at a glance the headline simply had a gap in the
+//     middle of it and the figure lost the emphasis this whole hero exists to give it.
+//
+// So: INK, not paper. The chip is the headline's own colour at full strength, which makes
+// the number the darkest mass in the fold — where the eye should land — and costs the page
+// none of its pink. The ticket is then carried by geometry rather than by texture: one
+// perforation, two notches at its ends where a real tear starts, and nothing else.
+.amount {
+  display: inline-block;
+  font-weight: inherit;
+  height: 1em;
+  position: relative;
+  vertical-align: middle;
+  // Reserved inline space: 1.06em of counterfoil, three tabular digits, and their padding.
+  // The saving is always three digits (£100 at two friends, £500 at ten), so this never
+  // has to stretch and the words either side of it never move as the slider runs.
+  width: 3.35em;
+  // The lift lives HERE, on the unmasked parent, because the ticket's shape is cut with a
+  // `mask` and a mask clips everything the element paints — an outer box-shadow would be
+  // clipped away entirely. A filter on the parent traces the masked shape instead, so the
+  // shadow follows the notches round their curve.
+  //
+  // Two stops, both short: this sits INSIDE a line of type, and a soft wide shadow under
+  // it read as a glow around the words rather than as an object above the page.
+  filter: drop-shadow(0 1px 2px rgba(17, 25, 40, 0.18))
+    drop-shadow(0 4px 10px rgba(17, 25, 40, 0.14));
+}
+
+.amountStamp {
+  // The tear's distance from the left edge. Read by three separate rules — the
+  // counterfoil's width, the perforation's position, and both notch masks — so the line
+  // and the bites cannot drift apart. Move the tear by changing this one number.
+  --tear: 1.06em;
+  // Notch radius: ~6.5px at the 52px headline. Tuned by eye against a render, not picked:
+  // at 0.105em the bites read as two stray dots rather than as something torn, and past
+  // ~0.14em they start to shave the rounded corners and the chip looks nibbled.
+  --notch: 0.125em;
+
+  align-items: stretch;
+  // Not flat: a few percent of lift at the top edge. Enough to read as a lit surface
+  // rather than a filled rectangle, far too little to look like a gradient.
+  background: linear-gradient(180deg, #1c2438 0%, #111928 58%);
+  border-radius: 0.2em;
+  color: #fff;
+  display: flex;
+  // 1.18em, where the parent reserves only 1em — the chip is deliberately taller than its
+  // own line. `inset: 0` + `margin: auto` centres it on that line without contributing to
+  // the line's height, so it can overhang into the leading and be rotated without moving
+  // a single word around it.
+  height: 1.18em;
+  inset: 0;
+  margin: auto;
+  position: absolute;
+  // Two operations, and the order matters — the lift is applied before the rotation, so
+  // the chip rises straight up rather than along its own tilted axis.
+  //
+  // The lift is NOT a style choice, it is an alignment fix, and it was measured rather
+  // than guessed: `vertical-align: middle` centres this box on the line's own middle,
+  // which put the figure 4px BELOW the baseline that "save" and "together" sit on. At a
+  // 52px headline that is visible, and it is exactly what makes an inline chip read as
+  // something pasted over the line instead of set into it. −0.075em is those 4px, in em
+  // so it holds if the headline size changes. Re-measure if you touch the height.
+  //
+  // The rotation is one degree: enough to say this is an object placed on the page, not
+  // enough to read as a sticker — which is where the earlier −3.2° version landed.
+  transform: translateY(-0.075em) rotate(-1deg);
+  width: 100%;
+  // The slider retargets this on every step; without tabular figures the digits change
+  // width and the ticket's contents jitter.
+  font-variant-numeric: tabular-nums;
+  // The top face of the card, caught by the light. Inset shadows are clipped by the mask,
+  // which is what we want here — the notches are holes in that face, not lit edges.
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09);
+
+  // ── The notches ────────────────────────────────────────────
+  // Two bites, top and bottom, both at the tear's x — and that placement is the point. On
+  // a real ticket the notches are where the tear STARTS, so sitting them at the ends of
+  // the perforation makes the line and the bites one idea instead of two decorations.
+  //
+  // Intersected, so each gradient's opaque area survives only where the other is opaque
+  // too. Where `mask-composite` is unsupported the two masks union instead and the chip is
+  // simply a rounded rectangle: the figure stays exactly as legible, only the bites go.
+  mask:
+    radial-gradient(var(--notch) at var(--tear) 0, #0000 98%, #000),
+    radial-gradient(var(--notch) at var(--tear) 100%, #0000 98%, #000);
+  mask-composite: intersect;
+}
+
+// The counterfoil — the narrow panel left of the tear, holding the currency and nothing
+// else. Width comes off --tear, so the panel ends exactly where the perforation is drawn.
+.stub {
+  align-items: center;
+  display: flex;
+  flex: none;
+  justify-content: center;
+  width: var(--tear);
+}
+
+// The £ is a unit mark, not a numeral: set down to 0.56em and held back to 62% white so it
+// stops competing with the figure. At full size and full white it read as a fourth digit,
+// and the eye stopped taking the number as a number.
+.currency {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.56em;
+  font-weight: 600;
+  // The glyph's ink sits low in its own box next to three tall figures; this brings its
+  // optical centre up to meet theirs.
+  transform: translateY(-0.05em);
+}
+
+// The perforation. A 1px column of dashes rather than a dashed border, so the dash rhythm
+// is set in em and scales with the headline instead of staying a fixed 2px at every size.
+// Placed off the same --tear as the notches and pulled back half its own width, so the
+// line sits ON that x rather than beside it. Held clear of both bites at top and bottom:
+// dashes running into the curves made them look ragged rather than cut.
+.tear {
+  background-image: repeating-linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.32) 0 0.05em,
+    transparent 0.05em 0.115em
+  );
+  bottom: 0.19em;
+  left: var(--tear);
+  margin-left: -0.5px;
+  position: absolute;
+  top: 0.19em;
+  width: 1px;
+}
+
+.figure {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  // Optically centred, not box-centred: the padding is asymmetric because the digits have
+  // to clear the perforation on one side and the card's own edge on the other, and those
+  // are not the same distance. The 0.02em at the bottom lifts the figures off centre by a
+  // hair — lining figures have no descenders, so a box that is centred by geometry reads
+  // as bottom-heavy, and sitting them ~2px high is what makes it look centred.
+  padding: 0 0.22em 0.02em 0.18em;
+}
+
+// Held narrower than the column so it breaks into comfortable lines rather than one
+// very long measure.
+.subtitle {
+  color: #636363;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.55;
+  margin: 16px 0 0;
+  max-width: 560px;
+}
+
+// ————————————————————————————————————————————————————————————————
+// Slider
+//
+// A transparent <input type="range"> sits over everything, so the control keeps
+// native keyboard, pointer and touch behaviour while the visible parts — track,
+// fill, pips, bubble — are ordinary elements we can style and animate.
+//
+// One piece of maths is shared by the fill, the pips and the bubble: a range
+// thumb's centre travels between thumb/2 and (width − thumb/2), never the full
+// width. Anything that has to line up with the thumb must use that same mapping,
+// or it drifts by up to half a thumb at the ends.
+// ————————————————————————————————————————————————————————————————
+$thumb-size: 32px;
+$track-height: 6px;
+$accent-from: #ff5771;
+$accent-to: #e53762;
+
+@function thumb-track($p) {
+  @return calc(#{$p} * (100% - #{$thumb-size}) + #{$thumb-size * 0.5});
+}
+
+// Reads out the slider's state above the track: what's selected on the left, the
+// ceiling on the right. Held to the track's own width so both ends line up with it.
+.sliderMeta {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 32px;
+  max-width: 520px;
+  width: 100%;
+}
+
+// Faces then the number. align-items centre rather than baseline, because the
+// avatars are taller than the text and would otherwise hang below it.
+.sliderCount {
+  align-items: center;
+  color: #636363;
+  display: flex;
+  font-size: 15px;
+  font-weight: 400;
+  gap: 10px;
+  line-height: 20px;
+}
+
+.sliderCountValue {
+  color: #111928;
+  font-size: 17px;
+  font-weight: 650;
+  // The number changes on every step; tabular figures stop the word after it from
+  // shifting as digit widths change.
+  font-variant-numeric: tabular-nums;
+  margin-right: 2px;
+}
+
+.sliderMax {
+  color: #9ca3af;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.sliderRow {
+  // 0 → 1, set inline from the component.
+  --fill: 0;
+
+  align-items: center;
+  cursor: grab;
+  display: flex;
+  height: $thumb-size;
+  // Tighter than before: the meta row above now carries the 32px gap.
+  margin-top: 10px;
+  max-width: 520px;
+  position: relative;
+  width: 100%;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.track {
+  background: #eceef1;
+  border-radius: 999px;
+  height: $track-height;
+  position: relative;
+  width: 100%;
+  // Recessed rather than drawn on: a hairline top-inset reads as a groove the fill
+  // sits inside.
+  box-shadow: inset 0 1px 2px rgba(16, 24, 40, 0.07);
+}
+
+.trackFill {
+  border-radius: 999px;
+  display: block;
+  height: 100%;
+  background-image: linear-gradient(90deg, $accent-from 0%, $accent-to 100%);
+  width: #{thumb-track("var(--fill)")};
+  // Short enough that a drag still feels direct, long enough that a keyboard step
+  // or a click on the track glides instead of snapping.
+  transition: width 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+  // Colour bleeding under the bar, so the filled length reads as lit.
+  box-shadow: 0 1px 8px rgba(229, 55, 98, 0.32);
+}
+
+// ————————————————————————————————————————————————————————————————
+// Step pips
+// ————————————————————————————————————————————————————————————————
+.ticks {
+  bottom: 0;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.tick {
+  background: #d3d7dd;
+  border-radius: 50%;
+  height: 5px;
+  // --p is the pip's own 0→1 position, set inline.
+  left: #{thumb-track("var(--p)")};
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 5px;
+  transition: background 0.22s ease, opacity 0.22s ease, transform 0.22s ease;
+}
+
+// Passed by the fill: knocked out of the gradient rather than sitting on it.
+.tickOn {
+  background: rgba(255, 255, 255, 0.85);
+  transform: translate(-50%, -50%) scale(0.85);
+}
+
+// ————————————————————————————————————————————————————————————————
+// Value bubble
+// ————————————————————————————————————————————————————————————————
+.bubble {
+  background: #111928;
+  border-radius: 8px;
+  bottom: calc(100% + 12px);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  left: #{thumb-track("var(--fill)")};
+  line-height: 16px;
+  opacity: 0;
+  padding: 4px 9px;
+  pointer-events: none;
+  position: absolute;
+  transform: translateX(-50%) translateY(4px) scale(0.92);
+  transition: opacity 0.18s ease, transform 0.18s cubic-bezier(0.34, 1.4, 0.5, 1),
+    left 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+
+  // The little tail, so it reads as attached to the thumb.
+  &::after {
+    border: 4px solid transparent;
+    border-top-color: #111928;
+    content: "";
+    left: 50%;
+    position: absolute;
+    top: 100%;
+    transform: translateX(-50%);
+  }
+}
+
+// Shown while the control is being used — pointer over it, or focused by keyboard.
+.sliderRow:hover .bubble,
+.sliderRow:focus-within .bubble {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+// ————————————————————————————————————————————————————————————————
+// The real input — invisible, but it is what you actually drag.
+// ————————————————————————————————————————————————————————————————
+.slider {
+  appearance: none;
+  background: transparent;
+  cursor: inherit;
+  height: 100%;
+  left: 0;
+  margin: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+
+  &:focus {
+    outline: none;
+  }
+
+  // Native tracks are hidden — .track above is what's drawn.
+  &::-webkit-slider-runnable-track {
+    background: transparent;
+    height: 100%;
+  }
+
+  &::-moz-range-track {
+    background: transparent;
+    height: 100%;
+  }
+
+  // Layered shadows instead of one: a hairline to define the edge, a tight shadow
+  // for contact, a wide soft one for lift. A single shadow reads as a sticker.
+  &::-webkit-slider-thumb {
+    appearance: none;
+    background: #fff;
+    border: 0;
+    border-radius: 50%;
+    height: $thumb-size;
+    width: $thumb-size;
+    box-shadow: 0 0 0 1px rgba(17, 24, 39, 0.07), 0 2px 5px rgba(16, 24, 40, 0.14),
+      0 10px 22px rgba(16, 24, 40, 0.11);
+    transition: transform 0.2s cubic-bezier(0.34, 1.4, 0.5, 1), box-shadow 0.2s ease;
+  }
+
+  &::-moz-range-thumb {
+    appearance: none;
+    background: #fff;
+    border: 0;
+    border-radius: 50%;
+    height: $thumb-size;
+    width: $thumb-size;
+    box-shadow: 0 0 0 1px rgba(17, 24, 39, 0.07), 0 2px 5px rgba(16, 24, 40, 0.14),
+      0 10px 22px rgba(16, 24, 40, 0.11);
+    transition: transform 0.2s cubic-bezier(0.34, 1.4, 0.5, 1), box-shadow 0.2s ease;
+  }
+
+  // Grows a little under the pointer, and picks up an accent halo while dragging so
+  // the thumb belongs to the filled part of the track.
+  &:hover::-webkit-slider-thumb {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 1px rgba(17, 24, 39, 0.08), 0 3px 8px rgba(16, 24, 40, 0.16),
+      0 14px 28px rgba(16, 24, 40, 0.14);
+  }
+
+  &:active::-webkit-slider-thumb {
+    transform: scale(1.14);
+    box-shadow: 0 0 0 1px rgba(229, 55, 98, 0.35), 0 0 0 8px rgba(229, 55, 98, 0.12),
+      0 3px 10px rgba(16, 24, 40, 0.18);
+  }
+
+  &:hover::-moz-range-thumb {
+    transform: scale(1.08);
+  }
+
+  &:active::-moz-range-thumb {
+    transform: scale(1.14);
+    box-shadow: 0 0 0 1px rgba(229, 55, 98, 0.35), 0 0 0 8px rgba(229, 55, 98, 0.12);
+  }
+
+  // Keyboard focus needs to be visible on the thumb, since the input's own outline
+  // is suppressed above.
+  &:focus-visible::-webkit-slider-thumb {
+    box-shadow: 0 0 0 1px rgba(229, 55, 98, 0.45), 0 0 0 5px rgba(229, 55, 98, 0.22),
+      0 3px 10px rgba(16, 24, 40, 0.18);
+  }
+
+  &:focus-visible::-moz-range-thumb {
+    box-shadow: 0 0 0 1px rgba(229, 55, 98, 0.45), 0 0 0 5px rgba(229, 55, 98, 0.22);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trackFill,
+  .tick,
+  .bubble,
+  .slider::-webkit-slider-thumb,
+  .slider::-moz-range-thumb {
+    transition: none;
+  }
+}
+
+.ctaRow {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 32px;
+
+  // .tryButton carries margin-left: 8px to space it from the navbar links, which
+  // would nudge it off-centre here. Class + element beats the single class, so this
+  // wins regardless of stylesheet order.
+  > a {
+    margin-left: 0;
+  }
+}
+
+// The page's MAIN action, larger — and NOTHING else changed.
+//
+// What was here before was invented: 17px type, a tinted drop shadow and a 1px hover
+// lift. None of those exist on any CTA on this site, so the button stopped being amber's
+// primary button and became a one-off that happened to be pink. The gradient, the radius,
+// the 14px/600 label and the white-text guard all come from `.tryButton`, untouched.
+//
+// The one override is the PADDING, and it is not a number I chose: 16px 24px is what
+// amber's own primary button uses at desktop size (`.btn.desktop` in the user site's
+// Button.module.scss). So "larger" here means the site's large primary, not a bigger
+// version of the navbar's small one.
+//
+// `.ctaRow .cta` beats the single `.tryButton` on specificity, so this wins regardless of
+// stylesheet order. Do NOT move it into `.tryButton` — that class is the navbar pill on
+// every v2 page, and growing it there grows the header everywhere.
+.ctaRow .cta {
+  padding: 16px 24px;
+}

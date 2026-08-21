@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
+  <!--
+    Same pink duotone as the other two: solid #FDC8D3 behind a #202020 outline.
+
+    The source shipped its fill as #E2C4FF (purple) rather than the #ffbdbc the book
+    and rocket used — recoloured to the same blush so the set reads as one family
+    rather than inheriting whichever tint each icon happened to arrive with.
+
+    No flip transform on this one: it is drawn directly in the 512 viewBox.
+  -->
+  <!-- Blush layer: the shoulders below the gown. -->
+  <path
+    d="M190.879 401.115c-27.393 16.224-45.861 46.096-45.861 80.072V512l227.069-.001v-30.813c0-34.185-18.695-64.213-46.366-80.368v-.29c-18.437 14.82-41.815 23.712-67.169 23.712-25.586 0-49.159-9.056-67.673-24.12z"
+    fill="#FDC8D3"
+    fill-rule="evenodd"
+    clip-rule="evenodd"
+  />
+
+  <g
+    fill="none"
+    stroke="#202020"
+    stroke-width="20"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill-rule="evenodd"
+    clip-rule="evenodd"
+  >
+    <path
+      d="M279.543 351.188c-4.914 6.695-12.675 10.685-20.992 10.685s-16.078-3.99-20.992-10.685"
+      stroke-miterlimit="2.6131"
+    />
+    <!-- The eyes: zero-length paths, drawn purely by the round linecap. -->
+    <path d="M206.496 314.923h.007M310.6 314.923h.008" stroke-miterlimit="22.9256" />
+    <path
+      d="M370.962 317.939h14.615c10.718 0 19.487-8.769 19.487-19.487v-9.523c0-10.718-8.769-19.487-19.487-19.487H250.615c-28.842 0-52.447-8.139-52.447-36.985 0 28.846-18.312 36.985-47.155 36.985h-19.487c-10.718 0-19.487 8.769-19.487 19.487v9.523c0 10.718 8.769 19.487 19.487 19.487h14.615"
+      stroke-miterlimit="2.6131"
+    />
+    <path
+      d="M366.09 274.313v42.388c0 59.145-48.392 107.538-107.538 107.538s-107.538-48.392-107.538-107.538v-42.388"
+      stroke-miterlimit="22.9256"
+    />
+    <path
+      d="M121.846 171.538 21.674 115.456 258.552 10l231.774 105.456-92.316 54.882"
+      stroke-miterlimit="2.6131"
+    />
+    <path
+      d="M125.325 268.68V151.655c0-79.605 267.25-79.591 267.25 0V268.68"
+      stroke-miterlimit="2.6131"
+    />
+    <path
+      d="M126.187 246.337c15.627-69.786 250.72-69.664 265.603.355M81.727 94.159v153.153M258.552 470.626v-46.387"
+      stroke-miterlimit="2.6131"
+    />
+  </g>
+</svg>

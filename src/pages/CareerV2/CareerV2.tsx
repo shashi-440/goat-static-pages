@@ -15,10 +15,10 @@ import styles from "./CareerV2.module.scss";
 
 const CareerV2 = () => (
   <div className={styles.page}>
-    <Helmet title="Careers | Amber">
+    <Helmet title="Careers | amber">
       <meta
         name="description"
-        content="We help students find home, before they find everything else. Explore open roles at Amber — a team of curious builders across 80+ countries helping students find a place to call home."
+        content="We help students find home, before they find everything else. Explore open roles at amber — a team of curious builders across 80+ countries helping students find a place to call home."
       />
       <meta name="robots" content="index,follow" />
       {/* Instrument Sans — the design font, loaded only on this page */}
@@ -30,15 +30,16 @@ const CareerV2 = () => (
       />
     </Helmet>
 
-    {/* "Career" is dropped from the links here — this *is* the career page — and
-        the CTA becomes "Apply now", secondary until the page is scrolled. */}
+    {/* "Career" is dropped from the links here — this *is* the career page.
+        "Apply now" is gone from the CTA: that pill is "Visit amber" on every page, so
+        the page's own action moves into the links beside it, where #open-roles is still
+        one click away. The CTA stays secondary until the page is scrolled, so the hero
+        keeps the only filled button above the fold. */}
     <Navbar
       links={[
-        { label: "Blogs", href: "/blog" },
-        { label: "About Us", href: "/about-us-v2" },
+        { label: "Open roles", href: "#open-roles" },
+        { label: "About us", href: "/about-us-v2" },
       ]}
-      ctaLabel="Apply now"
-      ctaHref="#open-roles"
       ctaSecondaryUntilScroll
     />
     <Hero />

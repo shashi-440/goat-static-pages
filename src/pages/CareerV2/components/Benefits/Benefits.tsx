@@ -58,7 +58,7 @@ const BENEFITS: Benefit[] = [
 ];
 
 /**
- * Dark "Benefits of working at Amber" band (Figma 2665:13571).
+ * Dark "Benefits of working at amber" band (Figma 2665:13571).
  *
  * The five titles on the left double as the carousel nav — the active one is
  * white, the rest neutral/500. Clicking a title, a dot, or an arrow moves the
@@ -82,7 +82,7 @@ const Benefits = () => {
   return (
     <section className={styles.section} data-nav-theme="dark">
       <Reveal className={styles.header}>
-        <h2 className={styles.title}>Benefits of working at Amber</h2>
+        <h2 className={styles.title}>Benefits of working at amber</h2>
         <p className={styles.subtitle}>
           No ping pong tables or bean bag chairs, just benefits you actually want
         </p>

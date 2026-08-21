@@ -1,0 +1,208 @@
+.section {
+  align-items: center;
+  background: #f7f7f7;
+  display: flex;
+  flex-direction: column;
+  padding: 96px 80px;
+  width: 100%;
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  max-width: 1280px;
+  width: 100%;
+}
+
+.headingBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+
+.heading {
+  color: #111928;
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -1px;
+  line-height: 48px;
+  margin: 0;
+  text-align: center;
+}
+
+.subheading {
+  color: #4b5563;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  margin: 0;
+  text-align: center;
+}
+
+/* ------------------------------------------------------------- scroll track */
+
+.viewport {
+  margin-top: 56px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  width: 100%;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.track {
+  display: flex;
+  gap: 24px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  gap: 24px;
+  // 188px in the design; a min rather than a fixed height so a longer quote
+  // grows the card instead of being clipped. The track stretches its cards to
+  // match, so the row stays level either way.
+  min-height: 188px;
+  overflow: hidden;
+  padding: 24px;
+  // 1280px container minus two 24px gaps, split three ways.
+  width: calc((100% - 48px) / 3);
+}
+
+.person {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+// The illustrations are drawn on a grey plate in the design, which shows through
+// wherever the artwork does not reach the edge of the circle.
+.avatar {
+  background: #f3f4f6;
+  border-radius: 100px;
+  flex-shrink: 0;
+  height: 44px;
+  object-fit: cover;
+  width: 44px;
+}
+
+.identity {
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.name {
+  color: #000;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 17px;
+}
+
+.role {
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 17px;
+}
+
+.quote {
+  color: #000;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  margin: 0;
+}
+
+/* -------------------------------------------------------------- nav controls */
+
+.nav {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 32px;
+}
+
+.dots {
+  align-items: center;
+  background: #ebebeb;
+  border-radius: 999px;
+  display: flex;
+  gap: 10px;
+  height: 40px;
+  padding: 0 28px;
+}
+
+.dot {
+  background: #c9c9c9;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  height: 8px;
+  padding: 0;
+  transition: background 0.2s ease, width 0.2s ease;
+  width: 8px;
+}
+
+.dotActive {
+  background: #202020;
+  width: 26px;
+}
+
+.discs {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+// Both discs carry the same pair of looks, chosen by whether there is anywhere
+// left to go in that direction — the design's two swatches were simply the two
+// states its chevrons happened to be in. `color` drives the inline chevron.
+.disc {
+  align-items: center;
+  background: #ebebeb;
+  border: 0;
+  border-radius: 50%;
+  color: #202020;
+  cursor: pointer;
+  display: flex;
+  height: 40px;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.2s ease, color 0.2s ease;
+  width: 40px;
+
+  &:disabled {
+    background: #f1f1f1;
+    color: #c9c9c9;
+    cursor: default;
+  }
+}
+
+.chev {
+  height: 16px;
+  width: 16px;
+}
+
+@media (max-width: 1100px) {
+  .card {
+    width: calc((100% - 24px) / 2);
+  }
+}
+
+@media (max-width: 720px) {
+  .card {
+    width: 100%;
+  }
+}

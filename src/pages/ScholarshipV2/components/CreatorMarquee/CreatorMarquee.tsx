@@ -10,12 +10,15 @@ import playIcon from "../../assets/play.svg";
 import winner1 from "../../assets/winner-1.jpg";
 import winner2 from "../../assets/winner-2.jpg";
 import winner3 from "../../assets/winner-3.jpg";
+import winner4 from "../../assets/winner-4.jpg";
+import winner5 from "../../assets/winner-5.jpg";
 import wrapperHOC from "@Utils/wrapperHOC";
 
-// Placeholder story video for every card — Blender's "Big Buck Bunny", which is
-// openly licensed, so it is an unambiguous stand-in. Swap in each winner's real
-// video id per entry in WINNERS below.
-const PLACEHOLDER_VIDEO_ID = "aqz-KE-bpKQ";
+// Placeholder story video for every card, until each winner's own is supplied —
+// swap in a real id per entry in WINNERS below and that card stops falling back.
+// https://www.youtube.com/watch?v=uPivRC-AyDc — an amber video, so the stand-in is
+// at least on-brand; it replaced Blender's "Big Buck Bunny", which read as random.
+const PLACEHOLDER_VIDEO_ID = "uPivRC-AyDc";
 
 interface Winner {
   name: string;
@@ -28,15 +31,18 @@ interface Winner {
   videoId?: string;
 }
 
+// Eight cards over five portraits, so some repeat. The order is set so no photo
+// sits next to itself — including across the loop seam, where the last card runs
+// straight back into the first.
 const WINNERS: Winner[] = [
   { name: "Salena Gomez", role: "Winner", edition: "Forth Edition", image: winner1 },
   { name: "Hind Irlane", role: "Runner Up", edition: "Forth Edition", image: winner2 },
   { name: "Micah Sarah", role: "Winner", edition: "Third Edition", image: winner3 },
-  { name: "Cam Malik", role: "Runner Up", edition: "Third Edition", image: winner1 },
-  { name: "Tyler Glass", role: "Winner", edition: "Second Edition", image: winner2 },
-  { name: "Julia Estonia", role: "Runner Up", edition: "Second Edition", image: winner3 },
-  { name: "Miriam Rao", role: "Winner", edition: "First Edition", image: winner1 },
-  { name: "Ashley Walseman", role: "Runner Up", edition: "First Edition", image: winner2 },
+  { name: "Cam Malik", role: "Runner Up", edition: "Third Edition", image: winner4 },
+  { name: "Tyler Glass", role: "Winner", edition: "Second Edition", image: winner1 },
+  { name: "Julia Estonia", role: "Runner Up", edition: "Second Edition", image: winner5 },
+  { name: "Miriam Rao", role: "Winner", edition: "First Edition", image: winner2 },
+  { name: "Ashley Walseman", role: "Runner Up", edition: "First Edition", image: winner3 },
 ];
 
 // Laurel pair flanking the award line. Authored here rather than exported —

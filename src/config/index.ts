@@ -35,6 +35,29 @@ const config = {
    */
   IMAGE_STATIC_ASSETS_COMPONENTS_PATH: "/assets/images/components",
 
+  /**
+   * Mapbox GL JS access token.
+   *
+   * Same key name and the same env-first shape as amber-user-website's config, so the globe
+   * component can be pasted back unchanged.
+   *
+   * ⚠️ NO FALLBACK VALUE, deliberately. This held amber's non-production token inline and this
+   * repo is PUBLIC — a `pk.` token is public by design and already ships in amber-user-website's
+   * client bundle, but a token sitting in a public repo is a token that gets scraped, and the
+   * usage it runs up is billed to amber. Supply it locally instead:
+   *
+   *   echo 'MAPBOX_ACCESS_TOKEN=pk...' > .env      # gitignored
+   *
+   * The build scripts read that file (`--env-file-if-exists=.env`, so a missing file is not an
+   * error) and DefinePlugin inlines whatever it finds — see `webpack/base.config.ts`. With no
+   * token the globe degrades to its fallback photograph rather than failing; see `DemandGlobe`.
+   *
+   * Mapbox is NOT an npm dependency in either repo: the main app injects mapbox-gl from
+   * api.mapbox.com at runtime and declares `mapboxgl` as an ambient global, and this sandbox
+   * mirrors that. api.mapbox.com is already in the main app's CSP script-src.
+   */
+  MAPBOX_ACCESS_TOKEN: process.env.MAPBOX_ACCESS_TOKEN || "",
+
   IS_CHINA_APP: false,
   CHINA_STATIC_ASSETS_URL: "",
 };

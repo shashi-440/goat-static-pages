@@ -21,7 +21,7 @@ const CARDS: StoryCard[] = [
     image: story1,
     date: "April 2016",
     description:
-      "We kicked off Amber with a team of 25 to make finding student housing abroad a breeze and take the stress out of searching for a place to stay.",
+      "We kicked off amber with a team of 25 to make finding student housing abroad a breeze and take the stress out of searching for a place to stay.",
   },
   {
     image: story2,
@@ -80,7 +80,7 @@ const AmberStory = () => {
   return (
     <section className={styles.section}>
       <Reveal as="h2" className={styles.heading}>
-        The Amber Story
+        The amber Story
       </Reveal>
 
       <Reveal className={styles.viewport} delay={120}>

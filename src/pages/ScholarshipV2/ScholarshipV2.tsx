@@ -7,6 +7,7 @@ import Navbar from "../AboutUsV2/components/Navbar/Navbar";
 import Hero from "./components/Hero/Hero";
 import CreatorMarquee from "./components/CreatorMarquee/CreatorMarquee";
 import Intro from "./components/Intro/Intro";
+import Manifesto from "./components/Manifesto/Manifesto";
 import Categories from "./components/Categories/Categories";
 import Steps from "./components/Steps/Steps";
 import Ambassadors from "./components/Ambassadors/Ambassadors";
@@ -16,7 +17,7 @@ import styles from "./ScholarshipV2.module.scss";
 
 const ScholarshipV2 = () => (
   <div className={styles.page}>
-    <Helmet title="amberscholar | Amber">
+    <Helmet title="amberscholar | amber">
       <meta
         name="description"
         content="amberscholar 2026 — apply for the $50,000 amber Dream Fund and get the goal you believe in funded."
@@ -31,10 +32,16 @@ const ScholarshipV2 = () => (
       />
     </Helmet>
 
-    <Navbar />
+    <Navbar
+      links={[
+        { label: "Blogs", href: "/blog" },
+        { label: "About us", href: "/about-us-v2" },
+      ]}
+    />
     <Hero />
     <CreatorMarquee />
     <Intro />
+    <Manifesto />
     <Categories />
     <Steps />
     <Ambassadors />

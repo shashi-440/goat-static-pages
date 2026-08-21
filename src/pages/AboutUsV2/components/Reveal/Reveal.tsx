@@ -10,14 +10,24 @@ interface RevealProps {
   className?: string;
   /** Render as this element (default div). */
   as?: keyof JSX.IntrinsicElements;
+  /**
+   * Keep the element hidden even once it has scrolled into view.
+   *
+   * Added for the List With Us hero, where the copy must wait for the globe to
+   * finish its entrance rather than for a scroll position. Defaults to false, so
+   * every existing caller behaves exactly as before.
+   */
+  hold?: boolean;
 }
 
 /**
  * Fade + rise-up scroll reveal. Animates once when the element first scrolls
  * into view, then stays visible (no replay on scroll-up). SSR-safe: renders in
  * the hidden state and reveals after hydration + intersection.
+ *
+ * `hold` lets a caller gate the reveal on something other than scroll position.
  */
-const Reveal = ({ children, delay = 0, className = "", as = "div" }: RevealProps) => {
+const Reveal = ({ children, delay = 0, className = "", as = "div", hold = false }: RevealProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   const Tag = as as any;
@@ -51,7 +61,7 @@ const Reveal = ({ children, delay = 0, className = "", as = "div" }: RevealProps
   return (
     <Tag
       ref={ref}
-      className={`${styles.reveal} ${visible ? styles.isVisible : ""} ${className}`}
+      className={`${styles.reveal} ${visible && !hold ? styles.isVisible : ""} ${className}`}
       style={{ transitionDelay: `${delay}ms` }}
     >
       {children}

@@ -59,13 +59,15 @@
 
 // Fixed slot so all four rows share one left edge and one optical centre,
 // whatever size the glyph inside is.
+// 56px, up from 44. Sized to the LARGEST glyph it has to hold — the cap at 49 (see PERKS) —
+// rather than to the base size, so the optical corrections have somewhere to go without clipping.
 .iconSlot {
   align-items: center;
   display: flex;
   flex-shrink: 0;
-  height: 32px;
+  height: 56px;
   justify-content: center;
-  width: 32px;
+  width: 56px;
 }
 
 // No size here on purpose — the width/height attributes carry each icon's own

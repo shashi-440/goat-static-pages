@@ -29,8 +29,149 @@
 .stat {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  // Was one 12px gap for the whole column. The stack needs more air beneath it than the
+  // number needs above its label, so the spacing is set per pair instead.
+  gap: 0;
   width: 175px;
+}
+
+/* ------------------------------------------------------------------ stack */
+
+// Overlapping circles above each figure — faces, flags or marks. Identical geometry in all
+// three columns; see the note in the TSX for why every column gets one.
+//
+// `align-self`, not `align-items`: this is a flex ITEM of the stat column, so its own
+// cross-axis size is set by how the parent aligns it. With the default `stretch` the stack's
+// box ran the full 175px of the column — harmless to look at, since the circles are flush
+// left either way, but it makes the group's hit area and its `role="img"` bounds four times
+// wider than the ink they describe.
+.stack {
+  align-items: center;
+  align-self: flex-start;
+  display: inline-flex;
+  // Derived from the STACK's own height, not picked in the abstract: in the reference this
+  // follows, the gap under the visual is about half the visual's height. At 32px tall that is
+  // 16px. (It was 24px under a 26px stack, and a gap nearly as tall as the stack itself is what
+  // made the visual read as floating above the column rather than belonging to it.)
+  //
+  // It still has to beat the 10px under the figure so the figure and its label read as one
+  // pair — but not by 4:1, which was tried and turned the pair into a clump with the visual
+  // stranded above it.
+  margin-bottom: 16px;
+}
+
+// 32px.
+//
+// The ceiling is the figure below it, which is 36px tall: a supporting visual has to stay
+// visibly smaller than the thing it supports, or the eye lands on the pictures and has to come
+// back for the stat. It was 34 (too close to the figure), then 26 (too small to read a face at
+// all). 32 is the most it can be while still losing to the number.
+//
+// The white ring separates one circle from the next where they overlap; without it the stack
+// reads as one blurred mass. It is a border rather than a gap because the overlap is the point.
+.chip {
+  background: #fff;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  // Starts flat and gains depth on hover, so the resting state stays quiet. The shadow is
+  // declared here rather than only in the hover rule so there is something to transition FROM
+  // — a shadow appearing from nothing jumps on the first frame.
+  box-shadow: 0 0 0 rgba(32, 32, 32, 0);
+  flex-shrink: 0;
+  height: 32px;
+  overflow: hidden;
+  position: relative;
+  // Two properties, one easing. The x-offsets are what fan the stack out (see the hover rules)
+  // and they are TRANSFORMS, not the `margin-left` that creates the overlap: animating that
+  // margin would relayout the whole stats row on every frame, which is the difference between
+  // this being smooth and being a stutter.
+  transition:
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.45s ease;
+  width: 32px;
+
+  // Negative margin, not `gap` — the circles are meant to sit on top of one another. The first
+  // is left alone so the stack starts flush with the column's left edge, in line with the
+  // figure and the label below it.
+  & + & {
+    margin-left: -10px;
+  }
+}
+
+// The hairline edge, moved off `box-shadow` and onto a pseudo-element so the shadow property is
+// free for the hover lift. Two shadows on one declaration would mean restating the ring in
+// every hover rule and in the mark variant's override.
+//
+// Not cosmetic. Nigeria's flag is green|white|green in vertical bands, so its centre is white —
+// between two white rings the disc lost its boundary entirely and the stack read as India, a
+// gap, then China. Curating the flags by colour fixes that one instance and leaves the trap set
+// for the next pale flag (Japan, Poland, Finland).
+.chip::after {
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(32, 32, 32, 0.1);
+  content: "";
+  inset: 0;
+  position: absolute;
+}
+
+/* ------------------------------------------------------- stack hover */
+
+// The stack fans open and lifts.
+//
+// Triggered from the whole `.stat`, not from the stack itself: the stack is 76px of a 175px
+// column, and a hover target that small next to the number it belongs to feels like a
+// mis-hover rather than an invitation. The figure and label are part of the same unit, so the
+// unit is the target.
+//
+// Each circle slides further than the one before it, which unwinds the overlap from left to
+// right — the stack opens like a hand of cards rather than sliding sideways as a block. The
+// per-circle delay is what makes it read as one connected movement; on the way OUT there is no
+// delay (these rules stop applying), so it closes as a single gesture.
+.stat:hover {
+  .chip {
+    box-shadow: 0 6px 16px rgba(32, 32, 32, 0.16);
+    transform: translateY(-3px);
+  }
+
+  .chip:nth-child(2) {
+    transform: translate3d(7px, -3px, 0);
+    transition-delay: 40ms;
+  }
+
+  .chip:nth-child(3) {
+    transform: translate3d(14px, -3px, 0);
+    transition-delay: 80ms;
+  }
+
+  .chip:nth-child(4) {
+    transform: translate3d(21px, -3px, 0);
+    transition-delay: 120ms;
+  }
+}
+
+// The lift is the whole interaction, so under reduced motion there is nothing left worth
+// keeping — the shadow alone would read as a hover state that failed to finish.
+@media (prefers-reduced-motion: reduce) {
+  .chip {
+    transition: none;
+  }
+
+  .stat:hover .chip,
+  .stat:hover .chip:nth-child(2),
+  .stat:hover .chip:nth-child(3),
+  .stat:hover .chip:nth-child(4) {
+    box-shadow: 0 0 0 rgba(32, 32, 32, 0);
+    transform: none;
+  }
+}
+
+.chipArt {
+  display: block;
+  height: 100%;
+  // `cover` on purpose: the faces are portrait crops and the flags are square, and both have
+  // to fill a circle. `contain` would letterbox a portrait inside it.
+  object-fit: cover;
+  width: 100%;
 }
 
 .value {
@@ -47,6 +188,9 @@
   font-size: 16px;
   font-weight: 400;
   line-height: 20px;
+  // The figure and its label are one unit; 10px holds them together without welding them.
+  // The 16px above the stack is what separates that unit from the visual.
+  margin-top: 10px;
 }
 
 // The other half. Figma draws a 557px measure, but that was inside its narrower

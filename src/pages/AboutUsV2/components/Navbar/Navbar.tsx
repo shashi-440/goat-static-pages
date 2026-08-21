@@ -8,15 +8,19 @@ import wrapperHOC from "@Utils/wrapperHOC";
 const logoDark = `${config.IMAGE_STATIC_ASSETS_COMPONENTS_PATH}/Header/assets/amber-logo-dark.svg`;
 const logoLight = `${config.IMAGE_STATIC_URL}/images/logo/amber-logo-light.svg`;
 
+// Fallback only. Every v2 page now passes its own `links` — the two most useful next
+// reads from wherever you are — because one shared pair meant the nav said the same thing
+// on all ten and told you nothing about where you were. Kept as a default so a new page
+// that forgets to pass links still renders something sane rather than an empty bar.
 const DEFAULT_NAV_LINKS = [
   { label: "Blogs", href: "/blog" },
-  { label: "Career", href: "/careers" },
+  { label: "Career", href: "/career-v2" },
 ];
 
 interface NavbarProps {
   /** Override the nav links. Defaults to Blogs + Career. */
   links?: { label: string; href: string }[];
-  /** CTA label. Defaults to "Try amber". */
+  /** CTA label. Defaults to "Visit amber". */
   ctaLabel?: string;
   /** CTA target. Defaults to "/". */
   ctaHref?: string;
@@ -26,13 +30,26 @@ interface NavbarProps {
    * the CTA is the pink primary at every scroll position.
    */
   ctaSecondaryUntilScroll?: boolean;
+  /**
+   * Renders the "Visit amber" CTA as the secondary (hairline) button instead of the
+   * gradient pill. For pages whose own hero CTA is the primary action — two filled
+   * pills on one screen leaves neither reading as the main one.
+   *
+   * Optional and defaulting to false, so every page that already renders <Navbar />
+   * keeps the gradient pill it has today.
+   *
+   * Distinct from `ctaSecondaryUntilScroll`, which is scroll-dependent: this one is
+   * secondary at every scroll position. Setting both makes this one win.
+   */
+  secondaryCta?: boolean;
 }
 
 const Navbar = ({
   links = DEFAULT_NAV_LINKS,
-  ctaLabel = "Try amber",
+  ctaLabel = "Visit amber",
   ctaHref = "/",
   ctaSecondaryUntilScroll = false,
+  secondaryCta = false,
 }: NavbarProps) => {
   // `true` when a dark-themed section is currently behind the header.
   const [onDark, setOnDark] = useState(false);
@@ -42,7 +59,7 @@ const Navbar = ({
 
   useEffect(() => {
     // Sections that opt into the dark header treatment are marked with the
-    // attribute data-nav-theme="dark" (see WhyAmberExists & CrewCTA sections).
+    // attribute data-nav-theme="dark" (see the CrewCTA section).
     const darkSections = Array.from(
       document.querySelectorAll<HTMLElement>('[data-nav-theme="dark"]'),
     );
@@ -88,7 +105,7 @@ const Navbar = ({
       >
         <Image
           src={onDark ? logoLight : logoDark}
-          alt="Amber"
+          alt="amber"
           className={styles.logo}
           width={100}
           height={24}
@@ -102,14 +119,27 @@ const Navbar = ({
             {link.label}
           </CustomLink>
         ))}
-        {/* Secondary-until-scroll: grey pill at the top of the page, pink primary
-            once scrolled. Without the flag the CTA is pink throughout. */}
+        {/*
+          Three CTA treatments, in precedence order:
+
+          - `secondaryCta` — always the hairline chip. The primary is a saturated
+            gradient pill that reads on either ground, so it needs no dark variant;
+            the hairline chip's ink and ring are both near-black, so it has to invert
+            with the bar — the same switch the logo above makes.
+          - `ctaSecondaryUntilScroll` — soft grey pill at the top of the page, pink
+            primary once scrolled.
+          - neither — pink primary throughout.
+        */}
         <CustomLink
           href={ctaHref}
-          className={`${styles.tryButton} ${
-            ctaSecondaryUntilScroll && !scrolled ? styles.tryButtonSecondary : ""
-          }`}
-          dataTestId="about-us-v2-try-amber"
+          className={
+            secondaryCta
+              ? `${styles.secondaryButton} ${onDark ? styles.secondaryButtonOnDark : ""}`
+              : `${styles.tryButton} ${
+                  ctaSecondaryUntilScroll && !scrolled ? styles.tryButtonSecondary : ""
+                }`
+          }
+          dataTestId="v2-navbar-cta"
         >
           {ctaLabel}
         </CustomLink>

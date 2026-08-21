@@ -4,6 +4,8 @@ import Reveal from "../../../AboutUsV2/components/Reveal/Reveal";
 // rules, so the two can't drift apart. It also carries the `color: #fff
 // !important` guard the site's global `a:hover` rule needs.
 import navStyles from "../../../AboutUsV2/components/Navbar/Navbar.module.scss";
+import InlineLottie from "../InlineLottie/InlineLottie";
+import graduationFees from "../../assets/lottie/graduation-fees.json";
 import styles from "./Hero.module.scss";
 import wrapperHOC from "@Utils/wrapperHOC";
 
@@ -14,6 +16,11 @@ import wrapperHOC from "@Utils/wrapperHOC";
  * It Works) rather than the design's own values, so all four pages share one
  * hero rhythm: 56px top padding, a centred 880px header block, 52px/56px title
  * and an 18px/1.5 subtitle 20px below it.
+ *
+ * The headline used to end on the figure — "deserves [mark] $50,000" — and now ends on
+ * "a big break", with the figure moved into the subtitle. The animated mark stays exactly
+ * where it was, between "deserves" and whatever follows, so its seating (see `.mark`'s
+ * negative vertical-align) is unaffected.
  */
 const Hero = () => (
   <section className={styles.hero}>
@@ -21,10 +28,22 @@ const Hero = () => (
       <Reveal as="h1" className={styles.title}>
         Because every big dream
         <br />
-        deserves <strong className={styles.amount}>$50,000</strong>
+        deserves
+        <span className={styles.mark}>
+          {/* 56px layout box, art scaled 2.2×. The comp's ink fills only 44% of its
+              canvas, so the multiplier does the real work; 2.2 sits the mark at
+              about the figure's own height rather than above it. The box stays 56
+              so the line box doesn't stretch. */}
+          <InlineLottie data={graduationFees} size={56} scale={2.2} delay={550} />
+        </span>
+        a big break
       </Reveal>
+      {/* "$50,000" moved DOWN here from the headline, where it used to be the phrase the
+          mark ran into. Emphasised rather than plain: it is the only number on the page and
+          the reason anyone reads the rest of the sentence. */}
       <Reveal as="p" className={styles.subtitle} delay={120}>
-        For dreamers with the hunger to chase something big.
+        Helping students chase big dreams with{" "}
+        <strong className={styles.amount}>$50,000</strong>.
       </Reveal>
     </div>
 

@@ -1,0 +1,149 @@
+// The Copilot input, docked over the hero photo.
+//
+// The pill's own metrics are amber-user-website's `CopilotContextualInput` verbatim — the 1px
+// gradient ring, the 48px inner, the 8px/14px padding, the 34px send button. What is new here is
+// only the DOCKING: that component floats near the viewport edge, this one sits on an image.
+.form {
+  // Positioned against the hero's media box, which sets `position: relative` for it.
+  bottom: 24px;
+  left: 50%;
+  position: absolute;
+  transform: translateX(-50%);
+  // Wide enough for a full question at 15px without running the width of a 1200px photo, where the
+  // send button would end up a hand's width from the caret.
+  width: min(560px, calc(100% - 48px));
+  // Above the image; the image is in flow with no z-index of its own.
+  z-index: 2;
+}
+
+// The gradient ring, drawn as 1px of padding behind a white pill rather than a border — a border
+// cannot carry a gradient, and `border-image` cannot follow a 999px radius.
+.ring {
+  background: linear-gradient(135deg, #ffab00 0%, #ff5771 50%, #ff33b1 100%);
+  border-radius: 999px;
+  padding: 1px;
+  // Heavier than the source's `floating` shadow (0 10px 30px / 0.16). This sits ON a photograph
+  // rather than on a page, so it needs more separation to read as above it and not printed on it.
+  box-shadow: 0 12px 34px rgba(20, 10, 30, 0.28);
+}
+
+.inner {
+  align-items: center;
+  background: #ffffff;
+  border-radius: 999px;
+  display: flex;
+  gap: 8px;
+  height: 48px;
+  // Asymmetric: the mark needs room from the edge, the round send button already carries its own.
+  padding: 0 8px 0 14px;
+  width: 100%;
+}
+
+.icon {
+  align-items: center;
+  display: flex;
+  flex-shrink: 0;
+}
+
+// `overflow: hidden` is what keeps a long typed suggestion from pushing the send button out — the
+// placeholder is absolutely positioned inside this, so it clips instead of growing the row.
+.field {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.input {
+  background: transparent;
+  border: none;
+  color: #1f2a37;
+  font-family: inherit;
+  font-size: 15px;
+  height: 100%;
+  outline: none;
+  width: 100%;
+}
+
+.placeholder {
+  align-items: center;
+  color: #6b7280;
+  display: flex;
+  font-size: 15px;
+  inset: 0;
+  overflow: hidden;
+  // The input underneath has to stay clickable through it.
+  pointer-events: none;
+  position: absolute;
+  white-space: nowrap;
+}
+
+// Sized in `em` so it tracks the placeholder's own type rather than needing a second number.
+.caret {
+  animation: caretBlink 1s step-end infinite;
+  background: #9ca3af;
+  display: inline-block;
+  height: 1.05em;
+  margin-left: 1.5px;
+  vertical-align: text-bottom;
+  width: 1.5px;
+}
+
+@keyframes caretBlink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+// Quiet until there is something to send, then it fills. That is the whole affordance: the button
+// is present from the start so the pill's proportions never change, but it only looks pressable
+// once pressing it would do something.
+.send {
+  align-items: center;
+  background: #f3f4f6;
+  border: none;
+  border-radius: 50%;
+  color: #6b7280;
+  cursor: pointer;
+  display: flex;
+  flex-shrink: 0;
+  height: 34px;
+  justify-content: center;
+  padding: 0;
+  transition: color 0.15s ease, background-color 0.15s ease;
+  width: 34px;
+
+  &:hover {
+    color: #111928;
+  }
+}
+
+.sendActive {
+  background: #1f2a37;
+  color: #ffffff;
+
+  &:hover {
+    background: #111928;
+    color: #ffffff;
+  }
+}
+
+@media (max-width: 900px) {
+  .form {
+    bottom: 16px;
+    width: calc(100% - 32px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caret {
+    animation: none;
+  }
+}

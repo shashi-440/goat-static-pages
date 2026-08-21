@@ -1,0 +1,269 @@
+// Shared primitives for the amber-connect product mock-ups that appear in the
+// bento (Your place is made for amber), the three-step section and the tools
+// tabs. Every mock in the Figma file is built from the same parts — a white
+// card, a mono breadcrumb, hairline rules, label/value rows, progress tracks and
+// pill badges — so they live here once instead of being redrawn per section.
+//
+// Two faces are in play and both are loaded by ListWithUs.tsx: Geist for prose,
+// Geist Mono for anything that reads as data.
+
+.bezel {
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid #fff;
+  border-radius: 16px;
+  padding: 8px;
+}
+
+.panel {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 12px;
+}
+
+.crumb {
+  align-items: center;
+  display: flex;
+  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  font-weight: 500;
+  justify-content: space-between;
+  letter-spacing: 0.6px;
+  // Explicit, not the inherited 1.4 — the design pins the crumb row to 13px.
+  line-height: 13px;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.crumbL {
+  color: #737373;
+}
+
+.crumbR {
+  color: #a3a3a3;
+}
+
+.rule {
+  background: #e5e5e5;
+  height: 1px;
+  width: 100%;
+}
+
+.row {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.label {
+  color: #737373;
+  font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 14px;
+  white-space: nowrap;
+}
+
+.value {
+  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.6px;
+  white-space: nowrap;
+}
+
+.valueInk {
+  color: #0a0a0a;
+}
+
+.valueBlue {
+  color: #0284c7;
+}
+
+.valueTeal {
+  color: #14b8a6;
+}
+
+.valueMuted {
+  color: #737373;
+}
+
+// Label + value + progress bar, stacked.
+.cmp {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.track {
+  background: #e5e5e5;
+  border-radius: 2px;
+  height: 3px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.bar {
+  border-radius: 2px;
+  height: 3px;
+}
+
+.barBlue {
+  background: #0284c7;
+}
+
+.barGrey {
+  background: #c9c9c9;
+}
+
+.barTeal {
+  background: #14b8a6;
+}
+
+.barViolet {
+  background: #8b5cf6;
+}
+
+// Headline figure block sitting under a mock panel.
+.stat {
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.statValue {
+  color: #0a0a0a;
+  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  line-height: 24px;
+  white-space: nowrap;
+}
+
+.delta {
+  align-items: center;
+  display: flex;
+  gap: 4px;
+}
+
+.deltaIcon {
+  height: 6px;
+  width: 7px;
+}
+
+.deltaUp {
+  color: #16a34a;
+}
+
+.deltaDown {
+  color: #dc2626;
+}
+
+.deltaValue {
+  font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 14px;
+}
+
+.deltaNote {
+  color: #a3a3a3;
+  font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 9px;
+  font-weight: 400;
+  line-height: 13px;
+  white-space: nowrap;
+}
+
+// Pill badges.
+.badge {
+  align-items: center;
+  border-radius: 6px;
+  display: flex;
+  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  line-height: 13px;
+  padding: 2px 6px;
+  white-space: nowrap;
+}
+
+.badgeGreen {
+  background: rgba(22, 163, 74, 0.1);
+  color: #16a34a;
+}
+
+.badgeBlue {
+  background: rgba(2, 132, 199, 0.1);
+  color: #0284c7;
+}
+
+.badgeGrey {
+  background: rgba(229, 229, 229, 0.5);
+  color: #737373;
+}
+
+// Two-line list entry: a bold name over a muted qualifier.
+.entry {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  white-space: nowrap;
+}
+
+.entryTitle {
+  color: #0a0a0a;
+  font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+}
+
+.entryNote {
+  color: #737373;
+  font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 14px;
+}
+
+.entryTag {
+  color: #0284c7;
+  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  line-height: 12px;
+}
+
+.thumb {
+  border-radius: 6px;
+  flex-shrink: 0;
+  height: 32px;
+  object-fit: cover;
+  width: 32px;
+}
+
+// Column headers above a mock table.
+.th {
+  align-items: center;
+  color: #a3a3a3;
+  display: flex;
+  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  font-weight: 500;
+  justify-content: space-between;
+  letter-spacing: 0.5px;
+  line-height: 13px;
+  white-space: nowrap;
+  width: 100%;
+}

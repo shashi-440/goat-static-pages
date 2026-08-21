@@ -1,0 +1,233 @@
+// Hero — centred stack on a blue gradient, white type, dark pill CTA, and the globe
+// below it running off the fold.
+//
+// This replaced a two-column layout (copy left, globe right) on a plain white ground.
+// Both the theme and the arrangement changed, so almost nothing here survived; the notes
+// below record the parts that are load-bearing rather than aesthetic.
+
+/* ------------------------------------------------------------------ ground */
+
+// Completely white. Nothing behind the content at all.
+//
+// Three things have been tried here and all are gone, so none gets re-derived from
+// scratch:
+//
+//   · A blue VERTICAL gradient. What made it work was ending the last stop on pure #fff,
+//     because the page below is white and any other final colour draws a visible horizontal
+//     seam across the full width.
+//   · An animated UNICORN STUDIO scene (project YpnYiGX14EMDAV3vaQCc) on their CDN. It ran
+//     fine, but the free tier tiles a "Unicorn" watermark across the whole hero, and it puts a
+//     second WebGL context in a viewport that already runs one for the globe.
+//   · A MESH of four large blurred colour fields drifting slowly across the white. The
+//     things that made that read as flowing rather than pulsing were mutually indivisible
+//     periods (29 / 37 / 43 / 53s) so the eye never finds the loop, and negative delays so
+//     they were not all starting together on load — which is the one moment anyone is
+//     looking at it. It was CSS rather than a canvas on purpose: this hero already runs a
+//     Mapbox WebGL context for the globe in the same viewport.
+//
+// No bottom padding: the globe is the last thing in the section and it is supposed to leave
+// through the bottom edge. Note `overflow` is NOT set here, and setting it would not clip
+// the globe anyway — that lives in a fixed layer (see GlobeTravel), and a fixed element
+// ignores an ancestor's overflow. Which is what this layout wants: the globe is meant to be
+// cut off by the FOLD, as in the reference, not by a container.
+.hero {
+  align-items: center;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  // 56px above the headline, down from 96. Measured, the hero was spending 96 + 28 + 36 + 72 =
+  // 232px on four gaps around ~150px of actual copy, so the content read as scattered across the
+  // fold rather than composed on it. Every one of the four came down; this is the largest cut
+  // because a top pad is the least load-bearing of them — the fixed header already separates the
+  // headline from the top of the window.
+  padding: 56px 24px 0;
+  position: relative;
+  width: 100%;
+}
+
+/* -------------------------------------------------------------------- copy */
+
+// Above the mesh, and no wider than the headline wants to be.
+.copy {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  max-width: 1000px;
+  position: relative;
+  width: 100%;
+  z-index: 1;
+}
+
+// 56px at the cap — the size this headline was at before the section was rearranged, and
+// the size the PAGE calls for: every h2 below it ("Your place is made for amber", "From
+// search to keys") is 44px, so an h1 belongs just above that. It was briefly 78px, taken
+// from the reference's scale, and at that size it ran to three lines and swamped everything
+// under it. A reference's type scale is only transferable along with its content, and this
+// headline is longer than that one's.
+//
+// `clamp` rather than a media-query ladder: this is the one element whose size should track
+// the viewport continuously, since a fixed value either wraps to four lines on a laptop or
+// looks timid on a wide display.
+.title {
+  color: #111928;
+  font-size: clamp(34px, 3.8vw, 56px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0;
+  text-align: center;
+}
+
+/* --------------------------------------------------------- avatar cluster */
+
+// Sits inline in the headline. Sized in `em` so the cluster tracks `clamp()` with the
+// type — at a fixed 44px it was a third of the cap height at the largest step and read as
+// three dots someone had dropped into the line.
+.avatars {
+  display: inline-flex;
+  margin: 0 0.1em;
+  vertical-align: baseline;
+}
+
+.avatar {
+  // White ring, on white — it is what keeps the three faces reading as separate discs where
+  // they overlap, not a border against the background.
+  border: 0.04em solid #fff;
+  border-radius: 999px;
+  display: block;
+  flex-shrink: 0;
+  height: 0.72em;
+  overflow: hidden;
+  position: relative;
+  width: 0.72em;
+
+  & + & {
+    margin-left: -0.3em;
+  }
+}
+
+// Position and size come from the node's own per-avatar crop (set inline).
+.avatarImage {
+  max-width: none;
+  position: absolute;
+}
+
+/* ---------------------------------------------------------- lede + CTA */
+
+// The two gaps inside the copy block, tightened together: 20px from the headline to the subtitle
+// and 26px from the subtitle to the CTA (from 28 and 36).
+//
+// The ratio matters more than either number. The gap BELOW the subtitle has to stay larger than the
+// one above it, or the subtitle detaches from the headline it belongs to and joins the button.
+.lede {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  margin-top: 20px;
+}
+
+// Back to ink now the ground is white. It was white-at-88% while the section carried a
+// gradient, because on a coloured ground a grey subtitle turns muddy.
+//
+// `strong` is kept styled but unused: the reference emphasises figures across three
+// authored lines, which was tried here and reverted, because restructuring the copy was not
+// part of changing the layout.
+.subtitle {
+  color: #4b5563;
+  // 16px — the original size. It was briefly 18px, for no reason beyond the reference.
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 46ch;
+  text-align: center;
+
+  strong {
+    color: #111928;
+    font-weight: 600;
+  }
+}
+
+// Unchanged from the original, and deliberately so — colour, size, padding, transition and
+// hover are all exactly as they were before this section was rearranged.
+//
+// Three things were changed here against the reference and all three were wrong. Near-black
+// fill: #1c64f2 is the CTA colour on the navbar button sitting in this same viewport and on
+// every other CTA down the page, so a black pill meant two CTA colours on one screen.
+// 16px type and 17px padding: this button's proportions are a site-wide style, so scaling it
+// up here alone makes this page's primary action a different size from every other page's.
+// And a hover lift, which nothing else on the site does.
+//
+// Rearranging a section is not a licence to restyle what is inside it.
+//
+// `!important` on colour: the site's global `a:hover/active/focus` rule turns link text red
+// otherwise.
+.cta {
+  align-items: center;
+  background: #1c64f2;
+  border-radius: 999px;
+  color: #fff !important;
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 600;
+  justify-content: center;
+  line-height: 1.25;
+  padding: 11px 32px;
+  text-decoration: none;
+  transition: background 0.2s ease;
+  white-space: nowrap;
+
+  &:hover,
+  &:active,
+  &:focus {
+    background: #1550c9;
+    color: #fff !important;
+  }
+}
+
+/* ------------------------------------------------------------------ globe */
+
+// Reserves the globe's space. The globe itself is the fixed layer in GlobeTravel, which
+// parks over this box; this is layout only and deliberately empty.
+//
+// This slot is the LARGEST the globe is ever drawn and GlobeTravel sizes its single canvas
+// from it, so every other section's pose scales DOWN from here — a downscale stays sharp
+// where an upscale would resample the canvas to mush. Enlarging this value is safe;
+// the per-step poses in WhyPartners.tsx are expressed as fractions of it, so changing it
+// means re-deriving those.
+// 40px under the CTA, down from 72.
+//
+// It can be this tight because the globe is a SPHERE: its artwork stops well short of its own
+// square box on every side, so there is already empty space above it that no margin has to
+// provide. At 72 the gap was being paid twice.
+.stage {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+  width: 100%;
+}
+
+.globeSlot {
+  --lwu-globe-size: clamp(300px, 48vw, 720px);
+
+  aspect-ratio: 1 / 1;
+  width: var(--lwu-globe-size);
+}
+
+/* -------------------------------------------------------------- responsive */
+
+@media (max-width: 900px) {
+  .hero {
+    padding: 44px 20px 0;
+  }
+
+  .lede {
+    gap: 22px;
+    margin-top: 16px;
+  }
+
+  .stage {
+    margin-top: 28px;
+  }
+}

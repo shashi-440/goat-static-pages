@@ -1,0 +1,134 @@
+.section {
+  align-items: center;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 96px 80px;
+  width: 100%;
+}
+
+.card {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  height: 440px;
+  max-width: 1280px;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.image {
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  position: absolute;
+  width: 100%;
+}
+
+// The shared Image fades and scales its photo in once it loads; this one is a
+// backdrop and should just be there. Written as a descendant so it outranks
+// that component's own class without !important, and only the animation is
+// overridden — the opacity it uses to hide an unloaded source is left alone, so
+// the element stays hidden until it actually has a photo to show. Done here
+// rather than with isNotLazy because at ~420KB this is worth keeping lazy.
+.card .image {
+  transform: none;
+  transition: none;
+}
+
+.tint {
+  background: rgba(8, 10, 15, 0.2);
+  inset: 0;
+  position: absolute;
+}
+
+// Holds the left third dark so the white copy stays legible over the skyline.
+.scrim {
+  background-image: linear-gradient(
+    90deg,
+    rgba(5, 8, 13, 0.8) 0%,
+    rgba(5, 8, 13, 0.48) 42%,
+    rgba(5, 8, 13, 0.14) 78%,
+    rgba(5, 8, 13, 0.04) 100%
+  );
+  inset: 0;
+  position: absolute;
+}
+
+.scrimBottom {
+  background-image: linear-gradient(
+    180deg,
+    rgba(5, 8, 13, 0) 0%,
+    rgba(5, 8, 13, 0.34) 42%,
+    rgba(5, 8, 13, 0.72) 100%
+  );
+  bottom: 0;
+  height: 190px;
+  left: 0;
+  position: absolute;
+  right: 0;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  inset: 0;
+  justify-content: flex-end;
+  padding: 56px;
+  position: absolute;
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.heading {
+  color: #fff;
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -1px;
+  line-height: 48px;
+  margin: 0;
+}
+
+.sub {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  margin: 0;
+}
+
+// White pill with ink text — the inverse of the hero CTA. `!important` guards
+// against the site's global `a:hover` colour rule.
+.button {
+  align-items: center;
+  align-self: flex-start;
+  background: #fff;
+  border-radius: 999px;
+  color: #111928 !important;
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 600;
+  justify-content: center;
+  line-height: 1.25;
+  padding: 11px 32px;
+  text-decoration: none;
+  transition: background 0.2s ease;
+  white-space: nowrap;
+
+  &:hover,
+  &:active,
+  &:focus {
+    background: #f1f1f1;
+    color: #111928 !important;
+  }
+}

@@ -1,0 +1,184 @@
+// Chip size, and the rail's own width. The rail is centred on the chip, so half the
+// chip is the rail's left offset.
+//
+// 28px on an 8px radius, matching HowItWorksV2 and ScholarshipV2 — this started as a
+// 32px circle, which made the same device look like a different one across the three
+// pages.
+$chip: 28px;
+$chip-radius: 8px;
+$rail-width: 2px;
+// Gap between the chip and the copy beside it.
+$chip-gutter: 24px;
+
+// ── Ground ─────────────────────────────────────────────────────────────────────
+// GREY, and light. This band was graphite — a near-black body with a cool specular
+// wash falling in from the top-right — and a black stripe between a white hero and a
+// white footer was the heaviest thing on the page by a distance.
+//
+// Grey also puts this stepper back where it started: it is HowItWorksV2's component,
+// inverted for the dark ground when it came over. Every value below is now that
+// page's own again (#111928 ink, #e5e7eb track, white chips), so the same device
+// reads the same way on both pages.
+//
+// The whole palette is these five values. To go back to a dark band, invert them
+// here and restore `data-nav-theme="dark"` on the section in Steps.tsx — the shared
+// navbar reads that attribute to swap to its light logo, and without it a dark band
+// would sit behind dark header type.
+$ground: #f7f8f9;
+$ink: #111928;
+$ink-dim: #6b7280;
+$track: #e5e7eb;
+$slot: #ededf0;
+
+.section {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  // Matches the hero's 80px side padding so both sections share one content edge.
+  // Deep vertical padding is doing most of the work on "spacing": the band is only a
+  // shade off the hero's white, so the air around the content is what separates the
+  // two sections rather than the contrast between them.
+  padding: 120px 80px 128px;
+  width: 100%;
+  background: $ground;
+}
+
+// 48, up from the 40 this stepper uses on How It Works: it is the section's only
+// large type, and it has a much taller band to hold. Centres and constrains itself.
+.heading {
+  color: $ink;
+  font-size: 48px;
+  font-weight: 550;
+  letter-spacing: -1.1px;
+  line-height: 56px;
+  margin: 0;
+  max-width: 900px;
+  text-align: center;
+}
+
+// Media left, stepper right. Held under the page's 1280 column: two columns of
+// this content at full width leave the copy running to an uncomfortable measure.
+.layout {
+  align-items: center;
+  display: grid;
+  gap: 80px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  margin-top: 72px;
+  max-width: 1120px;
+  width: 100%;
+}
+
+// PLACEHOLDER — the reserved media area. A barely-there tint and hairline rather
+// than an obvious dashed box: it should read as a quiet empty frame in a review,
+// not as a broken image. Replace with the media itself; the aspect ratio is what
+// holds the column's height.
+.mediaSlot {
+  aspect-ratio: 4 / 3;
+  border-radius: 20px;
+  // A step DOWN from the ground, not up: on a light band the empty frame has to be
+  // the darker of the two or it disappears into the section.
+  background: $slot;
+  box-shadow: inset 0 0 0 1px rgba(17, 25, 40, 0.06);
+  width: 100%;
+}
+
+.rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  width: 100%;
+}
+
+// Connector rail, centred on the chips. The effect narrows top/height to
+// chip-1 → chip-3 centres; the `top: 0; bottom: 0` default means the track still
+// connects the chips if that script never runs.
+.rail {
+  background: $track;
+  border-radius: 999px;
+  bottom: 0;
+  left: calc(#{$chip * 0.5} - #{$rail-width * 0.5});
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  width: $rail-width;
+}
+
+// The progress fill: near-black on the grey track. scaleY from the top is
+// compositor-friendly, so the scroll handler never triggers layout. Starts at 0:
+// without JS only the track shows, which is still a connected line.
+.railFill {
+  background: $ink;
+  display: block;
+  height: 100%;
+  transform: scaleY(0);
+  transform-origin: top center;
+  width: 100%;
+}
+
+// Chip in the gutter, copy indented past it. The chip is lifted out of the flow so
+// it sits on the rail beside the title rather than above it.
+.row {
+  padding-left: calc(#{$chip} + #{$chip-gutter});
+  position: relative;
+
+  & + .row {
+    margin-top: 44px;
+  }
+}
+
+// Opaque fill so the rail reads as passing behind it; it paints after the rail, so
+// no z-index is needed.
+.marker {
+  align-items: center;
+  // White, not the ground's grey: the chip has to be opaque so the rail reads as
+  // passing behind it, and a chip in the ground's own colour reads as a hole.
+  background: #fff;
+  border-radius: $chip-radius;
+  box-shadow: inset 0 0 0 1.5px rgba(17, 25, 40, 0.14);
+  color: $ink-dim;
+  display: flex;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  height: $chip;
+  justify-content: center;
+  left: 0;
+  position: absolute;
+  // Centres the chip on the title's first line rather than its box: (30px line −
+  // 28px chip) / 2.
+  top: 1px;
+  width: $chip;
+  transition: background 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+}
+
+// Reached: the chip fills to match the rail's bright fill, so the numbers read as
+// completed rather than staying uniform while the line moves past them.
+.markerActive {
+  background: $ink;
+  box-shadow: inset 0 0 0 1.5px $ink;
+  color: #fff;
+}
+
+.title {
+  color: $ink;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  line-height: 30px;
+  margin: 0;
+}
+
+.body {
+  color: $ink-dim;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 26px;
+  margin: 8px 0 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marker {
+    transition: none;
+  }
+}

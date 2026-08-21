@@ -56,7 +56,21 @@ const config: RspackOptions = {
           },
         },
         {
-          from: "src/pages/**/assets/*.*",
+          // Videos only, NOT `*.*`.
+          //
+          // base.config's asset rule already emits png|svg|jpe?g|gif as hashed files
+          // for anything a page imports, which is every image here. Copying `*.*` as
+          // well emitted a second, unhashed copy of all of them — ~16MB of duplicate
+          // bytes in the build output, none of it referenced.
+          //
+          // mp4 is the exception the loader does not match, and two pages point at
+          // one by literal URL (HowItWorksV2 Steps, GroupBookingV2Alt Hero), so those
+          // still have to be copied. Lottie JSON does not: it is imported, so it ends
+          // up inside the bundle.
+          //
+          // If a page ever needs another by-URL asset type, widen this glob to that
+          // extension rather than back to `*.*`.
+          from: "src/pages/**/assets/*.mp4",
           noErrorOnMissing: true,
           to({ absoluteFilename }: any) {
             return `../assets/images/pages/${absoluteFilename.split("src/pages/")[1]}`;
