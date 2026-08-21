@@ -22,8 +22,20 @@ const getPlugins = () => {
   return plugins;
 };
 
+// `reload=true` is deliberately NOT set.
+//
+// With it, any HMR update the runtime cannot apply becomes a full page reload.
+// `lottie-web` is pulled in by a dynamic `import()` inside LottieIcon, and the
+// hot runtime reports it back with an undefined module id — an update it can
+// never apply — so every sync forced a reload and the page refreshed in a loop.
+//
+// `noEmitOnErrors` keeps the older behaviour of not tearing the page down on a
+// failed build; without `reload` a stale module simply stays until the next
+// successful hot update or a manual refresh.
 const getEntry = () =>
-  isDev ? ["webpack-hot-middleware/client?reload=true", "./src/client"] : "./src/client";
+  isDev
+    ? ["webpack-hot-middleware/client?noEmitOnErrors=true", "./src/client"]
+    : "./src/client";
 
 const config: RspackOptions = {
   devtool: isDev ? "eval-cheap-source-map" : "source-map",

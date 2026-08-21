@@ -4,8 +4,10 @@
   "private": true,
   "description": "Standalone SSR sandbox for v2 static page designs, mirroring the amber-user-website build pipeline.",
   "scripts": {
-    "dev": "yarn dev:build && cross-env LOCAL_PORT=3005 DEVICE=desktop nodemon ./public/server",
-    "dev:build": "cross-env NODE_ENV=development DEVICE=desktop LOCAL_PORT=3005 rspack build --config ./webpack/server.config.ts",
+    "dev": "run-s dev:build && cross-env LOCAL_PORT=3005 DEVICE=desktop nodemon ./public/server",
+    "dev:build": "run-s dev:build:server dev:build:client",
+    "dev:build:server": "cross-env NODE_ENV=development DEVICE=desktop LOCAL_PORT=3005 rspack build --config ./webpack/server.config.ts",
+    "dev:build:client": "cross-env NODE_ENV=development DEVICE=desktop LOCAL_PORT=3005 rspack build --config ./webpack/client.config.ts",
     "build": "run-s build:server build:client",
     "build:server": "cross-env NODE_ENV=production DEVICE=desktop rspack build --config ./webpack/server.config.ts",
     "build:client": "cross-env NODE_ENV=production DEVICE=desktop rspack build --config ./webpack/client.config.ts",
@@ -40,7 +42,8 @@
     "react-router-config": "^5.1.1",
     "react-router-dom": "^5.2.0",
     "serialize-javascript": "^6.0.0",
-    "source-map-support": "^0.5.19"
+    "source-map-support": "^0.5.19",
+    "vercel": "^58.7.1"
   },
   "devDependencies": {
     "@babel/core": "^7.14.6",

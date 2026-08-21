@@ -1,0 +1,13 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "yarn install --frozen-lockfile",
+  "buildCommand": "yarn build",
+  "framework": null,
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "public/**",
+      "maxDuration": 30
+    }
+  },
+  "rewrites": [{ "source": "/(.*)", "destination": "/api/index" }]
+}

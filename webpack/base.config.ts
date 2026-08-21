@@ -70,14 +70,28 @@ const getStyleLoaders = (isWeb: boolean, isSass?: boolean) => {
 const getFileName = (filePath: string): string =>
   isDesktop ? `${filePath}-desktop.json` : `${filePath}.json`;
 
+/**
+ * The client and server builds each emit their own manifests, so the two must not
+ * share a filename. They used to: both wrote `loadable-stats-desktop.json`, and
+ * because `yarn dev` runs the server build last, the server's copy — which lists
+ * no CSS, since that bundle only renders HTML — overwrote the client's. SSR then
+ * looked up the page's stylesheets, found none, and served every page unstyled.
+ *
+ * Only the client manifest describes anything SSR needs, so it keeps the original
+ * name that `src/server/ssr.tsx` reads. The server build's copy is suffixed and
+ * written purely as a build artefact; nothing loads it.
+ */
 const getPlugins = (isWeb: boolean) => [
   new RspackManifestPlugin({
-    fileName: path.resolve(process.cwd(), getFileName("public/webpack-assets")),
+    fileName: path.resolve(
+      process.cwd(),
+      getFileName(isWeb ? "public/webpack-assets" : "public/webpack-assets-ssr"),
+    ),
     filter: (file: any) => file.isInitial,
   }),
   new LoadablePlugin({
     writeToDisk: true,
-    filename: getFileName("../loadable-stats"),
+    filename: getFileName(isWeb ? "../loadable-stats" : "../loadable-stats-ssr"),
   }),
   new rspack.DefinePlugin({
     __CLIENT__: isWeb,

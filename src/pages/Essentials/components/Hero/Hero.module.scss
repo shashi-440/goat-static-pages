@@ -1,0 +1,503 @@
+.section {
+  background: #fff;
+  padding: 56px var(--page-gutter) 0;
+  width: 100%;
+}
+
+.inner {
+  margin: 0 auto;
+  max-width: 1280px;
+  width: 100%;
+}
+
+// 52px/550 is the v2 page-title treatment (AboutUsV2, CareerFinal). The mockup's
+// 26px centred-on-gradient hero was sized for a screenshot frame, not a live page.
+.title {
+  color: $neutral9;
+  font-size: 52px;
+  font-weight: 550;
+  letter-spacing: -1.04px;
+  line-height: 56px;
+  margin: 0 0 32px;
+  text-align: center;
+}
+
+/* ---------------------------------------------------------------- services */
+
+// Six services on one row, each an equal track so the labels stay evenly spaced.
+.services {
+  border-bottom: 1px solid $neutral2;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(6, 1fr);
+  margin-bottom: 40px;
+  width: 100%;
+}
+
+.service {
+  align-items: center;
+  color: $neutral6;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 0 14px;
+  position: relative;
+  text-decoration: none;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: $neutral9;
+  }
+}
+
+// Tinted tile holding the line icon, which inherits the link's own colour.
+.serviceIcon {
+  align-items: center;
+  background: $neutral1;
+  border-radius: $radiussm;
+  display: flex;
+  height: 40px;
+  justify-content: center;
+  transition: background 0.2s ease, color 0.2s ease;
+  width: 40px;
+
+  svg {
+    height: 22px;
+    width: 22px;
+  }
+}
+
+.serviceLabel {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  text-align: center;
+}
+
+// Current service: pink underline sitting on the row's own bottom border.
+.serviceOn {
+  color: $primary5;
+
+  .serviceLabel {
+    font-weight: 600;
+  }
+
+  .serviceIcon {
+    background: $primary0;
+  }
+
+  &::after {
+    background: $primary5;
+    border-radius: 3px 3px 0 0;
+    bottom: -1px;
+    content: "";
+    height: 3px;
+    left: 20%;
+    position: absolute;
+    right: 20%;
+  }
+}
+
+/* -------------------------------------------------------------------- card */
+
+// Rail + shop. The rail is a fixed 400px so the kit tracks take the remainder;
+// below 1100px the two stack (see the breakpoint at the end of the file).
+.card {
+  border: 1px solid $neutral2;
+  border-radius: $radiusxl;
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  overflow: hidden;
+}
+
+/* -------------------------------------------------------------------- rail */
+
+.pitch {
+  border-right: 1px solid $neutral2;
+  display: flex;
+  flex-direction: column;
+  padding: 36px 32px;
+}
+
+.pitchTitle {
+  color: $neutral9;
+  font-size: 32px;
+  font-weight: 550;
+  letter-spacing: -0.64px;
+  line-height: 38px;
+  margin: 0;
+}
+
+.pitchBody {
+  color: $neutral6;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  margin: 16px 0 0;
+}
+
+// The confirmed booking, called out on the neutral tint.
+.booking {
+  background: $neutral0;
+  border: 1px solid $neutral2;
+  border-radius: $radiusmd;
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  padding: 16px;
+}
+
+.avatar {
+  align-items: center;
+  background: $primary0;
+  border-radius: 50%;
+  color: $primary6;
+  display: flex;
+  flex: 0 0 40px;
+  font-size: 16px;
+  font-weight: 600;
+  height: 40px;
+  justify-content: center;
+  width: 40px;
+}
+
+.bookingText {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.bookingLine {
+  color: $neutral9;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.15px;
+  line-height: 21px;
+}
+
+.bookingSub {
+  color: $neutral6;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 19px;
+}
+
+// `margin-top: auto` pins the trust block to the bottom of the rail, so it lines
+// up with the kit footers regardless of how tall the copy above runs.
+.trust {
+  border-top: 1px solid $neutral2;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 24px;
+}
+
+.trustRating {
+  align-items: center;
+  color: $neutral9;
+  display: flex;
+  font-size: 15px;
+  font-weight: 600;
+  gap: 6px;
+  letter-spacing: -0.15px;
+}
+
+.trustLine {
+  color: $neutral6;
+  font-size: 13px;
+  line-height: 19px;
+}
+
+.star {
+  color: $warning4;
+  flex: 0 0 16px;
+  height: 16px;
+  width: 16px;
+}
+
+/* -------------------------------------------------------------------- kits */
+
+.shop {
+  background: $neutral0;
+  padding: 24px;
+}
+
+.kits {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.kit {
+  background: #fff;
+  border: 1px solid $neutral2;
+  border-radius: $radiuslg;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    border-color: $neutral3;
+    box-shadow: #{$shadowsmd};
+    transform: translateY(-2px);
+  }
+}
+
+// The matched kit. Pink border and a tinted shadow, matching how the v2 pages
+// mark a primary choice.
+.kitRecommended {
+  border-color: $primary5;
+  box-shadow: 0 8px 22px rgba(243, 18, 60, 0.12);
+
+  &:hover {
+    border-color: $primary6;
+    box-shadow: 0 12px 28px rgba(243, 18, 60, 0.18);
+  }
+}
+
+.flag {
+  background: $primary5;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.55px;
+  line-height: 28px;
+  margin: 0;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+// Keeps the unflagged kits' images level with the flagged one.
+.flagSpacer {
+  background: $neutral0;
+  border-bottom: 1px solid $neutral2;
+  display: block;
+  height: 28px;
+}
+
+.kitImage {
+  border-bottom: 1px solid $neutral2;
+  height: 150px;
+  overflow: hidden;
+  width: 100%;
+
+  img {
+    height: 100%;
+    object-fit: cover;
+    // Sits the crop slightly low: the boxes are bottom-weighted in all three
+    // photos, and centring cut the amber wordmark off.
+    object-position: center 46%;
+    width: 100%;
+  }
+}
+
+.kitBody {
+  flex: 1;
+  padding: 16px 16px 4px;
+}
+
+.kitHead {
+  align-items: baseline;
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.kitName {
+  color: $neutral9;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.36px;
+  line-height: 24px;
+  margin: 0;
+}
+
+.kitRating {
+  align-items: center;
+  color: $neutral9;
+  display: flex;
+  font-size: 12px;
+  font-weight: 600;
+  gap: 3px;
+  white-space: nowrap;
+}
+
+.kitReviews {
+  color: $neutral5;
+  font-weight: 400;
+}
+
+.itemCount {
+  color: $neutral9;
+  font-size: 12px;
+  font-weight: 600;
+  margin: 14px 0 10px;
+}
+
+.contents {
+  display: grid;
+  gap: 8px 6px;
+  grid-template-columns: 1fr 1fr;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.content {
+  align-items: center;
+  color: $neutral6;
+  display: flex;
+  font-size: 12px;
+  gap: 6px;
+  line-height: 16px;
+}
+
+.contentDot {
+  background: $primary0;
+  border-radius: $radiusxs;
+  flex: 0 0 14px;
+  height: 14px;
+  width: 14px;
+}
+
+// `margin-top: auto` holds the footer at the card bottom so the three CTAs stay
+// on one line even when the kits list different numbers of categories.
+.kitFoot {
+  border-top: 1px solid $neutral2;
+  margin-top: auto;
+  padding: 14px 16px 16px;
+}
+
+.priceRow {
+  align-items: baseline;
+  display: flex;
+  gap: 8px;
+  margin: 0 0 14px;
+}
+
+.priceWas {
+  color: $neutral5;
+  font-size: 13px;
+  text-decoration: line-through;
+}
+
+.priceOff {
+  background: $secondary1;
+  border-radius: $radiusxs;
+  color: $secondary6;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+}
+
+// Pushed to the right edge of the row, away from the struck-through price.
+.priceNow {
+  color: $neutral9;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.44px;
+  margin-left: auto;
+}
+
+.button {
+  border: 1.5px solid $primary5;
+  border-radius: $radiussm;
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 0;
+  text-align: center;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  width: 100%;
+}
+
+.buttonPrimary {
+  background: $primary5;
+  color: #fff;
+
+  &:hover {
+    background: $primary6;
+    border-color: $primary6;
+  }
+}
+
+.buttonGhost {
+  background: #fff;
+  color: $primary5;
+
+  &:hover {
+    background: $primary0;
+  }
+}
+
+/* ------------------------------------------------------------- responsive */
+
+// Below 1100px the rail can no longer sit beside three kit tracks without the
+// cards getting too narrow to read, so it moves above them.
+@media (max-width: 1100px) {
+  .card {
+    grid-template-columns: 1fr;
+  }
+
+  .pitch {
+    border-bottom: 1px solid $neutral2;
+    border-right: 0;
+  }
+
+  .trust {
+    margin-top: 24px;
+  }
+}
+
+@media (max-width: 900px) {
+  .title {
+    font-size: 40px;
+    letter-spacing: -0.8px;
+    line-height: 46px;
+  }
+
+  // Six services no longer fit on one row; scroll them horizontally instead of
+  // letting the labels wrap and the icons drift out of line.
+  .services {
+    display: flex;
+    overflow-x: auto;
+    @include scrollbar-hide;
+  }
+
+  .service {
+    flex: 0 0 104px;
+  }
+
+  .kits {
+    grid-template-columns: 1fr;
+  }
+
+  .kitImage {
+    height: 180px;
+  }
+}
+
+@media (max-width: 600px) {
+  .title {
+    font-size: 32px;
+    letter-spacing: -0.64px;
+    line-height: 38px;
+  }
+
+  .pitch {
+    padding: 28px 20px;
+  }
+
+  .pitchTitle {
+    font-size: 26px;
+    line-height: 32px;
+  }
+
+  .shop {
+    padding: 16px;
+  }
+}

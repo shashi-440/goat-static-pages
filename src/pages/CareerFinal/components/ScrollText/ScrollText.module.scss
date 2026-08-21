@@ -1,0 +1,36 @@
+.text {
+  // Endpoints of the read-along ramp. `--dim` is the not-yet-read state; the
+  // consuming section can override both to match its own palette.
+  --dim: #{$neutral3};
+  --full: #{$neutral8};
+}
+
+.word {
+  // --lit runs 0 (unread) → 1 (read), set per-word by ScrollText.tsx.
+  --lit: 1;
+
+  // color-mix interpolates the two endpoints, so a word is genuinely part-lit
+  // mid-scroll rather than switching between two states.
+  color: color-mix(in srgb, var(--full) calc(var(--lit) * 100%), var(--dim));
+  // Short transition smooths the per-frame steps without lagging the scroll.
+  transition: color 0.18s linear;
+  // Keep words as inline text so they wrap and justify exactly as plain copy.
+  white-space: pre-wrap;
+}
+
+// color-mix is well supported, but fall back to opacity where it is not so the
+// effect degrades to a fade rather than disappearing.
+@supports not (color: color-mix(in srgb, red 50%, blue)) {
+  .word {
+    color: var(--full);
+    opacity: calc(0.35 + var(--lit) * 0.65);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .word {
+    color: var(--full);
+    opacity: 1;
+    transition: none;
+  }
+}

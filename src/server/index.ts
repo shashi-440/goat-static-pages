@@ -31,9 +31,23 @@ app.get("*", (req, res) => {
   void ssr(req, res);
 });
 
-app.listen(config.PORT, config.HOST, () => {
-  console.info(chalk.green(`==> ✅  Server started on ${config.HOST}:${config.PORT}`));
-  console.info(chalk.cyan(`==> 🚀  http://${config.HOST}:${config.PORT}/about-us-v2`));
-});
+// Only bind a port when this process owns one. A serverless host (Vercel and
+// friends) imports the app and handles the listening itself, so calling listen()
+// at module load would try to bind inside an environment that forbids it — the
+// import fails and every request 500s. `VERCEL` is set by the platform.
+//
+// Host/port come from the platform when it provides them: PORT is the standard
+// env var, and binding must be 0.0.0.0 rather than localhost or the container
+// accepts no external traffic. Local dev is unchanged — LOCAL_PORT and localhost
+// still apply when nothing else is set.
+if (!process.env.VERCEL) {
+  const port = Number(process.env.PORT) || config.PORT;
+  const host = process.env.HOST || (process.env.PORT ? "0.0.0.0" : config.HOST);
+
+  app.listen(port, host, () => {
+    console.info(chalk.green(`==> ✅  Server started on ${host}:${port}`));
+    console.info(chalk.cyan(`==> 🚀  http://${host}:${port}/about-us-v2`));
+  });
+}
 
 export default app;

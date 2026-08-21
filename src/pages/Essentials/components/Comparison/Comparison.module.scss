@@ -1,0 +1,252 @@
+.section {
+  background: #fff;
+  padding: 96px var(--page-gutter) 96px;
+  width: 100%;
+}
+
+.inner {
+  margin: 0 auto;
+  max-width: 1280px;
+  width: 100%;
+}
+
+.title {
+  color: $neutral9;
+  font-size: 40px;
+  font-weight: 550;
+  letter-spacing: -0.8px;
+  line-height: 46px;
+  margin: 0;
+}
+
+.subtitle {
+  color: $neutral6;
+  font-size: 18px;
+  line-height: 26px;
+  margin: 12px 0 0;
+}
+
+/* -------------------------------------------------------------- photo band */
+
+.band {
+  border-radius: $radiusxl;
+  height: 320px;
+  margin-top: 32px;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+
+  // Darkens the lower third so the caption stays legible over the photo.
+  &::after {
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.62) 100%);
+    bottom: 0;
+    content: "";
+    height: 140px;
+    left: 0;
+    position: absolute;
+    right: 0;
+  }
+}
+
+.bandImage {
+  height: 100%;
+  object-fit: cover;
+  // The subject's face and raised hands sit near the top of the source frame, so
+  // the crop is pinned to the top edge; any downward bias clipped her head at
+  // this band height.
+  object-position: center top;
+  width: 100%;
+}
+
+.caption {
+  bottom: 24px;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 600;
+  left: 28px;
+  letter-spacing: -0.4px;
+  margin: 0;
+  position: absolute;
+  z-index: 2;
+}
+
+/* ----------------------------------------------------------------- columns */
+
+.columns {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 24px;
+}
+
+.column {
+  border-radius: $radiuslg;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.columnWithout {
+  background: $neutral0;
+  border: 1px solid $neutral2;
+}
+
+.columnWith {
+  background: #fff;
+  border: 1px solid $primary5;
+  box-shadow: 0 10px 26px rgba(243, 18, 60, 0.1);
+}
+
+.columnHead {
+  align-items: center;
+  display: flex;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.91px;
+  margin: 0;
+  min-height: 52px;
+  padding: 0 24px;
+  text-transform: uppercase;
+
+  .columnWithout & {
+    background: $neutral1;
+    color: $neutral5;
+  }
+
+  .columnWith & {
+    background: $primary5;
+    color: #fff;
+  }
+}
+
+// Three equal rows in both columns, so the pairs line up across the gap even
+// though the "with" copy is shorter than the "without" copy.
+.rows {
+  display: grid;
+  flex: 1;
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0 24px;
+}
+
+.row {
+  align-items: center;
+  border-bottom: 1px solid $neutral2;
+  display: flex;
+  gap: 16px;
+  min-height: 84px;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+.cross {
+  align-items: center;
+  background: $neutral2;
+  border-radius: 50%;
+  color: $neutral5;
+  display: flex;
+  flex: 0 0 28px;
+  height: 28px;
+  justify-content: center;
+  width: 28px;
+
+  svg {
+    height: 16px;
+    width: 16px;
+  }
+}
+
+// Drives the inlined illustrations in icons.tsx. They were authored with a pink
+// fill on black line work; mapping them to tokens here keeps them on-palette.
+.icon {
+  --icon-accent: #{$primary1};
+  --icon-line: #{$neutral9};
+  --icon-bg: #fff;
+
+  align-items: center;
+  display: flex;
+  flex: 0 0 40px;
+
+  svg {
+    height: 38px;
+    width: 38px;
+  }
+}
+
+.rowTextWithout {
+  color: $neutral6;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 22px;
+  margin: 0;
+}
+
+.rowTextWith {
+  color: $neutral9;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.34px;
+  line-height: 23px;
+  margin: 0;
+}
+
+/* ------------------------------------------------------------- responsive */
+
+@media (max-width: 900px) {
+  .section {
+    padding: 64px var(--page-gutter);
+  }
+
+  .title {
+    font-size: 32px;
+    letter-spacing: -0.64px;
+    line-height: 38px;
+  }
+
+  .band {
+    height: 220px;
+  }
+
+  .caption {
+    bottom: 16px;
+    font-size: 17px;
+    left: 20px;
+  }
+
+  // Stacked, so "without" reads directly above "with" rather than beside it.
+  .columns {
+    grid-template-columns: 1fr;
+  }
+
+  // The equal-thirds grid only earns its keep while the columns sit side by side
+  // and have to align; stacked, it just pads short rows out.
+  .rows {
+    display: block;
+    padding: 0 20px;
+  }
+
+  .row {
+    min-height: 0;
+    padding: 18px 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .title {
+    font-size: 27px;
+    letter-spacing: -0.54px;
+    line-height: 33px;
+  }
+
+  .subtitle {
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  .band {
+    height: 180px;
+  }
+}

@@ -20,7 +20,19 @@ const config: RspackOptions = {
   externals: [
     "@loadable/component",
     nodeExternals({
-      allowlist: [/\.(?!(?:jsx?|json)$).{1,5}$/i],
+      allowlist: [
+        /\.(?!(?:jsx?|json)$).{1,5}$/i,
+        // `cobe` and its dependency `phenomenon` are both ESM-only ("type":
+        // "module"). Left external they are `require()`d at runtime, which Node
+        // refuses for ESM — fine under a lenient local run, fatal on a stricter
+        // host (Vercel returns `require() of ES Module ... not supported` and the
+        // page 500s). Bundling them sidesteps the interop entirely.
+        //
+        // Both are needed: fixing only `cobe` moved the same error onto
+        // `phenomenon`, which it pulls in.
+        "cobe",
+        "phenomenon",
+      ],
     }) as any,
   ],
   plugins: [
