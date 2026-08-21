@@ -126,7 +126,7 @@ const routes: RouteConfig[] = [
         component: AsyncContactUsV2CardPage,
       },
       {
-        path: "/career-finals",
+        path: "/career",
         exact: true,
         component: AsyncCareerFinalPage,
       },

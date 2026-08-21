@@ -10,7 +10,7 @@ const logoLight = `${config.IMAGE_STATIC_URL}/images/logo/amber-logo-light.svg`;
 
 const DEFAULT_NAV_LINKS = [
   { label: "Blogs", href: "/blog" },
-  { label: "Career", href: "/careers" },
+  { label: "Career", href: "/career" },
 ];
 
 interface NavbarProps {

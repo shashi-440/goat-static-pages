@@ -71,7 +71,7 @@ const CrewCTA = () => {
       </div>
 
       <Reveal delay={660}>
-        <CustomLink href="/careers" className={styles.button} dataTestId="about-us-v2-view-roles">
+        <CustomLink href="/career" className={styles.button} dataTestId="about-us-v2-view-roles">
           View open roles
         </CustomLink>
       </Reveal>
