@@ -52,10 +52,6 @@ const AsyncAboutUsContentUpdatedPage = loadable(() => import("@Pages/AboutUsCont
   fallback: <FullPageLoader />,
 });
 
-const AsyncEssentialsPage = loadable(() => import("@Pages/Essentials"), {
-  fallback: <FullPageLoader />,
-});
-
 const AsyncIndexPage = loadable(() => import("@Pages/Index"), {
   fallback: <FullPageLoader />,
 });
@@ -134,11 +130,6 @@ const routes: RouteConfig[] = [
         path: "/about-us-content-updated",
         exact: true,
         component: AsyncAboutUsContentUpdatedPage,
-      },
-      {
-        path: "/essentials",
-        exact: true,
-        component: AsyncEssentialsPage,
       },
       {
         path: "/",

@@ -34,7 +34,6 @@ const PAGES = [
 const ARCHIVE = [
   { path: "/about-us-v2", title: "About Us — earlier pass" },
   { path: "/career-v2", title: "Careers — earlier pass" },
-  { path: "/essentials", title: "Essentials" },
 ];
 
 const Index = (): JSX.Element => (
