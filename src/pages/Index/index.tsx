@@ -9,18 +9,32 @@ import styles from "./Index.module.scss";
  * Name only — no path, no build note, and no version suffix in the label. The URLs
  * still carry their -v2 / -alt suffixes (they are what the routes are registered
  * under), but those belong in the address bar, not in a reviewer's list.
+ *
+ * Two groups. The first is what a reviewer should look at: one current page per
+ * slot. The second holds the earlier passes at About Us and Careers — still
+ * routed and worth keeping for comparison, but they are superseded, and a flat
+ * list gave no way to tell which of three About Us links was the real one.
  */
 const PAGES = [
   { path: "/list-with-us", title: "List With Us" },
   { path: "/partner-with-us", title: "Partner With Us" },
-  { path: "/about-us-v2", title: "About Us" },
+  { path: "/about-us-content-updated", title: "About Us" },
   { path: "/how-it-works-v2", title: "How It Works" },
-  { path: "/career-v2", title: "Careers" },
+  { path: "/career", title: "Careers" },
   { path: "/scholarship-v2", title: "amberscholar" },
   { path: "/group-booking-v2-alt", title: "Group Booking" },
   { path: "/contact-us-v2-card", title: "Contact Us" },
   { path: "/privacy-v2", title: "Privacy Policy" },
   { path: "/terms-v2", title: "Terms and Conditions" },
+];
+
+// Superseded drafts. Labelled by what distinguishes them from the live version,
+// not by their route suffix — "About Us (v2)" tells a reviewer nothing about why
+// they might open it.
+const ARCHIVE = [
+  { path: "/about-us-v2", title: "About Us — earlier pass" },
+  { path: "/career-v2", title: "Careers — earlier pass" },
+  { path: "/essentials", title: "Essentials" },
 ];
 
 const Index = (): JSX.Element => (
@@ -37,6 +51,22 @@ const Index = (): JSX.Element => (
               <span className={styles.title}>{page.title}</span>
               {/* Chevron, drawn in CSS so the tile carries no asset. Slides on
                   hover to signal the row is the thing you click, not just a label. */}
+              <span className={styles.arrow} aria-hidden="true" />
+            </CustomLink>
+          </li>
+        ))}
+      </ul>
+
+      <h2 className={styles.groupHeading}>Area 51 trash</h2>
+      <p className={styles.groupNote}>
+        Earlier passes, kept for comparison. Superseded by the pages above.
+      </p>
+
+      <ul className={`${styles.list} ${styles.listMuted}`}>
+        {ARCHIVE.map((page) => (
+          <li key={page.path}>
+            <CustomLink href={page.path} className={styles.link}>
+              <span className={styles.title}>{page.title}</span>
               <span className={styles.arrow} aria-hidden="true" />
             </CustomLink>
           </li>
