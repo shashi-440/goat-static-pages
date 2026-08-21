@@ -1,0 +1,215 @@
+// Photo gallery — a 3D cylinder carousel, sitting above the closing CTA.
+//
+// The cards sit on the INNER wall of a cylinder with the viewer at its centre.
+// That is what produces the concave arc: the strip curves away at both edges and
+// bows toward the viewer in the middle. A flat row with a curve filter cannot do
+// this, because each card has to be genuinely angled in space.
+//
+// Card width here MUST match CARD_W in Gallery.tsx — the radius is derived from
+// it, so a mismatch leaves gaps or overlaps between cards on the ring.
+// Must match CARD_W / CARD_H in Gallery.tsx — the radius is derived from the
+// width, so a mismatch re-opens the gaps between cards. Landscape: office photos
+// are wide scenes and a tall crop cuts the subject off.
+$card-w: 400px;
+$card-h: 265px;
+// Space between adjacent photos. Applied as padding inside each card, so the
+// cards themselves still meet and the ring stays continuous.
+$img-gap: 10px;
+
+// White → near-black gradient, the same one the Team section used to carry.
+//
+// It belongs here now: the final stop is #0a0a0a, the exact colour CrewCTA's own
+// gradient starts from, and Gallery is what sits directly above CrewCTA. Ending
+// at #000 instead would make the page get *lighter* across that boundary
+// (rgb 3 → rgb 10), which reads as a hard line however subtle the values are.
+.section {
+  background: linear-gradient(
+    180deg,
+    #fff 0%,
+    #d2d2d2 36.194%,
+    #3d3d3d 74.324%,
+    #1a1a1a 88.556%,
+    #0a0a0a 100%
+  );
+  // The ring is far wider than the viewport; this clips it rather than letting
+  // the page scroll sideways.
+  overflow: hidden;
+  padding: 8px 0 96px;
+  // Anchors `.darkZone` below.
+  position: relative;
+  width: 100%;
+}
+
+// Invisible marker for the region where the header must go white. The shared
+// Navbar looks for [data-nav-theme="dark"] and switches to its light logo and
+// links while such an element is behind the 64px header line.
+//
+// Starts at 25%, just past where the header block ends (~22%) and the gradient
+// begins darkening in earnest. Paints nothing and takes no clicks — it exists
+// only to be found by the Navbar's querySelectorAll.
+.darkZone {
+  bottom: 0;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 25%;
+}
+
+// The cap has to sit OUTSIDE the gutter padding, not inside it. Previously this
+// was `max-width: 720px` with `padding: 0 var(--page-gutter)` on the same box —
+// and since the gutter is at least 80px a side, that left only ~560px of usable
+// width for a subtitle needing ~630px, so it always wrapped to two lines.
+//
+// The padding now lives on an outer box and the cap on the inner one, so 860px
+// means 860px of text width.
+.header {
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--page-gutter);
+  width: 100%;
+}
+
+.headerInner {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 0 48px;
+  // Wide enough to hold the subtitle on one line at 18px, with room to spare.
+  max-width: 860px;
+  text-align: center;
+}
+
+// 40px/-0.72px, the scale every other section title on this page uses.
+.title {
+  color: $neutral9;
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -0.72px;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.subtitle {
+  color: $neutral6;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 28px;
+  margin: 0;
+  // Balanced rather than nowrap: if a narrow viewport does force a break, two
+  // even lines read better than one long line and one orphaned word. nowrap
+  // would push the text past the gutter instead.
+  text-wrap: balance;
+}
+
+// ---- Stage ---------------------------------------------------------------
+// Owns the perspective and the gestures. The perspective origin sits at the
+// horizontal centre, so the nearest card is the middle one.
+//
+// Height is the card height plus room for the arc: cards at the edges are
+// rotated away and their corners swing below the centre card's baseline.
+.stage {
+  cursor: grab;
+  height: $card-h + 60px;
+  perspective: 1200px;
+  perspective-origin: 50% 50%;
+  position: relative;
+  // Let a vertical swipe scroll the page while a horizontal one turns the ring.
+  touch-action: pan-y;
+  user-select: none;
+  width: 100%;
+}
+
+.isDragging {
+  cursor: grabbing;
+}
+
+// The rotating ring. `translateZ` pushes the whole cylinder back so the near
+// wall lands at the screen plane rather than in front of it; the JS writes this
+// transform every frame, and the value here is only the pre-hydration state.
+.ring {
+  height: $card-h;
+  left: 50%;
+  position: absolute;
+  top: 30px;
+  transform-style: preserve-3d;
+  width: $card-w;
+  // Centre the ring's own box on the stage before any rotation.
+  margin-left: -$card-w * 0.5;
+}
+
+// ---- Cards ---------------------------------------------------------------
+// Each is rotated to its own angle and pushed out to the cylinder wall by an
+// inline transform from the component.
+// No border-radius. A rounded corner on each card cuts a notch out of the
+// strip's top and bottom edge at every join, which is exactly the "not smooth"
+// stepping this fixes — the arc has to read as one continuous band.
+.card {
+  backface-visibility: hidden;
+  height: $card-h;
+  left: 0;
+  // No overflow clip: the radius lives on the photo (below), and clipping here
+  // would square its corners back off against the card's own box.
+  position: absolute;
+  top: 0;
+  width: $card-w;
+
+  // The gap between images lives INSIDE the card, as padding — not as a gap in
+  // the ring. Widening CARD_GAP instead opens a real hole between neighbours and
+  // the white page shows through the arc (verified: at 16px the seam turns
+  // positive). Padding keeps the cards butted so the ring stays continuous while
+  // the photos are separated.
+  //
+  // border-box is essential: with the default content-box the padding would make
+  // the card 410px wide, and the radius is derived from 400 — every pair would
+  // overlap by 10px more than intended and the arc would tighten.
+  box-sizing: border-box;
+  padding-right: $img-gap;
+}
+
+// Fills the frame without distorting.
+// The radius goes on the PHOTO, not the card. The card is the ring slot and its
+// right 10px is the inter-image gap, so rounding the card would put the corners
+// in the gap rather than on the picture.
+//
+// This is safe now in a way it was not before: when the cards were butted edge
+// to edge a radius cut a notch out of the strip's continuous top and bottom
+// edge. With the internal gap each photo is a discrete frame, so rounding reads
+// as intended.
+.photo {
+  border-radius: 8px;
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+@media (max-width: 1100px) {
+  .stage {
+    // A nearer camera on a narrower viewport, so the arc keeps its curve
+    // instead of flattening out across less width.
+    perspective: 950px;
+  }
+}
+
+@media (max-width: 900px) {
+  .section {
+    padding-bottom: 72px;
+  }
+
+  .title {
+    font-size: 32px;
+    letter-spacing: -0.5px;
+  }
+
+  // The cards keep their ring geometry (the radius is fixed in JS), so the whole
+  // cylinder is scaled down instead — that preserves the arc exactly while
+  // fitting a phone. The negative margins reclaim the space the untransformed
+  // box would still occupy.
+  .stage {
+    height: 220px;
+    margin: -55px 0;
+    transform: scale(0.6);
+  }
+}

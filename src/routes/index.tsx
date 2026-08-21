@@ -44,6 +44,14 @@ const AsyncContactUsV2CardPage = loadable(() => import("@Pages/ContactUsV2Card")
   fallback: <FullPageLoader />,
 });
 
+const AsyncCareerFinalPage = loadable(() => import("@Pages/CareerFinal"), {
+  fallback: <FullPageLoader />,
+});
+
+const AsyncAboutUsContentUpdatedPage = loadable(() => import("@Pages/AboutUsContentUpdated"), {
+  fallback: <FullPageLoader />,
+});
+
 const AsyncIndexPage = loadable(() => import("@Pages/Index"), {
   fallback: <FullPageLoader />,
 });
@@ -112,6 +120,16 @@ const routes: RouteConfig[] = [
         path: "/contact-us-v2-card",
         exact: true,
         component: AsyncContactUsV2CardPage,
+      },
+      {
+        path: "/career",
+        exact: true,
+        component: AsyncCareerFinalPage,
+      },
+      {
+        path: "/about-us-content-updated",
+        exact: true,
+        component: AsyncAboutUsContentUpdatedPage,
       },
       {
         path: "/",

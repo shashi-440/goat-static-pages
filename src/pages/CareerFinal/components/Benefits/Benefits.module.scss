@@ -1,0 +1,124 @@
+// "Benefits" — a 3 x 2 card grid on the page's dark band.
+//
+// Card treatment follows the convention the other dark sections use: a #1d1d1d
+// fill lifted off a #151515 band by a 1px white-at-10% hairline. Without the
+// border the cards and the band are only 8 levels apart and the grid dissolves.
+.section {
+  background: #151515;
+  display: flex;
+  justify-content: center;
+  padding: 96px var(--page-gutter);
+  width: 100%;
+}
+
+.inner {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  max-width: 1280px;
+  width: 100%;
+}
+
+// Centre-aligned header.
+.top {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 640px;
+  text-align: center;
+}
+
+// 40px/-0.72px, the scale every other section title on this page uses.
+.heading {
+  color: #fff;
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -0.72px;
+  line-height: 1.2;
+  margin: 0;
+}
+
+// White at 70% rather than a flat grey: it stays keyed to the band if the
+// background tone is ever adjusted.
+.lede {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 28px;
+  margin: 0;
+}
+
+// Three columns, all cards the same height.
+//
+// `align-items` is left at its `stretch` default deliberately: every card in a
+// row then takes the height of the tallest, and `grid-auto-rows: 1fr` extends
+// that across both rows, so all six match rather than each row matching only
+// itself. The bodies are very unevenly sized ("Health & Wellbeing" is ~4x
+// "Time Away"), so the short cards carry trailing space — that is the trade for
+// a uniform grid, and the alternative is the ragged edges this replaces.
+.grid {
+  display: grid;
+  grid-auto-rows: 1fr;
+  gap: 24px;
+  grid-template-columns: repeat(3, 1fr);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.card {
+  background: #1d1d1d;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 32px;
+}
+
+.cardTitle {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24px;
+  margin: 0;
+}
+
+// #b6bcc4 rather than a dimmer grey: on this band it holds roughly 8.6:1, so the
+// copy reads as body text rather than receding into the card.
+.cardBody {
+  color: #b6bcc4;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 26px;
+  margin: 0;
+}
+
+@media (max-width: 1100px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .section {
+    padding: 64px var(--page-gutter);
+  }
+
+  .heading {
+    font-size: 32px;
+    letter-spacing: -0.5px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .card {
+    padding: 24px;
+  }
+}

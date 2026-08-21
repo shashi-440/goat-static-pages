@@ -1,0 +1,169 @@
+/* stylelint-disable order/properties-alphabetical-order, property-no-vendor-prefix */
+.navbar {
+  // At the very top the header is PLAIN: fully transparent, no blur / border /
+  // shadow. The frosted-glass treatment is added only once scrolled (see .scrolled).
+  align-items: center;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  box-shadow: none;
+  display: flex;
+  height: 64px;
+  justify-content: space-between;
+  // Fixed to the top so it stays while scrolling.
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  // Nav content sits on the same centred 1280px grid the page sections use, so
+  // the logo lines up with section content (and the hero image) at every width.
+  // A flat 80px gutter only matched below 1440px, above which the capped,
+  // centred content columns moved inward while the nav stayed full-bleed.
+  // Held in a custom property because Sass strips the calc() inside max().
+  --gutter: max(80px, calc((100% - 1280px) / 2));
+
+  padding: 12px var(--gutter);
+  width: 100%;
+  transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease,
+    -webkit-backdrop-filter 0.35s ease, backdrop-filter 0.35s ease;
+}
+
+// Once scrolled: transparent liquid glass — light blur (very minute frost), a
+// barely-there tint, and a soft shadow for separation.
+.scrolled {
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  backdrop-filter: blur(12px) saturate(160%);
+  // Much lighter tint — mostly transparent glass, let the content show through.
+  background: rgba(255, 255, 255, 0.1);
+  border-bottom-color: rgba(255, 255, 255, 0.25);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 3px 18px rgba(17, 25, 40, 0.05);
+
+  // Fallback for browsers without backdrop-filter — near-opaque white.
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    background: rgba(255, 255, 255, 0.9);
+  }
+
+  // Over a dark section: a faint dark tint so the light frost reads on black
+  // and the (white) text stays legible.
+  &.onDark {
+    background: rgba(20, 20, 22, 0.28);
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 3px 18px rgba(0, 0, 0, 0.22);
+
+    @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+      background: rgba(20, 20, 22, 0.88);
+    }
+  }
+}
+/* stylelint-enable order/properties-alphabetical-order, property-no-vendor-prefix */
+
+// Nav content sits above the frosted backdrop.
+.above {
+  position: relative;
+  z-index: 1;
+}
+
+.brand {
+  align-items: center;
+  display: flex;
+}
+
+.logo {
+  height: 24px;
+  width: 100px;
+}
+
+.links {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.link {
+  border-radius: 8px;
+  color: #111928;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.024px;
+  line-height: 1.25;
+  padding: 11px 12px;
+  text-decoration: none;
+  transition: background 0.15s ease, color 0.35s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+}
+
+// Over a dark section, the links turn white.
+.onDark .link {
+  color: #fff;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+}
+
+// "Try amber" — pink gradient pill CTA (matches Figma node 1344:50254).
+.tryButton {
+  background-image: linear-gradient(107.58deg, #ff5771 9.93%, #e53762 51.5%, #ff5771 105.98%);
+  border-radius: 999px;
+  // Force white text on every state — the site's global `a:hover/active/focus`
+  // rule turns link text red otherwise (that was the orange text on hover).
+  color: #fff !important;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.25;
+  margin-left: 8px;
+  padding: 11px 16px;
+  text-decoration: none;
+  // Hover only nudges the gradient a touch deeper; text stays white, no shadow.
+  transition: background-image 0.2s ease;
+  white-space: nowrap;
+
+  &:hover,
+  &:active,
+  &:focus {
+    background-image: linear-gradient(107.58deg, #f0466a 9.93%, #d92b48 51.5%, #f0466a 105.98%);
+    color: #fff !important;
+  }
+}
+
+// Secondary treatment — soft grey fill, dark text. Applied only while the page
+// is unscrolled on pages that opt in via `ctaSecondaryUntilScroll`; scrolling
+// drops this class so the pink primary above takes over.
+// `background-image: none` is required to cancel the gradient (a plain
+// `background` shorthand would not override `background-image`).
+.tryButtonSecondary {
+  background-image: none;
+  background-color: rgba(17, 25, 40, 0.06);
+  // Matches .link colour, and needs !important for the same reason as above:
+  // the global `a:hover` rule would otherwise turn the label red.
+  color: #111928 !important;
+  transition: background-color 0.2s ease, color 0.35s ease;
+
+  &:hover,
+  &:active,
+  &:focus {
+    background-image: none;
+    background-color: rgba(17, 25, 40, 0.1);
+    color: #111928 !important;
+  }
+}
+
+// Over a dark section the grey fill and dark text would both disappear, so
+// lighten them the same way `.onDark .link` does.
+.onDark .tryButtonSecondary {
+  background-color: rgba(255, 255, 255, 0.16);
+  color: #fff !important;
+
+  &:hover,
+  &:active,
+  &:focus {
+    background-color: rgba(255, 255, 255, 0.24);
+    color: #fff !important;
+  }
+}

@@ -139,8 +139,10 @@
   height: 100%;
   position: relative;
   transform-style: preserve-3d;
-  // Smooth, weighty flip.
-  transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
+  // 0.55s rather than the original 0.7s: the flip is now driven by hover rather
+  // than a deliberate click, so a cursor sweeping across the row would otherwise
+  // leave several cards still turning behind it.
+  transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1);
   width: 100%;
 }
 

@@ -1,0 +1,253 @@
+// "Our values" — eight cards in a 4x2 grid (Figma 2937:4380).
+//
+// Figma's frame is 80px side padding with 80px above the heading and 80px below
+// the grid; the page gutter variable is used instead of a hardcoded 80 so this
+// section lines up with every other one on the page.
+.section {
+  align-items: center;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--page-gutter) 80px;
+  width: 100%;
+}
+
+.header {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  padding: 80px 0 48px;
+  width: 100%;
+}
+
+// 40px/-0.72px, the same scale every other section title on this page uses.
+.title {
+  color: #202020;
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -0.72px;
+  line-height: 40px;
+  margin: 0;
+  text-align: center;
+}
+
+// Four columns on desktop, wrapping to two then one. `max-width` matches the
+// 1352px content width the rest of the page uses (1512 - 2x80 gutter).
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  list-style: none;
+  margin: 0;
+  max-width: 1352px;
+  padding: 0;
+  width: 100%;
+}
+
+// Dividers are gradient pseudo-elements on the cells rather than flat borders,
+// matching the stroke Benefits and Categories use: nearly transparent at the
+// ends, strongest in the middle, so the rule fades out instead of butting into
+// the section's edges. Drawn on the cell so they reflow on their own when the
+// column count changes.
+//
+// `inset` insets the rule vertically (12px top and bottom) — that is what keeps
+// it from running to the end of the container, so each line reads as separating
+// two cards rather than framing a grid.
+.card {
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  padding: 24px;
+  position: relative;
+  transform: translateY(18px);
+  transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+// Vertical rule down the cell's left edge.
+.card::before {
+  background-image: linear-gradient(
+    to bottom,
+    rgba(229, 231, 235, 0.1),
+    rgba(229, 231, 235, 0.9) 50%,
+    rgba(229, 231, 235, 0.1)
+  );
+  content: "";
+  inset: 12px auto 12px 0;
+  position: absolute;
+  width: 1px;
+}
+
+// No rule at the start of a row — otherwise every row opens with a stray line
+// against the section's left edge.
+.card:nth-child(4n + 1)::before {
+  display: none;
+}
+
+// Horizontal rule between the rows, drawn on the second row's cells (5-8 at four
+// columns). Same gradient turned 90 degrees and inset from the left and right
+// edges instead, so it fades out rather than reaching the container's sides.
+//
+// One rule per cell rather than one spanning the grid: each segment then fades
+// independently and lines up with the column it separates, and it costs nothing
+// to reflow when the column count changes.
+// The rule sits on the cell's top edge, so the row it opens needs more headroom
+// than the first row does — without this the line crowds the icon under it.
+.card:nth-child(n + 5) {
+  padding-top: 40px;
+}
+
+.card:nth-child(n + 5)::after {
+  background-image: linear-gradient(
+    to right,
+    rgba(229, 231, 235, 0.1),
+    rgba(229, 231, 235, 0.9) 50%,
+    rgba(229, 231, 235, 0.1)
+  );
+  content: "";
+  height: 1px;
+  inset: 0 12px auto 12px;
+  position: absolute;
+}
+
+.cardShown {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+// The Lottie box. Fixed at 32px so the title baselines line up across a row
+// regardless of what each animation's own artboard does.
+.iconSlot {
+  display: block;
+  height: 32px;
+  margin-bottom: 16px;
+  width: 32px;
+}
+
+.cardTitle {
+  color: $neutral9;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 24px;
+  margin: 0 0 8px;
+}
+
+// 14px/18px is Figma's spec. It is smaller than this page's usual 18px body,
+// but these are eight dense cards rather than running prose — matching the
+// larger size would push the grid well past a screen height.
+.cardBody {
+  color: $neutral6;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18px;
+  margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+// Two columns: the divider rule has to reset on every odd cell instead of every
+// fourth, and a horizontal rule appears between the rows that now exist.
+@media (max-width: 1100px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .card:nth-child(4n + 1)::before {
+    display: block;
+  }
+
+  .card:nth-child(odd)::before {
+    display: none;
+  }
+
+  // Four rows now, not two: the desktop rule (cards 5-8) no longer marks a row
+  // boundary, so it is cleared and re-applied to every card from the third on.
+  .card:nth-child(n + 5)::after {
+    display: none;
+  }
+
+  // Headroom follows the rule: at two columns every card from the third on opens
+  // a row, so the desktop-only rule for cards 5-8 is replaced.
+  .card:nth-child(n + 5) {
+    padding-top: 24px;
+  }
+
+  .card:nth-child(n + 3) {
+    padding-top: 40px;
+  }
+
+  // Horizontal rule between each of the rows that now exist, same gradient
+  // turned 90 degrees and inset from the left and right edges instead.
+  .card:nth-child(n + 3)::after {
+    display: block;
+    background-image: linear-gradient(
+      to right,
+      rgba(229, 231, 235, 0.1),
+      rgba(229, 231, 235, 0.9) 50%,
+      rgba(229, 231, 235, 0.1)
+    );
+    content: "";
+    height: 1px;
+    inset: 0 12px auto 12px;
+    position: absolute;
+  }
+}
+
+@media (max-width: 640px) {
+  .header {
+    padding: 56px 0 32px;
+  }
+
+  .title {
+    font-size: 32px;
+    letter-spacing: -0.5px;
+    line-height: 36px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  // Single column: no vertical rules at all, and every card after the first
+  // gets a horizontal one.
+  .card {
+    padding: 20px 0;
+  }
+
+  // One column, so every card opens its own row — a single uniform rhythm
+  // replaces the per-row headroom above.
+  .card:nth-child(n + 3),
+  .card:nth-child(n + 5) {
+    padding-top: 24px;
+  }
+
+  .card::before,
+  .card:nth-child(4n + 1)::before,
+  .card:nth-child(odd)::before {
+    display: none;
+  }
+
+  .card:nth-child(n + 5)::after,
+  .card:nth-child(n + 3)::after {
+    display: none;
+  }
+
+  .card:nth-child(n + 2)::after {
+    background-image: linear-gradient(
+      to right,
+      rgba(229, 231, 235, 0.1),
+      rgba(229, 231, 235, 0.9) 50%,
+      rgba(229, 231, 235, 0.1)
+    );
+    content: "";
+    display: block;
+    height: 1px;
+    inset: 0 0 auto 0;
+    position: absolute;
+  }
+}

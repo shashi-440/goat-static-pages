@@ -1,0 +1,12 @@
+// Sized inline (px) by the component so it matches whatever static icon it
+// replaces; this just pins the injected <svg> to the box.
+.icon {
+  display: block;
+  flex-shrink: 0;
+
+  svg {
+    display: block;
+    height: 100% !important;
+    width: 100% !important;
+  }
+}

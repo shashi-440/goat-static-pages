@@ -33,6 +33,37 @@
   padding: 0;
 }
 
+// --- Area 51 trash -------------------------------------------------------
+// Heading for the superseded group. Smaller and lighter than the page title so
+// the archive reads as a footnote to the list above rather than a second section
+// of equal weight.
+.groupHeading {
+  color: #202020;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 48px 0 6px;
+}
+
+.groupNote {
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 20px;
+  margin: 0 0 16px;
+}
+
+// The rows themselves are dimmed rather than restyled, so they still read as the
+// same kind of control — just demoted. Full opacity on hover, so anything you
+// actually reach for comes back to normal.
+.listMuted {
+  opacity: 0.62;
+  transition: opacity 0.2s ease;
+}
+
+.listMuted:hover {
+  opacity: 1;
+}
+
 // The whole row is the target, not just the text — 56px tall so it is an easy click
 // and the ten rows still read as one list.
 .link {
