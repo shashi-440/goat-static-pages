@@ -91,14 +91,34 @@ const CARDS: Shot[] = [
   },
 ];
 
+// Three rows, each carrying the FULL deck rotated by a different offset.
+//
+// Not a round-robin split. The ring radius is derived from the angular step
+// between neighbours, and the step is 360/count — so dealing the deck into
+// thirds drops each row to ~5 cards, which collapses the radius from ~1000px to
+// ~300px and turns the shallow arc into a tight hexagonal fan. Every row needs
+// the full count to keep the original curve.
+//
+// Instead each row shows all sixteen, offset by a different amount so the three
+// rows are never displaying the same photo at the same angle.
+const ROW_COUNT = 3;
+const ROW_OFFSET = [0, 6, 11];
+const ROWS: Shot[][] = Array.from({ length: ROW_COUNT }, (_, r) => {
+  const k = ROW_OFFSET[r] % CARDS.length;
+  return [...CARDS.slice(k), ...CARDS.slice(0, k)];
+});
+
 // ---- Cylinder geometry ---------------------------------------------------
 // Cards sit on the INSIDE wall of a cylinder with the viewer at its centre,
 // which is what gives the concave arc — edges curving away, centre nearest.
 //
 // CARD_W must match $card-w in the stylesheet: the radius is derived from it, so
 // a mismatch leaves the cards overlapping or gapped on the ring.
-const COUNT = CARDS.length;
-const STEP = 360 / COUNT; // degrees between adjacent cards
+// Per ROW, not per deck: each row carries a third of the cards, so the ring
+// spacing is derived from the row length. Rows can differ in length by one (16
+// across 3 is 6/5/5), so STEP is computed from each row's own count at render
+// time rather than being a single module constant.
+const stepFor = (count: number) => 360 / count;
 
 // Landscape frames. Office photos are wide scenes — a room, a table, a group —
 // and a tall portrait crop cuts the sides off whatever the shot was actually of.
@@ -107,7 +127,9 @@ const STEP = 360 / COUNT; // degrees between adjacent cards
 // curve is recovered with a tighter radius and a nearer camera rather than by
 // making the cards tall.
 const CARD_W = 400;
-const CARD_H = 265; // 1:0.66 landscape
+// Mirrors $card-h. Not read by the geometry — only CARD_W feeds the radius — but
+// kept in sync so the two files do not disagree about the card's shape.
+const CARD_H = 190;
 
 // ZERO. A positive gap opens a real hole in the ring and the white page shows
 // through it — that was the visible seam. At 0 the tangent seating already
@@ -122,7 +144,8 @@ const CARD_GAP = 0;
 // `w * cos(a)` wide while its neighbour's centre is still a full chord away — so
 // every pair gaps, widening toward the edges. Dividing by tan seats them so they
 // meet on screen, with `CARD_GAP` opening the hairline.
-const RADIUS = Math.round((CARD_W + CARD_GAP) / (2 * Math.tan((Math.PI * STEP) / 360)));
+const radiusFor = (step: number) =>
+  Math.round((CARD_W + CARD_GAP) / (2 * Math.tan((Math.PI * step) / 360)));
 
 // Cards this far (in slots) from the front are edge-on slivers; they fade out
 // rather than being drawn as 1px lines.
@@ -140,9 +163,9 @@ const FADE_SLOTS = 4.2;
  * Only opacity varies, so cards edge-on to the viewer leave rather than
  * collapsing into a hard 1px line at the end of the arc.
  */
-const opacityAt = (deg: number) => {
+const opacityAt = (deg: number, step: number) => {
   const d = Math.abs((((deg % 360) + 540) % 360) - 180);
-  const slots = d / STEP;
+  const slots = d / step;
   // Fade over the last 1.3 slots before FADE_SLOTS, smoothstepped so neither
   // end of the fade has a corner in it.
   const t = Math.min(1, Math.max(0, (slots - (FADE_SLOTS - 1.3)) / 1.3));
@@ -150,12 +173,22 @@ const opacityAt = (deg: number) => {
   return Number((1 - k).toFixed(3));
 };
 
-// Idle spin, degrees per second.
+// Idle spin, degrees per second, PER ROW.
 //
 // Positive: with the cards on the inner wall, an increasing rotateY carries the
 // near face right-to-left, which is the direction the reference drifts. (This is
 // the same sign convention the drag inverts — see onPointerMove.)
-const SPIN_DPS = 2.6;
+//
+// The middle row runs negative so it travels the opposite way, and the three
+// speeds are deliberately not multiples of each other — with 2.6/-2.0/3.1 the
+// rows drift back into alignment only after several minutes, where round numbers
+// would visibly re-sync every few seconds and the three would read as one block.
+const ROW_SPIN_DPS = [2.6, -2.0, 3.1];
+
+// Starting offset per row, in degrees. Without this every row would begin with a
+// card centred at exactly the same angle and the first frame would look like a
+// grid rather than three independent rings.
+const ROW_PHASE = [0, 14, 27];
 
 // Drag: screen px -> degrees. A full viewport drag turns a bit over a quarter.
 const DRAG_SENS = 0.16;
@@ -188,13 +221,16 @@ const DRAG_SLOP = 3;
  */
 const Gallery = () => {
   const stageRef = useRef<HTMLDivElement>(null);
-  const ringRef = useRef<HTMLDivElement>(null);
-  // One ref per card, so the loop can restyle each without a re-render.
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  // One entry per row: the ring element, and that row's card elements.
+  const ringRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const cardRefs = useRef<(HTMLDivElement | null)[][]>(
+    ROWS.map(() => []),
+  );
 
-  // Live rotation state, all in refs so the loop never triggers a render.
-  const angle = useRef(0);
-  const velocity = useRef(0); // degrees/frame, from a fling
+  // Live rotation state. One angle per row now — all in refs, so the loop never
+  // triggers a render.
+  const angles = useRef<number[]>([...ROW_PHASE]);
+  const velocity = useRef(0); // degrees/frame, from a fling; shared by all rows
   const dragging = useRef<{ id: number; x: number; moved: boolean } | null>(null);
   const rafRef = useRef(0);
   const lastT = useRef(0);
@@ -207,21 +243,27 @@ const Gallery = () => {
   const [isDragging, setIsDragging] = useState(false);
 
   const apply = useCallback(() => {
-    const ring = ringRef.current;
-    if (ring) ring.style.transform = `translateZ(${RADIUS}px) rotateY(${angle.current}deg)`;
+    ROWS.forEach((row, r) => {
+      const step = stepFor(row.length);
+      const radius = radiusFor(step);
+      const angle = angles.current[r];
 
-    // Only opacity is per-frame now — height is uniform, so the arc's top and
-    // bottom edges stay smooth. Written straight to style rather than through
-    // state: this runs every frame, and a setState here would re-render every
-    // card 60x a second for a value only the compositor consumes.
-    cardRefs.current.forEach((el, i) => {
-      if (!el) return;
-      el.style.opacity = String(opacityAt(i * STEP + angle.current));
+      const ring = ringRefs.current[r];
+      if (ring) ring.style.transform = `translateZ(${radius}px) rotateY(${angle}deg)`;
+
+      // Only opacity is per-frame — height is uniform, so the arc's top and
+      // bottom edges stay smooth. Written straight to style rather than through
+      // state: this runs every frame, and a setState here would re-render every
+      // card 60x a second for a value only the compositor consumes.
+      cardRefs.current[r].forEach((el, i) => {
+        if (!el) return;
+        el.style.opacity = String(opacityAt(i * step + angle, step));
+      });
     });
   }, []);
 
-  // One loop for the idle spin and the fling decay. Runs only while the section
-  // is on screen, so an off-screen carousel costs nothing.
+  // One loop for every row's idle spin and the shared fling decay. Runs only
+  // while the section is on screen, so an off-screen carousel costs nothing.
   const tick = useCallback(
     (t: number) => {
       const dt = lastT.current ? Math.min(64, t - lastT.current) : 16;
@@ -229,12 +271,17 @@ const Gallery = () => {
 
       if (!dragging.current?.moved) {
         if (Math.abs(velocity.current) > MIN_FLING) {
-          // Coasting from a fling; friction eases it back toward the idle spin.
-          angle.current += velocity.current;
+          // Coasting from a fling. Every row takes the same angular delta, so a
+          // flick moves the whole gallery as one piece rather than shearing the
+          // rows apart.
+          angles.current = angles.current.map((a) => a + velocity.current);
           velocity.current *= FRICTION;
         } else {
           velocity.current = 0;
-          angle.current += (SPIN_DPS * dt) / 1000;
+          // Idle: each row returns to its own speed and direction.
+          angles.current = angles.current.map(
+            (a, r) => a + (ROW_SPIN_DPS[r] * dt) / 1000,
+          );
         }
         apply();
       }
@@ -254,8 +301,8 @@ const Gallery = () => {
 
     apply();
 
-    // Reduced motion: lay the ring out and leave it. Drag and wheel still work,
-    // so the photos remain reachable — it just never moves on its own.
+    // Reduced motion: lay the rings out and leave them. Drag and wheel still
+    // work, so the photos remain reachable — it just never moves on its own.
     if (stillRef.current) return undefined;
 
     const start = () => {
@@ -312,8 +359,12 @@ const Gallery = () => {
     // so increasing rotateY carries the near face LEFT while the cursor goes
     // right — the surface would move against the hand. Flipping the sign makes
     // the photos follow the drag, which is what "grab and pull" should do.
+    //
+    // Applied equally to all three rows: one gesture over the stage moves the
+    // whole gallery, which is what a single grab should feel like. The rows
+    // resume their own directions the moment the fling decays.
     const delta = -dx * DRAG_SENS;
-    angle.current += delta;
+    angles.current = angles.current.map((a) => a + delta);
     // Remember the last movement as the fling velocity, so releasing mid-drag
     // carries on rather than stopping dead.
     velocity.current = delta;
@@ -345,8 +396,9 @@ const Gallery = () => {
       e.preventDefault();
       // Same inversion as the drag, for the same reason: a rightward scroll
       // should move the strip the way a rightward drag does.
-      angle.current += -e.deltaX * WHEEL_SENS;
-      velocity.current = -e.deltaX * WHEEL_SENS * 0.5;
+      const delta = -e.deltaX * WHEEL_SENS;
+      angles.current = angles.current.map((a) => a + delta);
+      velocity.current = delta * 0.5;
       apply();
     };
 
@@ -372,8 +424,9 @@ const Gallery = () => {
         </Reveal>
       </div>
 
-      {/* The stage owns the perspective and the gestures. The ring inside it is
-          what actually rotates. */}
+      {/* The stage owns the perspective and the gestures for all three rows, so
+          one drag turns the whole gallery. Each row inside it is an independent
+          cylinder with its own angle, speed and direction. */}
       <div
         ref={stageRef}
         className={`${styles.stage} ${isDragging ? styles.isDragging : ""}`}
@@ -384,26 +437,43 @@ const Gallery = () => {
         role="group"
         aria-label="Photos of life at amber. Drag or scroll sideways to browse."
       >
-        <div ref={ringRef} className={styles.ring}>
-          {CARDS.map((card, i) => (
-            <div
-              key={card.label}
-              ref={(el) => {
-                cardRefs.current[i] = el;
-              }}
-              className={styles.card}
-              // Each card is turned to its own angle on the ring, then pushed
-              // out to the wall. The negative radius puts the cards on the
-              // INSIDE of the cylinder, facing inward at the viewer.
-              // Opacity is written per frame by `apply`.
-              style={{
-                transform: `rotateY(${i * STEP}deg) translateZ(${-RADIUS}px)`,
-              }}
-            >
-              <img src={card.src} alt="" className={styles.photo} loading="lazy" />
+        {ROWS.map((row, r) => {
+          const step = stepFor(row.length);
+          const radius = radiusFor(step);
+          return (
+            <div key={`row-${r}`} className={styles.row}>
+              <div
+                ref={(el) => {
+                  ringRefs.current[r] = el;
+                }}
+                className={styles.ring}
+                // Pre-hydration state only; the JS rewrites this every frame.
+                style={{
+                  transform: `translateZ(${radius}px) rotateY(${ROW_PHASE[r]}deg)`,
+                }}
+              >
+                {row.map((card, i) => (
+                  <div
+                    key={`${card.label}-${i}`}
+                    ref={(el) => {
+                      cardRefs.current[r][i] = el;
+                    }}
+                    className={styles.card}
+                    // Each card is turned to its own angle on its row's ring,
+                    // then pushed out to the wall. The negative radius puts the
+                    // cards on the INSIDE of the cylinder, facing inward at the
+                    // viewer. Opacity is written per frame by `apply`.
+                    style={{
+                      transform: `rotateY(${i * step}deg) translateZ(${-radius}px)`,
+                    }}
+                  >
+                    <img src={card.src} alt="" className={styles.photo} loading="lazy" />
+                  </div>
+                ))}
+              </div>
             </div>
-          ))}
-        </div>
+          );
+        })}
       </div>
     </section>
   );
