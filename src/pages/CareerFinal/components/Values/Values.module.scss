@@ -37,11 +37,8 @@
 // lines. Three columns give ~400px and ~50 characters at the larger 16px size
 // below, and drop the worst card to five lines.
 //
-// Eight cards over three columns leaves the last row short by one. That is
-// deliberate and better than the alternatives: four columns is the cramping this
-// fixes, and two columns runs the lines to ~78 characters, past comfortable.
-// `.card:last-child` gets no left rule so the gap does not read as a missing
-// card (see below).
+// NINE cards over three columns, so all three rows are full — the short-row rule
+// that used to cap the last card's divider is gone with it.
 //
 // `max-width` matches the 1352px content width the rest of the page uses
 // (1512 - 2x80 gutter).
@@ -125,19 +122,6 @@
   height: 1px;
   inset: 0 12px auto 12px;
   position: absolute;
-}
-
-// Eight cards over three columns leaves the last row one short, so the row rule
-// would run the full grid width and the empty cell would read as a card that
-// failed to load. Capping the last card's rule at its own right edge ends the
-// line where the content ends.
-//
-// `:nth-child(8)` rather than `:last-child` so the intent is explicit: it is the
-// eighth of eight, the card that happens to close a short row. If a ninth
-// principle is ever added the row fills and this rule should simply be deleted.
-.card:nth-child(8)::after {
-  inset: 0 auto auto 12px;
-  right: -1px;
 }
 
 .cardShown {

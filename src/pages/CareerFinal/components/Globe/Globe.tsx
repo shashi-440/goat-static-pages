@@ -78,7 +78,7 @@ interface Person {
 // The twenty-one people, grouped by country.
 //
 // PLACEMENT. These coordinates are NOT the exact office cities, and that is
-// deliberate. A 32px face subtends ~8deg of arc on this globe while the whole of
+// deliberate. A 44px face subtends ~8deg of arc on this globe while the whole of
 // Britain spans ~9deg, so the UK's four cannot all sit inside it without
 // overlapping. Every option was measured: real cities gave a 5px worst-case gap,
 // strict borders 8-9px, land-only regional corridors 17px — all against a face
@@ -96,32 +96,32 @@ interface Person {
 // moving one pin can push a different pair into collision.
 const PEOPLE: Person[] = [
   // ---- United Kingdom ----
-  { name: "David Seymor", department: "Product", country: "United Kingdom", flag: flagGB, location: [57.338, 20.742], photo: davidImg },
-  { name: "Marielle", department: "Partnerships", country: "United Kingdom", flag: flagGB, location: [70.331, -10.406], photo: marielleImg },
-  { name: "Jools", department: "Partnerships", country: "United Kingdom", flag: flagGB, location: [40.634, -26.185], photo: joolsImg },
-  { name: "Robin Walsh", department: "Business Development", country: "United Kingdom", flag: flagGB, location: [42.654, 7.993], photo: robinImg },
+  { name: "David Seymor", department: "Product", country: "United Kingdom", flag: flagGB, location: [64.96, 22.004], photo: davidImg },
+  { name: "Marielle", department: "Partnerships", country: "United Kingdom", flag: flagGB, location: [61.806, -28.899], photo: marielleImg },
+  { name: "Jools", department: "Partnerships", country: "United Kingdom", flag: flagGB, location: [39.619, -30.234], photo: joolsImg },
+  { name: "Robin Walsh", department: "Business Development", country: "United Kingdom", flag: flagGB, location: [45.085, 9.12], photo: robinImg },
   // ---- Nigeria ----
-  { name: "Ajibode Solomon", department: "Business Development", country: "Nigeria", flag: flagNG, location: [-7.446, 15.407], photo: solomonImg },
-  { name: "Adeniran Michael", department: "Business Development", country: "Nigeria", flag: flagNG, location: [4.653, -2.814], photo: michaelImg },
+  { name: "Ajibode Solomon", department: "Business Development", country: "Nigeria", flag: flagNG, location: [-7.136, 22.87], photo: solomonImg },
+  { name: "Adeniran Michael", department: "Business Development", country: "Nigeria", flag: flagNG, location: [14.011, -11.942], photo: michaelImg },
   // ---- Egypt ----
-  { name: "Mohammed Husien", department: "Operations", country: "Egypt", flag: flagEG, location: [24.95, 40.979], photo: mohammedImg },
-  { name: "Ahmed Sammy", department: "Supply", country: "Egypt", flag: flagEG, location: [41.959, 40.934], photo: ahmedImg },
-  { name: "Merna Elgezawy", department: "Business Development", country: "Egypt", flag: flagEG, location: [25.437, 17.501], photo: mernaImg },
-  { name: "Mirna Abdo", department: "Employee Experience", country: "Egypt", flag: flagEG, location: [12.205, 20.796], photo: mirnaImg },
-  { name: "Peter", department: "Operations", country: "Egypt", flag: flagEG, location: [11.866, 41.215], photo: peterImg },
+  { name: "Mohammed Husien", department: "Operations", country: "Egypt", flag: flagEG, location: [23.326, 42.552], photo: mohammedImg },
+  { name: "Ahmed Sammy", department: "Supply", country: "Egypt", flag: flagEG, location: [45.133, 41.282], photo: ahmedImg },
+  { name: "Merna Elgezawy", department: "Business Development", country: "Egypt", flag: flagEG, location: [25.393, 17.643], photo: mernaImg },
+  { name: "Mirna Abdo", department: "Employee Experience", country: "Egypt", flag: flagEG, location: [9.169, 19.273], photo: mirnaImg },
+  { name: "Peter", department: "Operations", country: "Egypt", flag: flagEG, location: [7.613, 42.171], photo: peterImg },
   // ---- Thailand ----
-  { name: "Damien Pang", department: "Growth", country: "Thailand", flag: flagTH, location: [12.277, 125.729], photo: damienImg },
-  { name: "Joey Panithan Ittisan", department: "Supply", country: "Thailand", flag: flagTH, location: [-0.19, 123.647], photo: joeyImg },
+  { name: "Damien Pang", department: "Growth", country: "Thailand", flag: flagTH, location: [-9.827, 118.532], photo: damienImg },
+  { name: "Joey Panithan Ittisan", department: "Supply", country: "Thailand", flag: flagTH, location: [8.608, 117.142], photo: joeyImg },
   // ---- China ----
-  { name: "Anqi Zhao", department: "Operations", country: "China", flag: flagCN, location: [49.36, 128.042], photo: anqiImg },
-  { name: "Summer Xia", department: "Market Expansion", country: "China", flag: flagCN, location: [48.092, 99.15], photo: summerImg },
-  { name: "Dan Teo", department: "Global Operations", country: "China", flag: flagCN, location: [26.432, 126.061], photo: danImg },
+  { name: "Anqi Zhao", department: "Operations", country: "China", flag: flagCN, location: [44.432, 128.437], photo: anqiImg },
+  { name: "Summer Xia", department: "Market Expansion", country: "China", flag: flagCN, location: [53.017, 95.054], photo: summerImg },
+  { name: "Dan Teo", department: "Global Operations", country: "China", flag: flagCN, location: [24.315, 133.427], photo: danImg },
   // ---- India ----
-  { name: "Bhanu Mahajan", department: "Supply", country: "India", flag: flagIN, location: [15.462, 91.442], photo: bhanuImg },
-  { name: "Prachi Kamble", department: "Marketing", country: "India", flag: flagIN, location: [31.119, 87.299], photo: prachiImg },
-  { name: "Harshal Maniyar", department: "Product", country: "India", flag: flagIN, location: [28.596, 65.814], photo: harshalImg },
-  { name: "Shrey", department: "Data", country: "India", flag: flagIN, location: [15.109, 69.039], photo: shreyImg },
-  { name: "Gautam Bagga", department: "Growth", country: "India", flag: flagIN, location: [2.519, 75.072], photo: gautamImg },
+  { name: "Bhanu Mahajan", department: "Supply", country: "India", flag: flagIN, location: [15.015, 93.857], photo: bhanuImg },
+  { name: "Prachi Kamble", department: "Marketing", country: "India", flag: flagIN, location: [33.713, 94.774], photo: prachiImg },
+  { name: "Harshal Maniyar", department: "Product", country: "India", flag: flagIN, location: [34.01, 66.394], photo: harshalImg },
+  { name: "Shrey", department: "Data", country: "India", flag: flagIN, location: [15.663, 70.086], photo: shreyImg },
+  { name: "Gautam Bagga", department: "Growth", country: "India", flag: flagIN, location: [-0.418, 77.599], photo: gautamImg },
 ];
 
 
@@ -648,8 +648,8 @@ const Globe = () => {
                     src={person.photo}
                     alt=""
                     className={styles.avatarImg}
-                    width={32}
-                    height={32}
+                    width={44}
+                    height={44}
                     isEagerLoad
                   />
 

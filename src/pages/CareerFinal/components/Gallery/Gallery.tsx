@@ -21,6 +21,17 @@ import life10 from "../../assets/life/life-10.jpg";
 import life11 from "../../assets/life/life-11.jpg";
 import life12 from "../../assets/life/life-12.jpg";
 import life13 from "../../assets/life/life-13.jpg";
+// The offices outside India (Career Page Cleanup, node 3003:4591 — "outer"). The
+// OPPO Find N5 / HASSELBLAD camera watermark was a white band exactly 384px tall
+// at the bottom of each source, measured by scanning up for near-white rows rather
+// than eyeballed; the stairwell has faint text baked into the photo instead, so ~7%
+// of its height came off. Cropped away before the ratio fit, so the watermark is
+// gone rather than merely out of frame.
+import life14 from "../../assets/life/life-14.jpg";
+import life15 from "../../assets/life/life-15.jpg";
+import life16 from "../../assets/life/life-16.jpg";
+import life17 from "../../assets/life/life-17.jpg";
+import life18 from "../../assets/life/life-18.jpg";
 
 interface Shot {
   /** Short caption, used as the image's accessible description. */
@@ -52,6 +63,17 @@ const CARDS: Shot[] = [
   { label: "Team celebration", src: life11 },
   { label: "Desks at full tilt", src: life12 },
   { label: "Afternoon in the lounge", src: life13 },
+  // ---- offices outside India ----
+  //
+  // Five, not seven: the Figma section holds seven tiles but two are exact
+  // duplicates (byte-identical downloads — the dinner and the group photo each
+  // appear twice), and the carousel shows every card in all three rows, so a
+  // repeat would be visible.
+  { label: "Desks at the China office", src: life14 },
+  { label: "Working session", src: life15 },
+  { label: "Team dinner in China", src: life16 },
+  { label: "The China team", src: life17 },
+  { label: "Office stairwell", src: life18 },
 ];
 
 // Three rows, each carrying the FULL deck rotated by a different offset.
@@ -69,7 +91,9 @@ const CARDS: Shot[] = [
 const ROW_COUNT = 3;
 // Offsets are ~1/3 of the deck apart so the three rows never show the same photo
 // at the same angle. Re-spaced for thirteen cards (was 0/6/11 for sixteen).
-const ROW_OFFSET = [0, 4, 9];
+// Roughly a third of the deck apart, so no two rows show the same photo at the
+// same angle. Re-spaced for eighteen cards (was 0/4/9 for thirteen).
+const ROW_OFFSET = [0, 6, 12];
 const ROWS: Shot[][] = Array.from({ length: ROW_COUNT }, (_, r) => {
   const k = ROW_OFFSET[r] % CARDS.length;
   return [...CARDS.slice(k), ...CARDS.slice(0, k)];

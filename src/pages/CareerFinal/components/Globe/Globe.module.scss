@@ -291,15 +291,16 @@
 // including the ocean between faces — still grabs and spins the globe.
 // `left`/`top` are the projected point and the translate centres the face on it.
 .avatarPin {
-  // 32px, down from 44px. Twenty-one faces on a 622px globe cannot hold 44px
-  // without overlapping — the binding pair is always two of the UK's four, since
-  // the whole of Britain spans only ~40px of a 498px sphere.
+  // 44px. The faces were 32px, which read small on a 622px globe.
   //
-  // 32 and not 36: the shipped coordinates measure a 34.6px worst-case gap
-  // across a full rotation at nine tilt angles (binding pair David/Robin Walsh),
-  // so 36px would overlap by 1.4px at the tightest moment. 32px keeps a real
-  // 2.6px of daylight. Re-run the gap check before changing either number.
-  height: 32px;
+  // Getting here needed the PLACEMENT re-solved, not just the number changed: at
+  // the old coordinates the tightest pair (David/Robin Walsh) cleared only 34.6px,
+  // so 36px already overlapped. Widening each person's allowed drift from their
+  // country's centre to 22deg and re-annealing lifts the worst-case gap to 49.1px
+  // (now binding on Harshal/Shrey), which holds a 44px face with 5px to spare.
+  //
+  // Re-run the gap check before changing either number — they are a pair.
+  height: 44px;
   // Interactive now, so a face can be hovered for its card. `pointer-events` is
   // set back to `auto` EXPLICITLY: the parent `.pinLayer` sets `none` so drags
   // over empty ocean reach the globe, and that inherits — without this line the
@@ -312,7 +313,7 @@
   // transition on top would fight those updates and make every face lag the
   // globe it is pinned to. `transform` is set inline for the same reason — it
   // carries the limb scale as well as the centring translate.
-  width: 32px;
+  width: 44px;
 }
 
 /* ------------------------------------------------------------- hover card */
