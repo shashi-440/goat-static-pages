@@ -6,6 +6,7 @@ import Reveal from "../../../AboutUsV2/components/Reveal/Reveal";
 // The About Us count-up: renders the final value on the server so the figures
 // are present without JS, then counts from 0 once visible.
 import CountUp from "../../../AboutUsV2/components/CountUp/CountUp";
+import LottieIcon from "../LottieIcon/LottieIcon";
 import styles from "./Globe.module.scss";
 // Team headshots — the markers are the people, not the places. Six individual
 // shots plus five crew shots is every face this page has; with fifteen markers a
@@ -52,6 +53,9 @@ import flagEG from "../../assets/flags/eg.png";
 import flagTH from "../../assets/flags/th.png";
 import flagCN from "../../assets/flags/cn.png";
 import flagIN from "../../assets/flags/in.png";
+// The mark for "Languages spoken" — verified to render (it is one of the icons in
+// this folder that ends on a drawn frame).
+import globeAnim from "../../assets/lottie/globe.json";
 
 interface Person {
   name: string;
@@ -120,15 +124,54 @@ interface Stat {
   target: number;
   suffix: string;
   label: string;
+  /**
+   * Overlapping circles above the figure. Mutually exclusive with `lottie`.
+   *
+   * Every stat carries a visual of the same size and count, which is the point:
+   * three columns where one has a picture and two do not reads as two of them
+   * being unfinished. What changes is only what is INSIDE the circles.
+   */
+  stack?: string[];
+  /** A mark, for the stat that has no photograph. Mutually exclusive with `stack`. */
+  lottie?: any;
+  /** One description for the whole visual, so a screen reader reads it once. */
+  stackLabel: string;
 }
 
 // Business stats, replacing the stale "7 offices, 20 nationalities" prose that
 // used to carry these numbers inside the lede.
 // Labels verbatim from Figma 1565:3930.
 const STATS: Stat[] = [
-  { target: 500, suffix: "+", label: "Amazing people" },
-  { target: 20, suffix: "+", label: "Nationalities represented" },
-  { target: 15, suffix: "+", label: "Languages spoken" },
+  {
+    target: 500,
+    suffix: "+",
+    label: "Amazing people",
+    // Real teammates, taken from the same head-cropped set the globe pins use
+    // rather than stock — this stat is about these people.
+    stack: [harshalImg, davidImg, anqiImg],
+    stackLabel: "People across the amber team",
+  },
+  {
+    target: 20,
+    suffix: "+",
+    label: "Nationalities represented",
+    // THREE, matching the stack beside it. A fourth circle would make this column
+    // wider than its neighbours and give the row no rhythm. Three of the largest
+    // markets, not a ranking: the figure is the count, and the flags only have to
+    // say "from everywhere".
+    stack: [flagIN, flagGB, flagCN],
+    stackLabel: "Team members from over 20 nationalities",
+  },
+  {
+    target: 15,
+    suffix: "+",
+    label: "Languages spoken",
+    // No photograph exists of a spoken language, so this column plays a mark
+    // instead. It keeps the same 32px box as the stacks so the three figures stay
+    // on one line — a taller visual here would push this number down alone.
+    lottie: globeAnim,
+    stackLabel: "Over 15 languages spoken across the team",
+  },
 ];
 
 // ---- Limb falloff --------------------------------------------------------
@@ -272,6 +315,9 @@ const Globe = () => {
   // Index of the person whose card is open, or null. Also read by the render
   // loop (through activeRef) to hold the globe still while a card is up.
   const [active, setActive] = useState<number | null>(null);
+  // Plays the stats' mark once the row is on screen. The row sits below the fold,
+  // so a self-starting one-shot would run unseen and then hold finished forever.
+  const [statsShown, setStatsShown] = useState(false);
   const [pins, setPins] = useState<Projected[]>(() =>
     PEOPLE.map(() => ({ x: SIZE / 2, y: SIZE / 2, z: -1 })),
   );
@@ -288,6 +334,27 @@ const Globe = () => {
   // effect and closes over that scope, so reading the state variable there would
   // pin it to its initial null forever.
   const activeRef = useRef<number | null>(null);
+  const statsRef = useRef<HTMLUListElement>(null);
+
+  // Fire the stats' mark the first time the row scrolls into view.
+  useEffect(() => {
+    const node = statsRef.current;
+    if (!node || typeof IntersectionObserver === "undefined") {
+      setStatsShown(true);
+      return undefined;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setStatsShown(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.4 },
+    );
+    io.observe(node);
+    return () => io.disconnect();
+  }, []);
 
   // Keep the loop's view of the open card current.
   useEffect(() => {
@@ -459,9 +526,24 @@ const Globe = () => {
 
           {/* The figures the lede used to carry as prose. Counting them up gives
               them the weight a sentence clause never had. */}
-          <ul className={styles.stats}>
+          <ul ref={statsRef} className={styles.stats}>
             {STATS.map((stat, i) => (
               <Reveal as="li" key={stat.label} className={styles.stat} delay={160 + i * 90}>
+                {/* One `role="img"` with a single label for the whole visual, not
+                    an alt per circle — three separate alts would have a screen
+                    reader read out three flags before reaching the number they
+                    illustrate. */}
+                <span className={styles.stack} role="img" aria-label={stat.stackLabel}>
+                  {stat.lottie ? (
+                    <LottieIcon animationData={stat.lottie} size={32} play={statsShown} />
+                  ) : (
+                    stat.stack?.map((src) => (
+                      <span className={styles.chip} key={src}>
+                        <img className={styles.chipArt} src={src} alt="" />
+                      </span>
+                    ))
+                  )}
+                </span>
                 <CountUp
                   className={styles.statValue}
                   target={stat.target}

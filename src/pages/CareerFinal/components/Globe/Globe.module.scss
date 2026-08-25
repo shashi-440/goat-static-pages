@@ -89,15 +89,16 @@
   width: 100%;
 }
 
+// Left-aligned, matching the amberscholar row. It was centred, which worked when
+// the column held only a figure and a label — but the visual above them is a
+// left-flush stack, and a centred figure under it looked misregistered.
+//
+// `gap` is dropped in favour of explicit margins on `.stack` (16px) and
+// `.statLabel` (10px): the three elements want two different gaps, not one.
 .stat {
-  // Figure centred over its label. The label is always the wider of the two, so
-  // centring is what makes each figure sit visually above the middle of its own
-  // column rather than hanging off the left edge.
-  align-items: center;
+  align-items: flex-start;
   display: flex;
   flex-direction: column;
-  // Figma's 4px.
-  gap: 4px;
   // Sized by content, not stretched. The label is the wider element in every
   // column, so it sets the width — which means the column does NOT change width
   // as the figure counts up through digit counts. That is what keeps the row
@@ -119,21 +120,129 @@
 // 26px rather than the About Us spec's 30px. That spec is for a row spanning a
 // full centred section; here the three sit inside a 594px copy column beside the
 // globe, where 30px read as oversized against the 18px body copy above them.
+// 30px/36px, matching the amberscholar stats row. Was 26px/32px, which sat below
+// the scale that row uses and made the same three-figure pattern read as a
+// smaller, secondary version of it.
+// ---- Stat visuals -------------------------------------------------------
+// Every stat carries one of these, all the same 32px height and the same count.
+// Three columns where one has a picture and two do not reads as two of them being
+// unfinished; keeping the shape constant and changing only what is inside the
+// circles makes the row read as one set.
+//
+// 16px under the visual, against 10px under the figure: the figure and its label
+// are one pair, and the wider gap is what separates that pair from the visual
+// without stranding it above them.
+.stack {
+  align-items: center;
+  align-self: flex-start;
+  display: inline-flex;
+  height: 32px;
+  margin-bottom: 16px;
+}
+
+.chip {
+  background: #fff;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  // Declared flat here rather than only in the hover rule, so the shadow has
+  // something to transition FROM — appearing from nothing jumps on frame one.
+  box-shadow: 0 0 0 rgba(32, 32, 32, 0);
+  flex-shrink: 0;
+  height: 32px;
+  overflow: hidden;
+  position: relative;
+  // The fan below moves TRANSFORMS, not the negative margin that creates the
+  // overlap: animating that margin would relayout the whole row every frame.
+  transition:
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.45s ease;
+  width: 32px;
+
+  // Negative margin, not `gap` — the circles are meant to overlap. The first is
+  // left alone so the stack starts flush with the column's left edge, in line
+  // with the figure and label below it.
+  & + & {
+    margin-left: -10px;
+  }
+}
+
+// Hairline inside the white ring, so a pale flag still has an edge against the
+// white section behind it.
+.chip::after {
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(32, 32, 32, 0.1);
+  content: "";
+  inset: 0;
+  position: absolute;
+}
+
+.chipArt {
+  display: block;
+  height: 100%;
+  // `cover` on purpose: the headshots are portrait crops and the flags are
+  // square, and both have to fill a circle. `contain` would letterbox them.
+  object-fit: cover;
+  width: 100%;
+}
+
+// Hover unwinds the overlap left to right, so the stack opens like a hand of
+// cards rather than sliding as a block. The per-circle delay is what makes it one
+// connected movement; on the way out these rules stop applying, so it closes as a
+// single gesture.
+//
+// Triggered from the whole `.stat`, not the stack: a 76px target next to the
+// number it belongs to feels like a mis-hover rather than an invitation.
+.stat:hover {
+  .chip {
+    box-shadow: 0 6px 16px rgba(32, 32, 32, 0.16);
+    transform: translateY(-3px);
+  }
+
+  .chip:nth-child(2) {
+    transform: translate3d(7px, -3px, 0);
+    transition-delay: 40ms;
+  }
+
+  .chip:nth-child(3) {
+    transform: translate3d(14px, -3px, 0);
+    transition-delay: 80ms;
+  }
+}
+
+// The lift IS the interaction, so there is nothing worth keeping without it — a
+// shadow on its own reads as a hover state that failed to finish.
+@media (prefers-reduced-motion: reduce) {
+  .chip {
+    transition: none;
+  }
+
+  .stat:hover .chip,
+  .stat:hover .chip:nth-child(2),
+  .stat:hover .chip:nth-child(3) {
+    box-shadow: 0 0 0 rgba(32, 32, 32, 0);
+    transform: none;
+  }
+}
+
 .statValue {
   color: #202020;
-  font-size: 26px;
+  font-size: 30px;
   font-weight: 550;
   letter-spacing: -0.3px;
-  line-height: 32px;
+  line-height: 36px;
+  white-space: nowrap;
 }
 
 // Figma's 16px/20px at weight 450, same as the About Us stat labels.
+// 16px/20px, also from amberscholar. `text-align: center` is dropped with it —
+// the visual, figure and label are left-aligned as one column now, and a centred
+// label under a left-aligned stack looked misregistered.
 .statLabel {
   color: #636363;
-  font-size: 14px;
-  font-weight: 450;
-  line-height: 18px;
-  text-align: center;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 20px;
+  margin-top: 10px;
   // One line each. Wrapping was what made the row look misaligned — a two-line
   // label pushed its own column taller than its neighbours.
   white-space: nowrap;
