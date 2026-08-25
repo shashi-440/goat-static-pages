@@ -57,12 +57,13 @@ const STAGGER = 80;
  * accordion did. Nothing is hidden behind an interaction, so the whole offer
  * reads at a glance.
  *
- * Dark band, so it carries data-nav-theme="dark": the shared Navbar watches for
- * that attribute and switches to its white logo and light links while the
- * section is behind the header line.
+ * Light band now (#f7f7f7), so it deliberately does NOT carry
+ * data-nav-theme="dark". The shared Navbar switches to its white logo and light
+ * links while such a section is behind the header line — correct when this was a
+ * #151515 band, but it would put white-on-grey now.
  */
 const Benefits = () => (
-  <section className={styles.section} data-nav-theme="dark">
+  <section className={styles.section}>
     <div className={styles.inner}>
       <Reveal className={styles.top}>
         <h2 className={styles.heading}>Benefits</h2>
