@@ -74,29 +74,71 @@
   width: 100%;
 }
 
+// The card. A pale lilac-to-pink wash rather than flat white, so the grid reads
+// as a set of objects on the grey band instead of six panels the same colour as
+// the page.
+//
+// The gradient runs to the BOTTOM-RIGHT (135deg) and is lightest at the top-left,
+// which puts its strongest colour directly behind the icon in that corner — the
+// icon then sits on tint rather than on near-white, and needs no container of its
+// own to read as deliberate.
+//
+// `min-height` rather than a fixed height: the copy is short and even now, so the
+// cards are naturally close in size, and a floor keeps the icon from riding up
+// into the text on the shortest one ("Time Away") without stretching the rest.
 .card {
-  background: #fff;
-  border: 1px solid rgba(17, 25, 40, 0.08);
-  border-radius: 16px;
+  // Stronger than a first pass at #fdf7ff -> #fbe4f3, which was so pale against
+  // the #f7f7f7 band that the cards barely separated from it. These stops carry
+  // real tint while staying light enough for near-black text.
+  background: linear-gradient(135deg, #fbf3ff 0%, #f0e2fb 45%, #fbd9ee 100%);
+  border: 1px solid rgba(17, 25, 40, 0.05);
+  border-radius: 18px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 32px;
+  min-height: 232px;
+  padding: 26px 26px 22px;
+}
+
+// NOTE: no opacity/transform here. The card IS a `Reveal`, which brings its own
+// `.reveal` -> `.isVisible` fade-and-rise and its own reduced-motion handling.
+// Declaring opacity: 0 on `.card` as well would fight that — and since Reveal
+// toggles its own class rather than one of ours, the card would never fade in.
+
+// Bottom-right corner. `margin-top: auto` is what pins it: the card is a column
+// flexbox, so the auto margin absorbs all the leftover vertical space above the
+// icon and pushes it to the floor regardless of how many lines the body ran to.
+// `align-self: flex-end` does the same on the cross axis for the right edge.
+.cardIcon {
+  align-self: flex-end;
+  display: block;
+  height: 28px;
+  margin-top: auto;
+  width: 28px;
+
+  // The glyph colour is baked into the Lottie JSON (these ship recoloured to
+  // $neutral7), so it cannot be restyled with `color` or `fill` from here. On the
+  // lilac wash that mid-grey washed out almost to nothing, so the whole layer is
+  // pushed darker with a filter instead — brightness below 1 deepens the stroke
+  // and saturate pulls it toward the card's plum family rather than staying grey.
+  filter: brightness(0.42) saturate(1.5);
+  opacity: 0.9;
 }
 
 .cardTitle {
-  color: $neutral9;
+  color: #2a1c33;
   font-size: 18px;
   font-weight: 600;
+  letter-spacing: -0.2px;
   line-height: 24px;
   margin: 0;
 }
 
-// $neutral8 on white holds comfortably above 7:1, so the copy reads as body text
-// rather than receding into the card — the same intent the old #b6bcc4 had on the
-// dark band.
+// A desaturated plum rather than $neutral8: on the lilac wash a neutral grey
+// reads as slightly green, and this keeps the copy in the card's own colour
+// family while still holding above 7:1 against the lightest stop.
 .cardBody {
-  color: $neutral8;
+  color: #4a3a55;
   font-size: 16px;
   font-weight: 400;
   line-height: 26px;
