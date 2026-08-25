@@ -3,20 +3,24 @@ import wrapperHOC from "@Utils/wrapperHOC";
 import Reveal from "../../../AboutUsV2/components/Reveal/Reveal";
 import LottieIcon, { LottieIconHandle } from "../LottieIcon/LottieIcon";
 import styles from "./Benefits.module.scss";
-// One icon per benefit, from the set this page already uses.
+// One purpose-picked icon per benefit, from the Iconly animation set.
 //
-// FOUR OF THESE FILES ARE UNUSABLE: heart-bag, cup, party and shield render
-// nothing — sampled at frames 20 through 89, every one is blank, so they are
-// broken exports rather than mis-timed animations. (LottieIcon parks on the last
-// frame, which is why the first attempt here showed only two of six icons.) The
-// working set is ai-brain, ai-chip, flash, globe, graduation, rocket, search,
-// shield-key, stopwatch-speed, user-ai and users-ai; these six are drawn from it.
-import usersAiAnim from "../../assets/lottie/users-ai.json";
-import rocketAnim from "../../assets/lottie/rocket.json";
-import userAiAnim from "../../assets/lottie/user-ai.json";
-import shieldKeyAnim from "../../assets/lottie/shield-key.json";
-import stopwatchAnim from "../../assets/lottie/stopwatch-speed.json";
-import graduationAnim from "../../assets/lottie/graduation.json";
+// Copied into this folder rather than referenced from outside the repo, and
+// recoloured on import from pure black (and a few red accents) to $neutral7 —
+// the grey every other Lottie on this page uses. White stops are deliberately
+// left alone: in these files white is the knockout that gives each glyph its
+// counters, so recolouring it would fill the holes and turn the icon into a blob.
+//
+// Each was rendered at frames 0/20/40/60/89 before being committed, to confirm it
+// ends on a drawn frame. That check exists because four of this page's original
+// icons (heart-bag, cup, party, shield) are blank at every frame, and LottieIcon
+// parks on the last one — so a broken export shows up as a missing icon.
+import healthAnim from "../../assets/lottie/benefit-health.json";
+import everydayAnim from "../../assets/lottie/benefit-everyday.json";
+import familyAnim from "../../assets/lottie/benefit-family.json";
+import financialAnim from "../../assets/lottie/benefit-financial.json";
+import timeAnim from "../../assets/lottie/benefit-time.json";
+import learningAnim from "../../assets/lottie/benefit-learning.json";
 
 interface Benefit {
   title: string;
@@ -37,38 +41,38 @@ const BENEFITS: Benefit[] = [
     body:
       "Medical, dental and vision cover for you and your dependents, plus therapy and mental " +
       "health support when you need it.",
-    icon: usersAiAnim,
+    icon: healthAnim,
   },
   {
     title: "Everyday Life",
     body:
       "A monthly lifestyle stipend, commuter and phone allowances, and lunch and snacks on the " +
       "house.",
-    icon: rocketAnim,
+    icon: everydayAnim,
   },
   {
     title: "Family Support",
     body:
       "Paid parental leave for biological, adoptive and foster parents, with support for your " +
       "path to parenthood.",
-    icon: userAiAnim,
+    icon: familyAnim,
   },
   {
     title: "Financial Future",
     body:
       "Retirement and pension plans with a company match, and help navigating equity and " +
       "financial planning.",
-    icon: shieldKeyAnim,
+    icon: financialAnim,
   },
   {
     title: "Time Away",
     body: "Flexible paid vacation, public holidays, and a company-wide year-end closure.",
-    icon: stopwatchAnim,
+    icon: timeAnim,
   },
   {
     title: "Learning & Growth",
     body: "Funds for courses, training and subscriptions, so you keep growing in the role.",
-    icon: graduationAnim,
+    icon: learningAnim,
   },
 ];
 
