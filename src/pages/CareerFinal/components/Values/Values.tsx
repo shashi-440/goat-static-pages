@@ -17,7 +17,12 @@ import aiChipAnim from "../../assets/lottie/ai-chip.json";
 import usersAiAnim from "../../assets/lottie/users-ai.json";
 import graduationAnim from "../../assets/lottie/graduation.json";
 import globeAnim from "../../assets/lottie/globe.json";
-import rocketAnim from "../../assets/lottie/rocket.json";
+// Sunrise for "Irrational optimism" — a sun clearing the horizon with an upward
+// arrow. Recoloured from pure black to $neutral7 like the rest of the set. Two of
+// its layers (Mask, Arrow) end at frame 12 while the comp runs to 90, so the
+// frames were checked: the arrow is back by 45 and the resting frame 89 draws the
+// complete glyph, which is what LottieIcon parks on.
+import sunriseAnim from "../../assets/lottie/value-sunrise.json";
 
 interface Value {
   icon: any;
@@ -87,7 +92,7 @@ const VALUES: Value[] = [
       "speed of work is better that way.",
   },
   {
-    icon: rocketAnim,
+    icon: sunriseAnim,
     title: "Irrational optimism",
     body:
       "We believe difficult things are possible before there is enough evidence to prove it. " +
