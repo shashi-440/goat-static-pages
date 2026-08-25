@@ -74,45 +74,63 @@
   width: 100%;
 }
 
+// The grid cell. This is the `Reveal`, so its transform belongs to the entrance
+// animation — the tilt lives two levels down instead.
+.cardOuter {
+  display: flex;
+  min-width: 0;
+}
+
 // White on the #f7f7f7 band, matching the rest of the light v2 sections.
 //
-// This was briefly a lilac-to-pink gradient wash. White reads better here: the
-// band is already tinted, and a second colour on top of it competed with the
-// photos and headshots elsewhere on the page rather than sitting quietly behind
-// the copy.
+// Also the PERSPECTIVE HOST for the tilt below. Perspective has to sit on the
+// parent of the rotating element: declaring it on the same element that carries
+// the rotation flattens the effect to a plain 2D skew.
 //
 // White on #f7f7f7 is only 8 levels of separation, so the 1px hairline is what
 // keeps the grid from dissolving into the band.
 .card {
+  --tilt-x: 0deg; // written by JS from the cursor's height within the card
+
   background: #fff;
   border: 1px solid rgba(17, 25, 40, 0.08);
   border-radius: 16px;
+  min-height: 232px;
+  perspective: 800px;
+  width: 100%;
+}
+
+// The rotating layer. Kept separate from `.card` so the border and background
+// stay unrotated as a frame while the contents tip — and separate from the
+// `Reveal` above so the entrance and the tilt never overwrite each other's
+// transform. 0.12s is short enough to track a moving cursor without lag but long
+// enough that the return to level is not a snap.
+.tilt {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  min-height: 232px;
-  padding: 26px 26px 22px;
+  height: 100%;
+  padding: 26px;
+  transform: rotateX(var(--tilt-x));
+  transform-style: preserve-3d;
+  transition: transform 0.12s ease-out;
 }
 
-// NOTE: no opacity/transform here. The card IS a `Reveal`, which brings its own
-// `.reveal` -> `.isVisible` fade-and-rise and its own reduced-motion handling.
-// Declaring opacity: 0 on `.card` as well would fight that — and since Reveal
-// toggles its own class rather than one of ours, the card would never fade in.
+@media (prefers-reduced-motion: reduce) {
+  .tilt {
+    transform: none;
+    transition: none;
+  }
+}
 
-// Bottom-right corner. `margin-top: auto` is what pins it: the card is a column
-// flexbox, so the auto margin absorbs all the leftover vertical space above the
-// icon and pushes it to the floor regardless of how many lines the body ran to.
-// `align-self: flex-end` does the same on the cross axis for the right edge.
+// Leads the card now, above the title. `margin-bottom` rather than relying on the
+// column gap so the icon-to-title distance is tuned independently of the
+// title-to-body one.
 .cardIcon {
-  align-self: flex-end;
   display: block;
-  height: 28px;
-  margin-top: auto;
-  width: 28px;
-
-  // No filter. The glyphs ship recoloured to $neutral7, which needed darkening to
-  // survive the lilac wash but is already the right weight on white — the same
-  // grey the Values icons use on their own white cards.
+  height: 30px;
+  margin-bottom: 6px;
+  width: 30px;
 }
 
 .cardTitle {
