@@ -25,39 +25,27 @@ $img-gap: 10px;
 // like three unrelated carousels rather than one gallery.
 $row-gap: 14px;
 
-// Flat white behind the photos, with the darkening compressed into the last
-// stretch only.
+// Flat white, full height.
 //
-// This used to be a full-height white → near-black ramp, so the middle and
-// bottom rows sat on grey and dark grey — which dulled the photos and made the
-// three rows look like they belonged to different sections. White throughout
-// keeps them reading as one set.
+// This carried a white -> #0a0a0a ramp in its last 16%, added to avoid a hard
+// edge against CrewCTA below. The ramp itself was the problem: over ~130px it
+// read as a long grey smear under the bottom row of photos rather than as a
+// transition, and it dulled the images it sat beneath.
 //
-// The tail is still needed: CrewCTA directly below opens on #0a0a0a, so ending
-// this section at pure white would leave a hard white-to-black line at the
-// boundary. Holding white to 84% and ramping over the remaining 16% keeps the
-// photos on white while still handing off to the exact colour CrewCTA starts
-// from. (Ending at #000 rather than #0a0a0a would make the page get *lighter*
-// across the join — rgb 3 → rgb 10 — which reads as a line however subtle.)
+// The section ends white now and CrewCTA opens on its own flat #0a0a0a, so the
+// boundary is a crisp line. That matches how every other seam on this page
+// works — Globe white -> Benefits grey -> Values white are all hard edges — so
+// the join reads as two deliberate panels rather than an unfinished fade.
 .section {
-  background: linear-gradient(
-    180deg,
-    #fff 0%,
-    #fff 84%,
-    #6b6b6b 92%,
-    #1a1a1a 97%,
-    #0a0a0a 100%
-  );
+  background: #fff;
   // The ring is far wider than the viewport; this clips it rather than letting
   // the page scroll sideways.
   overflow: hidden;
-  // Bottom padding widened from 96px. The ramp below begins at 84% of the
-  // section's height, and with the shorter 96px the third row's lower edge fell
-  // inside that ramp — the bottom band of photos was visibly dimmed while the
-  // two above it sat on white. The extra space puts the whole ramp below the
-  // cards, so all three rows are lit identically.
-  padding: 8px 0 168px;
-  // Anchors `.darkZone` below.
+  // Back to 96px. The 168px was headroom for the removed ramp — it had to start
+  // below the third row of cards so the photos were not dimmed by it. With a flat
+  // background the cards need no such clearance, and the extra 72px just left a
+  // band of empty white above the CTA.
+  padding: 8px 0 96px;
   position: relative;
   width: 100%;
 }
@@ -66,22 +54,6 @@ $row-gap: 14px;
 // Navbar looks for [data-nav-theme="dark"] and switches to its light logo and
 // links while such an element is behind the 64px header line.
 //
-// Follows the ramp above rather than the old 25%. The background is white for
-// the first 84% now, so flipping the header to its white logo at a quarter of
-// the way down would put white-on-white. Starting at 88% means the switch
-// happens only once the backdrop behind the header line is genuinely dark.
-//
-// Paints nothing and takes no clicks — it exists only to be found by the
-// Navbar's querySelectorAll.
-.darkZone {
-  bottom: 0;
-  left: 0;
-  pointer-events: none;
-  position: absolute;
-  right: 0;
-  top: 88%;
-}
-
 // The cap has to sit OUTSIDE the gutter padding, not inside it. Previously this
 // was `max-width: 720px` with `padding: 0 var(--page-gutter)` on the same box —
 // and since the gutter is at least 80px a side, that left only ~560px of usable

@@ -413,15 +413,12 @@ const Gallery = () => {
     return () => stage.removeEventListener("wheel", onWheel);
   }, [apply]);
 
+  // No data-nav-theme marker in this section any more. It used to end in a dark
+  // ramp, so it carried one over its lower region to flip the header to its white
+  // logo. The background is flat white now and a white logo on white would
+  // vanish; CrewCTA below carries its own marker for the real dark band.
   return (
     <section className={styles.section}>
-      {/* The section runs white → near-black, so it cannot carry
-          data-nav-theme="dark" as a whole — the header would flip to its white
-          logo while still over the pale top. This zero-impact marker covers only
-          the region from the carousel down, which is what the shared Navbar
-          detects. */}
-      <div className={styles.darkZone} data-nav-theme="dark" aria-hidden="true" />
-
       <div className={styles.header}>
         <Reveal className={styles.headerInner}>
           <h2 className={styles.title}>Life at amber</h2>
