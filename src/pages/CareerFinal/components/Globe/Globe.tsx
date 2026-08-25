@@ -6,7 +6,7 @@ import Reveal from "../../../AboutUsV2/components/Reveal/Reveal";
 // The About Us count-up: renders the final value on the server so the figures
 // are present without JS, then counts from 0 once visible.
 import CountUp from "../../../AboutUsV2/components/CountUp/CountUp";
-import LottieIcon from "../LottieIcon/LottieIcon";
+import LottieIcon, { LottieIconHandle } from "../LottieIcon/LottieIcon";
 import styles from "./Globe.module.scss";
 // Team headshots — the markers are the people, not the places. Six individual
 // shots plus five crew shots is every face this page has; with fifteen markers a
@@ -53,9 +53,14 @@ import flagEG from "../../assets/flags/eg.png";
 import flagTH from "../../assets/flags/th.png";
 import flagCN from "../../assets/flags/cn.png";
 import flagIN from "../../assets/flags/in.png";
-// The mark for "Languages spoken" — verified to render (it is one of the icons in
-// this folder that ends on a drawn frame).
-import globeAnim from "../../assets/lottie/globe.json";
+// The mark for "Languages spoken" — two speech bubbles that swap an A for a 文.
+//
+// Recoloured on import: it ships with blue, teal and magenta stops, and every
+// other Lottie on this page is $neutral7. The twelve WHITE stops are deliberately
+// left alone — white is the bubble fill the characters sit on, and recolouring it
+// would flood the bubbles and lose the glyphs. Verified to draw at frames
+// 0/24/48/72/96/120, including the last one, which is what it rests on.
+import translateAnim from "../../assets/lottie/stat-translate.json";
 
 interface Person {
   name: string;
@@ -169,7 +174,7 @@ const STATS: Stat[] = [
     // No photograph exists of a spoken language, so this column plays a mark
     // instead. It keeps the same 32px box as the stacks so the three figures stay
     // on one line — a taller visual here would push this number down alone.
-    lottie: globeAnim,
+    lottie: translateAnim,
     stackLabel: "Over 15 languages spoken across the team",
   },
 ];
@@ -315,9 +320,10 @@ const Globe = () => {
   // Index of the person whose card is open, or null. Also read by the render
   // loop (through activeRef) to hold the globe still while a card is up.
   const [active, setActive] = useState<number | null>(null);
-  // Plays the stats' mark once the row is on screen. The row sits below the fold,
-  // so a self-starting one-shot would run unseen and then hold finished forever.
-  const [statsShown, setStatsShown] = useState(false);
+  // The stats' mark animates on hover only — never on load and never on a loop.
+  // A ref rather than state: replaying is a command to one child, not a value the
+  // render depends on, and routing it through state would re-render the row.
+  const statMarkRef = useRef<LottieIconHandle | null>(null);
   const [pins, setPins] = useState<Projected[]>(() =>
     PEOPLE.map(() => ({ x: SIZE / 2, y: SIZE / 2, z: -1 })),
   );
@@ -334,27 +340,6 @@ const Globe = () => {
   // effect and closes over that scope, so reading the state variable there would
   // pin it to its initial null forever.
   const activeRef = useRef<number | null>(null);
-  const statsRef = useRef<HTMLUListElement>(null);
-
-  // Fire the stats' mark the first time the row scrolls into view.
-  useEffect(() => {
-    const node = statsRef.current;
-    if (!node || typeof IntersectionObserver === "undefined") {
-      setStatsShown(true);
-      return undefined;
-    }
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
-          setStatsShown(true);
-          io.disconnect();
-        }
-      },
-      { threshold: 0.4 },
-    );
-    io.observe(node);
-    return () => io.disconnect();
-  }, []);
 
   // Keep the loop's view of the open card current.
   useEffect(() => {
@@ -526,16 +511,32 @@ const Globe = () => {
 
           {/* The figures the lede used to carry as prose. Counting them up gives
               them the weight a sentence clause never had. */}
-          <ul ref={statsRef} className={styles.stats}>
+          <ul className={styles.stats}>
             {STATS.map((stat, i) => (
               <Reveal as="li" key={stat.label} className={styles.stat} delay={160 + i * 90}>
                 {/* One `role="img"` with a single label for the whole visual, not
                     an alt per circle — three separate alts would have a screen
                     reader read out three flags before reaching the number they
                     illustrate. */}
-                <span className={styles.stack} role="img" aria-label={stat.stackLabel}>
+                <span
+                  className={styles.stack}
+                  role="img"
+                  aria-label={stat.stackLabel}
+                  // The hover target is the visual itself rather than the whole
+                  // stat. `Reveal` accepts no DOM handlers, and giving it some
+                  // would change a component three other sections share.
+                  onMouseEnter={stat.lottie ? () => statMarkRef.current?.replay() : undefined}
+                >
                   {stat.lottie ? (
-                    <LottieIcon animationData={stat.lottie} size={32} play={statsShown} />
+                    <LottieIcon
+                      ref={statMarkRef}
+                      animationData={stat.lottie}
+                      size={32}
+                      // `play` stays false: the icon renders its settled frame and
+                      // waits. Hovering the stat calls replay() — see the handler
+                      // on the <Reveal> below.
+                      play={false}
+                    />
                   ) : (
                     stat.stack?.map((src) => (
                       <span className={styles.chip} key={src}>
