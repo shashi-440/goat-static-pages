@@ -74,25 +74,19 @@
   width: 100%;
 }
 
-// The card. A pale lilac-to-pink wash rather than flat white, so the grid reads
-// as a set of objects on the grey band instead of six panels the same colour as
-// the page.
+// White on the #f7f7f7 band, matching the rest of the light v2 sections.
 //
-// The gradient runs to the BOTTOM-RIGHT (135deg) and is lightest at the top-left,
-// which puts its strongest colour directly behind the icon in that corner — the
-// icon then sits on tint rather than on near-white, and needs no container of its
-// own to read as deliberate.
+// This was briefly a lilac-to-pink gradient wash. White reads better here: the
+// band is already tinted, and a second colour on top of it competed with the
+// photos and headshots elsewhere on the page rather than sitting quietly behind
+// the copy.
 //
-// `min-height` rather than a fixed height: the copy is short and even now, so the
-// cards are naturally close in size, and a floor keeps the icon from riding up
-// into the text on the shortest one ("Time Away") without stretching the rest.
+// White on #f7f7f7 is only 8 levels of separation, so the 1px hairline is what
+// keeps the grid from dissolving into the band.
 .card {
-  // Stronger than a first pass at #fdf7ff -> #fbe4f3, which was so pale against
-  // the #f7f7f7 band that the cards barely separated from it. These stops carry
-  // real tint while staying light enough for near-black text.
-  background: linear-gradient(135deg, #fbf3ff 0%, #f0e2fb 45%, #fbd9ee 100%);
-  border: 1px solid rgba(17, 25, 40, 0.05);
-  border-radius: 18px;
+  background: #fff;
+  border: 1px solid rgba(17, 25, 40, 0.08);
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -116,29 +110,23 @@
   margin-top: auto;
   width: 28px;
 
-  // The glyph colour is baked into the Lottie JSON (these ship recoloured to
-  // $neutral7), so it cannot be restyled with `color` or `fill` from here. On the
-  // lilac wash that mid-grey washed out almost to nothing, so the whole layer is
-  // pushed darker with a filter instead — brightness below 1 deepens the stroke
-  // and saturate pulls it toward the card's plum family rather than staying grey.
-  filter: brightness(0.42) saturate(1.5);
-  opacity: 0.9;
+  // No filter. The glyphs ship recoloured to $neutral7, which needed darkening to
+  // survive the lilac wash but is already the right weight on white — the same
+  // grey the Values icons use on their own white cards.
 }
 
 .cardTitle {
-  color: #2a1c33;
+  color: $neutral9;
   font-size: 18px;
   font-weight: 600;
-  letter-spacing: -0.2px;
   line-height: 24px;
   margin: 0;
 }
 
-// A desaturated plum rather than $neutral8: on the lilac wash a neutral grey
-// reads as slightly green, and this keeps the copy in the card's own colour
-// family while still holding above 7:1 against the lightest stop.
+// $neutral8 on white holds comfortably above 7:1, so the copy reads as body text
+// rather than receding into the card.
 .cardBody {
-  color: #4a3a55;
+  color: $neutral8;
   font-size: 16px;
   font-weight: 400;
   line-height: 26px;
