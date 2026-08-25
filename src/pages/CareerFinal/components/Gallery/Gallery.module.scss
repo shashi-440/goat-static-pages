@@ -25,25 +25,38 @@ $img-gap: 10px;
 // like three unrelated carousels rather than one gallery.
 $row-gap: 14px;
 
-// White → near-black gradient, the same one the Team section used to carry.
+// Flat white behind the photos, with the darkening compressed into the last
+// stretch only.
 //
-// It belongs here now: the final stop is #0a0a0a, the exact colour CrewCTA's own
-// gradient starts from, and Gallery is what sits directly above CrewCTA. Ending
-// at #000 instead would make the page get *lighter* across that boundary
-// (rgb 3 → rgb 10), which reads as a hard line however subtle the values are.
+// This used to be a full-height white → near-black ramp, so the middle and
+// bottom rows sat on grey and dark grey — which dulled the photos and made the
+// three rows look like they belonged to different sections. White throughout
+// keeps them reading as one set.
+//
+// The tail is still needed: CrewCTA directly below opens on #0a0a0a, so ending
+// this section at pure white would leave a hard white-to-black line at the
+// boundary. Holding white to 84% and ramping over the remaining 16% keeps the
+// photos on white while still handing off to the exact colour CrewCTA starts
+// from. (Ending at #000 rather than #0a0a0a would make the page get *lighter*
+// across the join — rgb 3 → rgb 10 — which reads as a line however subtle.)
 .section {
   background: linear-gradient(
     180deg,
     #fff 0%,
-    #d2d2d2 36.194%,
-    #3d3d3d 74.324%,
-    #1a1a1a 88.556%,
+    #fff 84%,
+    #6b6b6b 92%,
+    #1a1a1a 97%,
     #0a0a0a 100%
   );
   // The ring is far wider than the viewport; this clips it rather than letting
   // the page scroll sideways.
   overflow: hidden;
-  padding: 8px 0 96px;
+  // Bottom padding widened from 96px. The ramp below begins at 84% of the
+  // section's height, and with the shorter 96px the third row's lower edge fell
+  // inside that ramp — the bottom band of photos was visibly dimmed while the
+  // two above it sat on white. The extra space puts the whole ramp below the
+  // cards, so all three rows are lit identically.
+  padding: 8px 0 168px;
   // Anchors `.darkZone` below.
   position: relative;
   width: 100%;
@@ -53,16 +66,20 @@ $row-gap: 14px;
 // Navbar looks for [data-nav-theme="dark"] and switches to its light logo and
 // links while such an element is behind the 64px header line.
 //
-// Starts at 25%, just past where the header block ends (~22%) and the gradient
-// begins darkening in earnest. Paints nothing and takes no clicks — it exists
-// only to be found by the Navbar's querySelectorAll.
+// Follows the ramp above rather than the old 25%. The background is white for
+// the first 84% now, so flipping the header to its white logo at a quarter of
+// the way down would put white-on-white. Starting at 88% means the switch
+// happens only once the backdrop behind the header line is genuinely dark.
+//
+// Paints nothing and takes no clicks — it exists only to be found by the
+// Navbar's querySelectorAll.
 .darkZone {
   bottom: 0;
   left: 0;
   pointer-events: none;
   position: absolute;
   right: 0;
-  top: 25%;
+  top: 88%;
 }
 
 // The cap has to sit OUTSIDE the gutter padding, not inside it. Previously this

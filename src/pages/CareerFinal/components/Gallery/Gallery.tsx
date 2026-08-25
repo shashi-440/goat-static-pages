@@ -14,9 +14,14 @@ interface Shot {
   src: string;
 }
 
-// PLACEHOLDER PHOTOS — hotlinked Unsplash office stock, eleven images across
-// twenty-two slots (offset so no two adjacent cards repeat). Every URL was
-// checked to return 200.
+// PLACEHOLDER PHOTOS — hotlinked Unsplash, sixteen DISTINCT images, no repeats.
+// Every URL was checked to return 200.
+//
+// Chosen for colour and people rather than empty rooms: the previous set was
+// muted office interiors, which looked flat once the dark background came off
+// and the photos had to carry the section on their own. Dark concert and
+// architectural shots were deliberately rejected — against a white backdrop they
+// read as holes in the strip.
 //
 // These are stand-ins: replace each `src` with a local import of the real photo
 // and nothing else here changes.
@@ -26,68 +31,68 @@ interface Shot {
 // automatically. Sixteen puts ~8 across the viewport, matching the reference.
 const CARDS: Shot[] = [
   {
-    label: "Open-plan desks",
-    src: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=820&h=560&q=72&auto=format&fit=crop",
+    label: "Conference talk",
+    src: "https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=820&h=560&q=72&auto=format&fit=crop",
   },
   {
-    label: "Team standup",
-    src: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=820&h=560&q=72&auto=format&fit=crop",
+    label: "Students on campus",
+    src: "https://images.unsplash.com/photo-1543269865-cbf427effbad?w=820&h=560&q=72&auto=format&fit=crop",
   },
   {
-    label: "Pair programming",
-    src: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=820&h=560&q=72&auto=format&fit=crop",
+    label: "Working together",
+    src: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=820&h=560&q=72&auto=format&fit=crop",
   },
   {
-    label: "Whiteboard session",
-    src: "https://images.unsplash.com/photo-1541746972996-4e0b0f43e02a?w=820&h=560&q=72&auto=format&fit=crop",
+    label: "Festival lights",
+    src: "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=820&h=560&q=72&auto=format&fit=crop",
   },
   {
-    label: "Meeting room",
-    src: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=820&h=560&q=72&auto=format&fit=crop",
+    label: "Studio session",
+    src: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=820&h=560&q=72&auto=format&fit=crop",
   },
   {
-    label: "One-on-one",
-    src: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=820&h=560&q=72&auto=format&fit=crop",
+    label: "Sunset offsite",
+    src: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=820&h=560&q=72&auto=format&fit=crop",
   },
   {
-    label: "Design review",
-    src: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=820&h=560&q=72&auto=format&fit=crop",
+    label: "Long table dinner",
+    src: "https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=820&h=560&q=72&auto=format&fit=crop",
   },
   {
-    label: "Workshop",
+    label: "Workshop wall",
     src: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=820&h=560&q=72&auto=format&fit=crop",
   },
   {
-    label: "Sprint planning",
-    src: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=820&h=560&q=72&auto=format&fit=crop",
+    label: "Bright standup",
+    src: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=820&h=560&q=72&auto=format&fit=crop",
+  },
+  {
+    label: "Hands in",
+    src: "https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?w=820&h=560&q=72&auto=format&fit=crop",
+  },
+  {
+    label: "Drinks after work",
+    src: "https://images.unsplash.com/photo-1541532713592-79a0317b6b77?w=820&h=560&q=72&auto=format&fit=crop",
   },
   {
     label: "Team lunch",
-    src: "https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=820&h=560&q=72&auto=format&fit=crop",
+    src: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=820&h=560&q=72&auto=format&fit=crop",
+  },
+  {
+    label: "Group portrait",
+    src: "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=820&h=560&q=72&auto=format&fit=crop",
   },
   {
     label: "Collaboration",
-    src: "https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=820&h=560&q=72&auto=format&fit=crop",
+    src: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=820&h=560&q=72&auto=format&fit=crop",
   },
   {
     label: "Open-plan desks",
-    src: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=820&h=560&q=72&auto=format&fit=crop",
-  },
-  {
-    label: "Team standup",
-    src: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=820&h=560&q=72&auto=format&fit=crop",
+    src: "https://images.unsplash.com/photo-1552581234-26160f608093?w=820&h=560&q=72&auto=format&fit=crop",
   },
   {
     label: "Pair programming",
     src: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=820&h=560&q=72&auto=format&fit=crop",
-  },
-  {
-    label: "Whiteboard session",
-    src: "https://images.unsplash.com/photo-1541746972996-4e0b0f43e02a?w=820&h=560&q=72&auto=format&fit=crop",
-  },
-  {
-    label: "Meeting room",
-    src: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=820&h=560&q=72&auto=format&fit=crop",
   },
 ];
 
@@ -100,7 +105,9 @@ const CARDS: Shot[] = [
 // the full count to keep the original curve.
 //
 // Instead each row shows all sixteen, offset by a different amount so the three
-// rows are never displaying the same photo at the same angle.
+// rows are never displaying the same photo at the same angle. The deck holds no
+// duplicates now, so the offsets only have to be distinct — they no longer need
+// to avoid landing two copies of one photo side by side.
 const ROW_COUNT = 3;
 const ROW_OFFSET = [0, 6, 11];
 const ROWS: Shot[][] = Array.from({ length: ROW_COUNT }, (_, r) => {
