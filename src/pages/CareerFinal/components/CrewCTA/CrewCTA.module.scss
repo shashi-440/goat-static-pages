@@ -1,10 +1,13 @@
-// Picks up exactly where Team's gradient ends (#0a0a0a) and keeps descending to
-// black, so the two sections read as one continuous fade rather than a flat
-// band butted against a gradient. AboutUsV2 uses a flat #0a0a0a here because
-// nothing gradients into it there.
+// Flat #0a0a0a, matching AboutUsV2's treatment of this section.
+//
+// This was a #0a0a0a -> #000 gradient, written to continue the fade the Gallery
+// above used to hand off. Gallery still ends at #0a0a0a, so the join is seamless
+// with a flat fill — and a solid panel is what the section wants: the gradient's
+// only effect was to darken the lower half behind the CTA button and footer
+// links, which made the block look unevenly lit rather than deliberately dark.
 .section {
   align-items: center;
-  background: linear-gradient(180deg, #0a0a0a 0%, #050505 55%, #000 100%);
+  background: #0a0a0a;
   display: flex;
   flex-direction: column;
   // Was a flat 120px, 40px further in than the other sections. Uses the page

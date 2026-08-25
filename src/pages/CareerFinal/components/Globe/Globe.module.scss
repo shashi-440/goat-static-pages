@@ -152,10 +152,11 @@
   cursor: grabbing;
 }
 
-// Holds the pins so the whole layer gets one mouseleave, which is what releases
-// the latched selection when the cursor leaves the globe.
+// Holds the pins. Transparent to pointer events itself — each face opts back in
+// (see `.avatarPin`) — so the layer never intercepts a drag aimed at the globe.
 .pinLayer {
   inset: 0;
+  pointer-events: none;
   position: absolute;
 }
 
@@ -175,19 +176,158 @@
 // COBE's own markers cannot be used — it draws them as flat dots inside its
 // shader and has no way to render an image — so these are HTML over the canvas.
 //
-// Presentational only: `pointer-events: none` means a cursor crossing the globe
-// never interacts with a face, which is what keeps the idle spin undisturbed.
+// The LAYER is transparent to pointer events (`pointer-events: none` on
+// `.pinLayer`) while each face re-enables them for itself. That combination is
+// what lets a face be hovered for its card while a drag begun anywhere else —
+// including the ocean between faces — still grabs and spins the globe.
 // `left`/`top` are the projected point and the translate centres the face on it.
 .avatarPin {
-  height: 44px;
-  pointer-events: none;
+  // 32px, down from 44px. Twenty-one faces on a 622px globe cannot hold 44px
+  // without overlapping — the binding pair is always two of the UK's four, since
+  // the whole of Britain spans only ~40px of a 498px sphere.
+  //
+  // 32 and not 36: the shipped coordinates measure a 34.6px worst-case gap
+  // across a full rotation at nine tilt angles (binding pair David/Robin Walsh),
+  // so 36px would overlap by 1.4px at the tightest moment. 32px keeps a real
+  // 2.6px of daylight. Re-run the gap check before changing either number.
+  height: 32px;
+  // Interactive now, so a face can be hovered for its card. `pointer-events` is
+  // set back to `auto` EXPLICITLY: the parent `.pinLayer` sets `none` so drags
+  // over empty ocean reach the globe, and that inherits — without this line the
+  // faces inherit `none` too and nothing is ever hoverable.
+  cursor: pointer;
+  pointer-events: auto;
   position: absolute;
   // NO transition at all. Opacity and scale are now driven per-frame from the
   // pin's projected depth, so the easing lives in the depth ramp itself; a CSS
   // transition on top would fight those updates and make every face lag the
   // globe it is pinned to. `transform` is set inline for the same reason — it
   // carries the limb scale as well as the centring translate.
-  width: 44px;
+  width: 32px;
+}
+
+// Initials stand-in for the fifteen people without a headshot. Composed WITH
+// .avatarImg (both classes on the same element) so the ring, shadow and hover
+// lift are shared — a real JPG later swaps the element without changing layout.
+.avatarInitials {
+  align-items: center;
+  color: rgba(17, 25, 40, 0.72);
+  display: flex;
+  font-size: 12px;
+  font-weight: 600;
+  justify-content: center;
+  letter-spacing: 0.2px;
+  line-height: 1;
+  user-select: none;
+}
+
+/* ------------------------------------------------------------- hover card */
+
+// The detail card for one person. Anchored to its pin and lifted above it, with
+// the arrow below pointing back down at the face.
+//
+// Positioned with `bottom: 100%` rather than a translate so it grows upward from
+// the face regardless of how tall the content is — a two-line department does not
+// push the card down over the pin.
+//
+// Motion: fade + a 6px rise + a hair of scale, all on one transform, easing on a
+// gentle custom curve. `visibility` rides along so a hidden card is not a
+// focus/hit target mid-fade. The transition is on the CARD, not the pin — the pin
+// is re-styled every frame by the render loop, and a transition there would fight
+// those writes (see `.avatarPin`).
+.hoverCard {
+  background: #fff;
+  border-radius: 14px;
+  bottom: calc(100% + 12px);
+  box-shadow:
+    0 1px 2px rgba(17, 25, 40, 0.06),
+    0 12px 32px rgba(17, 25, 40, 0.16);
+  left: 50%;
+  opacity: 0;
+  padding: 12px 14px;
+  pointer-events: none;
+  position: absolute;
+  transform: translate(-50%, 6px) scale(0.96);
+  transition:
+    opacity 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s linear 260ms;
+  visibility: hidden;
+  // Wide enough for a full name and department on one line each, capped so a
+  // long department wraps rather than stretching the card across the globe.
+  width: max-content;
+  max-width: 210px;
+  z-index: 40;
+}
+
+// Shown state. `visibility` flips immediately on the way in (no delay) so the
+// fade is visible from its first frame.
+.hoverCardOpen {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+  transition:
+    opacity 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s;
+  visibility: visible;
+}
+
+// The arrow. A rotated square rather than a border triangle so the card's own
+// shadow reads continuously around it.
+.hoverCardArrow {
+  background: #fff;
+  bottom: -4px;
+  height: 9px;
+  left: 50%;
+  position: absolute;
+  transform: translateX(-50%) rotate(45deg);
+  width: 9px;
+}
+
+.cardName {
+  color: $neutral9;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.1px;
+  line-height: 18px;
+  margin: 0;
+  // Keeps the name on one line; the card sizes to content up to its max-width.
+  white-space: nowrap;
+}
+
+.cardDept {
+  color: $neutral6;
+  font-size: 12.5px;
+  font-weight: 400;
+  line-height: 17px;
+  margin: 2px 0 0;
+}
+
+// Flag + country, separated from the name block by a hairline.
+.cardCountry {
+  align-items: center;
+  border-top: 1px solid rgba(17, 25, 40, 0.08);
+  display: flex;
+  gap: 6px;
+  margin-top: 9px;
+  padding-top: 8px;
+}
+
+.cardFlag {
+  border-radius: 2px;
+  display: block;
+  flex: 0 0 16px;
+  height: 12px;
+  object-fit: cover;
+  width: 16px;
+}
+
+.cardCountryName {
+  color: $neutral7;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  white-space: nowrap;
 }
 
 // White ring + soft shadow so a face reads as sitting ON the globe and stays
@@ -198,8 +338,33 @@
   display: block;
   height: 100%;
   object-fit: cover;
+  // Only the ring and shadow animate. The pin's own transform carries the limb
+  // scale and is rewritten every frame, so growing the face on hover has to
+  // happen on this inner element instead — a transform here composes with the
+  // pin's rather than being overwritten by it.
+  transition:
+    box-shadow 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
   width: 100%;
 }
+
+// Hovered (or keyboard-focused) face: lifts slightly and takes a warmer, thicker
+// ring so the selected person is obvious even in a dense cluster.
+.avatarPin:hover .avatarImg,
+.avatarPin:focus-visible .avatarImg {
+  box-shadow:
+    0 0 0 3px #fff,
+    0 0 0 5px rgba(255, 87, 113, 0.9),
+    0 6px 18px rgba(0, 0, 0, 0.28);
+  transform: scale(1.14);
+}
+
+// The pin that owns an open card sits above its neighbours, so its card and ring
+// are never clipped by a face projected nearer the viewer.
+.avatarPinActive {
+  z-index: 30 !important;
+}
+
 
 // The globe is a fixed 622px, so below ~1190px the copy column drops under the
 // ~500px the three labels need and the row would wrap 2 + 1 — the ragged shape

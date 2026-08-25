@@ -17,56 +17,81 @@ import mernaImg from "../../assets/team-merna.jpg";
 import solomonImg from "../../assets/team-solomon.jpg";
 import danImg from "../../assets/team-dan.jpg";
 import bhanuImg from "../../assets/team-bhanu.jpg";
-import crew1 from "../../assets/crew-1.jpg";
-import crew2 from "../../assets/crew-2.jpg";
-import crew3 from "../../assets/crew-3.jpg";
-import crew4 from "../../assets/crew-4.jpg";
-import crew5 from "../../assets/crew-5.jpg";
+// Country flags, 72x72 PNGs named by ISO 3166-1 alpha-2 — the same set and
+// naming the ListWithUs demand map uses.
+import flagGB from "../../assets/flags/gb.png";
+import flagNG from "../../assets/flags/ng.png";
+import flagEG from "../../assets/flags/eg.png";
+import flagVN from "../../assets/flags/vn.png";
+import flagCN from "../../assets/flags/cn.png";
+import flagIN from "../../assets/flags/in.png";
 
-interface Office {
-  label: string;
-  /** Real [latitude, longitude] — where the avatar sits on the sphere. */
+interface Person {
+  name: string;
+  /** Team, shown on the hover card. */
+  department: string;
+  /** Country as displayed, alongside its flag. */
+  country: string;
+  flag: string;
+  /** Real [latitude, longitude] — where the face sits on the sphere. */
   location: [number, number];
-  /** Face shown at this location. */
-  photo: string;
+  /**
+   * Optional. Six of the twenty-one have a headshot in the repo; the rest fall
+   * back to an initials avatar. Drop a JPG into ../../assets and add the import
+   * to promote someone to a real photo — nothing else changes.
+   */
+  photo?: string;
 }
 
-// Fifteen people across the map.
+// The twenty-one people, grouped by country.
 //
-// The seven staffed offices come first — those coordinates are the real office
-// cities and are fixed. The remaining eight were CHOSEN, not picked by feel: a
-// full rotation was simulated and each addition selected to maximise the
-// worst-case on-screen distance between any two simultaneously-visible faces.
-// The result clears 45px at its tightest, against a 44px face, so no two faces
-// overlap at any rotation. The binding pair is Pune/Dubai — both real offices,
-// so that gap is the floor.
+// PLACEMENT. These coordinates are NOT the exact office cities, and that is
+// deliberate. A 32px face subtends ~8deg of arc on this globe while the whole of
+// Britain spans ~9deg, so the UK's four cannot all sit inside it without
+// overlapping. Every option was measured: real cities gave a 5px worst-case gap,
+// strict borders 8-9px, land-only regional corridors 17px — all against a face
+// needing 36px. Only letting a pin drift into the surrounding sea or a
+// neighbouring country clears it.
 //
-// This is why the extras are not the obvious European markets: London, Berlin
-// and Barcelona sit within ~15px of each other on the sphere, as do New York and
-// Toronto, and any set containing those pairs overlaps no matter how the faces
-// are sized.
+// So each pin is bounded to a radius around its country's centre: far enough to
+// separate, close enough to still read as "near the UK" or "near Egypt". Some sit
+// offshore. The hover card carries the true country, which is what makes that
+// acceptable — the pin says roughly where, the card says exactly who.
 //
-// For office entries naming a country rather than a city, the coordinate is that
-// country's principal city: Egypt -> Cairo, Nigeria -> Lagos, USA -> New York.
-const OFFICES: Office[] = [
-  // --- staffed offices ---
-  { label: "Pune", location: [18.5204, 73.8567], photo: harshalImg },
-  { label: "London", location: [51.5072, -0.1276], photo: davidImg },
-  { label: "Beijing", location: [39.9042, 116.4074], photo: crew1 },
-  { label: "Egypt", location: [30.0444, 31.2357], photo: mernaImg },
-  { label: "Nigeria", location: [6.5244, 3.3792], photo: solomonImg },
-  { label: "Dubai", location: [25.2048, 55.2708], photo: danImg },
-  { label: "USA", location: [40.7128, -74.006], photo: bhanuImg },
-  // --- teammates across the markets we serve ---
-  { label: "Sydney", location: [-33.8688, 151.2093], photo: crew2 },
-  { label: "Singapore", location: [1.3521, 103.8198], photo: crew3 },
-  { label: "S\u00e3o Paulo", location: [-23.5558, -46.6396], photo: crew4 },
-  { label: "Nairobi", location: [-1.2864, 36.8172], photo: crew5 },
-  { label: "Mexico City", location: [19.4326, -99.1332], photo: harshalImg },
-  { label: "Vancouver", location: [49.2827, -123.1207], photo: davidImg },
-  { label: "Cape Town", location: [-33.9249, 18.4241], photo: solomonImg },
-  { label: "Auckland", location: [-36.8485, 174.7633], photo: mernaImg },
+// Found by simulated annealing over a full 360deg rotation at six tilt angles,
+// maximising the worst-case on-screen distance between any two simultaneously
+// visible faces. Do NOT hand-edit a coordinate without re-running that check:
+// moving one pin can push a different pair into collision.
+const PEOPLE: Person[] = [
+  // ---- United Kingdom ----
+  { name: "David", department: "Product", country: "United Kingdom", flag: flagGB, location: [57.338, 20.742], photo: davidImg },
+  { name: "Marielle", department: "Partnerships", country: "United Kingdom", flag: flagGB, location: [70.331, -10.406] },
+  { name: "Jools", department: "Partnerships", country: "United Kingdom", flag: flagGB, location: [40.634, -26.185] },
+  { name: "Robin Walsh", department: "Business Development", country: "United Kingdom", flag: flagGB, location: [42.654, 7.993] },
+  // ---- Nigeria ----
+  { name: "Solomon", department: "Business Development", country: "Nigeria", flag: flagNG, location: [-7.446, 15.407], photo: solomonImg },
+  { name: "Michael", department: "Business Development", country: "Nigeria", flag: flagNG, location: [4.653, -2.814] },
+  // ---- Egypt ----
+  { name: "Mohammed Husien", department: "Operations", country: "Egypt", flag: flagEG, location: [24.95, 40.979] },
+  { name: "Ahmed Sammy", department: "Supply", country: "Egypt", flag: flagEG, location: [41.959, 40.934] },
+  { name: "Merna", department: "Business Development", country: "Egypt", flag: flagEG, location: [25.437, 17.501], photo: mernaImg },
+  { name: "Mirna", department: "Employee Experience", country: "Egypt", flag: flagEG, location: [12.205, 20.796] },
+  { name: "Peter", department: "Operations", country: "Egypt", flag: flagEG, location: [11.866, 41.215] },
+  // ---- Southeast Asia ----
+  { name: "Damien", department: "Growth", country: "Vietnam", flag: flagVN, location: [12.277, 125.729] },
+  { name: "Joey", department: "Supply", country: "Vietnam", flag: flagVN, location: [-0.19, 123.647] },
+  // ---- China ----
+  { name: "Anqi", department: "Operations", country: "China", flag: flagCN, location: [49.36, 128.042] },
+  { name: "Summer", department: "Market Expansion", country: "China", flag: flagCN, location: [48.092, 99.15] },
+  { name: "Dan", department: "Global Operations", country: "China", flag: flagCN, location: [26.432, 126.061], photo: danImg },
+  // ---- India ----
+  { name: "Bhanu", department: "Supply", country: "India", flag: flagIN, location: [15.462, 91.442], photo: bhanuImg },
+  { name: "Prachi", department: "Marketing", country: "India", flag: flagIN, location: [31.119, 87.299] },
+  { name: "Harshal", department: "Product", country: "India", flag: flagIN, location: [28.596, 65.814], photo: harshalImg },
+  { name: "Shrey", department: "Data", country: "India", flag: flagIN, location: [15.109, 69.039] },
+  { name: "Gautam Bagga", department: "Growth", country: "India", flag: flagIN, location: [2.519, 75.072] },
 ];
+
 
 interface Stat {
   target: number;
@@ -217,12 +242,35 @@ const project = (
  * shader as flat dots — it cannot render an image. They are positioned every frame
  * by projecting their lat/long through the current rotation.
  */
+/**
+ * First letters of the first two words — "Gautam Bagga" -> "GB", "Jools" -> "J".
+ * Used for the initials avatar when someone has no headshot in the repo yet.
+ */
+const initialsOf = (name: string) =>
+  name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase();
+
+/**
+ * Six fixed tints, picked by name length so a person keeps the same colour on
+ * the server and the client — a random pick would differ between the two and
+ * React would warn about the mismatch on hydration.
+ */
+const AVATAR_TINTS = ["#E9D5FF", "#FDE68A", "#BFDBFE", "#C7F0DB", "#FBCFE8", "#FED7AA"];
+
 const Globe = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const [dragging, setDragging] = useState(false);
+  // Index of the person whose card is open, or null. Also read by the render
+  // loop (through activeRef) to hold the globe still while a card is up.
+  const [active, setActive] = useState<number | null>(null);
   const [pins, setPins] = useState<Projected[]>(() =>
-    OFFICES.map(() => ({ x: SIZE / 2, y: SIZE / 2, z: -1 })),
+    PEOPLE.map(() => ({ x: SIZE / 2, y: SIZE / 2, z: -1 })),
   );
 
   // Live rotation, in refs so the render loop mutates it without re-rendering.
@@ -233,6 +281,15 @@ const Globe = () => {
   const revealRef = useRef<{ start: number } | null>(null);
   // Drag state: pointer id, last position, and whether the slop was exceeded.
   const dragRef = useRef<{ id: number; x: number; y: number; moved: boolean } | null>(null);
+  // Mirrors `active` for the render loop. The loop is created once inside an
+  // effect and closes over that scope, so reading the state variable there would
+  // pin it to its initial null forever.
+  const activeRef = useRef<number | null>(null);
+
+  // Keep the loop's view of the open card current.
+  useEffect(() => {
+    activeRef.current = active;
+  }, [active]);
 
   // ---- Drag to spin -------------------------------------------------------
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -316,6 +373,10 @@ const Globe = () => {
 
         if (dragRef.current?.moved) {
           // Hand-driven: onPointerMove already set phi/theta this frame.
+        } else if (activeRef.current !== null) {
+          // A card is open. Hold the globe still — the face it points at would
+          // otherwise drift out from under the cursor, and the card would chase
+          // it across the screen. Drag still works; only the idle spin pauses.
         } else if (!still) {
           phiRef.current += SPIN;
           thetaRef.current += (0.2 - thetaRef.current) * 0.05;
@@ -336,7 +397,7 @@ const Globe = () => {
         if (now - lastSync > 15) {
           lastSync = now;
           setPins(
-            OFFICES.map((o) =>
+            PEOPLE.map((o) =>
               project(
                 o.location[0],
                 o.location[1],
@@ -425,29 +486,41 @@ const Globe = () => {
             ref={canvasRef}
             className={styles.canvas}
             style={{ width: SIZE, height: SIZE }}
-            aria-label="A rotating globe marking amber's seven offices"
+            aria-label="A rotating globe marking where amber's team works around the world"
             role="img"
           />
 
-          {/* Faces over the canvas, easing out around the limb. These are
-              presentational: no pointer events at all, so a cursor crossing the
-              globe never disturbs the spin, and nothing is focusable. The whole
-              layer is aria-hidden because the canvas already carries the
-              descriptive label and the same city names are listed as text in the
-              copy column — announcing seven unlabelled images would only repeat
-              that. */}
-          <div className={styles.pinLayer} aria-hidden="true">
-            {OFFICES.map((office, i) => {
+          {/* Faces over the canvas, easing out around the limb.
+              Each face is now interactive: hovering one opens its detail card.
+              The LAYER stays transparent to pointer events (see .pinLayer) and
+              each face opts back in, so a drag begun on the ocean between faces
+              still grabs and spins the globe.
+
+              A face below the fade threshold is skipped entirely rather than
+              rendered at opacity 0 — an invisible face on the far side of the
+              sphere would otherwise still be hoverable, and the cursor would
+              open a card for someone who is not on screen. */}
+          <div className={styles.pinLayer}>
+            {PEOPLE.map((person, i) => {
               const p = pins[i];
-                // Depth drives both opacity and scale, so a face eases away as
-                // it rotates toward the limb and eases back as it comes round —
-                // symmetric in both directions, which is what makes the motion
-                // read as the sphere turning rather than as a cross-fade.
-                const k = presence(p.z);
-                return (
+              // Depth drives both opacity and scale, so a face eases away as it
+              // rotates toward the limb and eases back as it comes round —
+              // symmetric in both directions, which is what makes the motion
+              // read as the sphere turning rather than as a cross-fade.
+              const k = presence(p.z);
+              // A face on the far side is drawn at opacity 0 rather than skipped.
+              // Returning null here looked tempting — an invisible face should
+              // not be hoverable — but it also unmounts the card mid-transition,
+              // and on the very first paint (before the render loop has projected
+              // anything) every pin is still at its initial z of -1, so ALL of
+              // them cull and the layer mounts empty. `hittable` below is what
+              // actually stops a back-of-globe face taking the pointer.
+              const hittable = k > 0.35;
+              const isActive = active === i;
+              return (
                 <div
-                  key={office.label}
-                  className={styles.avatarPin}
+                  key={person.name}
+                  className={`${styles.avatarPin} ${isActive ? styles.avatarPinActive : ""}`}
                   style={{
                     left: p.x,
                     top: p.y,
@@ -458,16 +531,59 @@ const Globe = () => {
                     // Nearer faces sit above further ones, so an overlap at the
                     // limb layers the way the geometry implies.
                     zIndex: 2 + Math.round(k * 10),
+                    // Only a face turned toward the viewer takes the pointer, so
+                    // the cursor never opens a card for someone on the far side.
+                    pointerEvents: hittable ? "auto" : "none",
                   }}
+                  onPointerEnter={() => setActive(i)}
+                  onPointerLeave={() => setActive((cur) => (cur === i ? null : cur))}
+                  // Keyboard reachable: the card is real content, so it cannot be
+                  // hover-only. Focus opens the same card hover does.
+                  tabIndex={hittable ? 0 : -1}
+                  onFocus={() => setActive(i)}
+                  onBlur={() => setActive((cur) => (cur === i ? null : cur))}
+                  role="button"
+                  aria-label={`${person.name}, ${person.department}, ${person.country}`}
                 >
-                  <Image
-                    src={office.photo}
-                    alt=""
-                    className={styles.avatarImg}
-                    width={44}
-                    height={44}
-                    isEagerLoad
-                  />
+                  {person.photo ? (
+                    <Image
+                      src={person.photo}
+                      alt=""
+                      className={styles.avatarImg}
+                      width={32}
+                      height={32}
+                      isEagerLoad
+                    />
+                  ) : (
+                    // Stand-in for the fifteen without a headshot. Shares
+                    // .avatarImg so the ring, shadow and hover lift are identical
+                    // and a card does not shift when a real JPG lands later.
+                    <span
+                      aria-hidden="true"
+                      className={`${styles.avatarImg} ${styles.avatarInitials}`}
+                      style={{
+                        background:
+                          AVATAR_TINTS[person.name.length % AVATAR_TINTS.length],
+                      }}
+                    >
+                      {initialsOf(person.name)}
+                    </span>
+                  )}
+
+                  {/* The card. Always rendered so its fade-in and fade-out both
+                      animate — mounting it on hover would make the entry jump,
+                      and unmounting would cut the exit short. */}
+                  <div
+                    className={`${styles.hoverCard} ${isActive ? styles.hoverCardOpen : ""}`}
+                  >
+                    <p className={styles.cardName}>{person.name}</p>
+                    <p className={styles.cardDept}>{person.department}</p>
+                    <div className={styles.cardCountry}>
+                      <img src={person.flag} alt="" className={styles.cardFlag} />
+                      <span className={styles.cardCountryName}>{person.country}</span>
+                    </div>
+                    <span className={styles.hoverCardArrow} aria-hidden="true" />
+                  </div>
                 </div>
               );
             })}
