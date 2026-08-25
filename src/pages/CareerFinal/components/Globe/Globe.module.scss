@@ -206,21 +206,6 @@
   width: 32px;
 }
 
-// Initials stand-in for the fifteen people without a headshot. Composed WITH
-// .avatarImg (both classes on the same element) so the ring, shadow and hover
-// lift are shared — a real JPG later swaps the element without changing layout.
-.avatarInitials {
-  align-items: center;
-  color: rgba(17, 25, 40, 0.72);
-  display: flex;
-  font-size: 12px;
-  font-weight: 600;
-  justify-content: center;
-  letter-spacing: 0.2px;
-  line-height: 1;
-  user-select: none;
-}
-
 /* ------------------------------------------------------------- hover card */
 
 // The detail card for one person. Anchored to its pin and lifted above it, with

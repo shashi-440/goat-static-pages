@@ -11,18 +11,45 @@ import styles from "./Globe.module.scss";
 // shots plus five crew shots is every face this page has; with fifteen markers a
 // few faces necessarily appear twice, so the repeats are placed far apart (and
 // never in the same hemisphere) where the rotation will not show them together.
-import harshalImg from "../../assets/team-harshal.jpg";
-import davidImg from "../../assets/team-david.jpg";
-import mernaImg from "../../assets/team-merna.jpg";
-import solomonImg from "../../assets/team-solomon.jpg";
-import danImg from "../../assets/team-dan.jpg";
-import bhanuImg from "../../assets/team-bhanu.jpg";
+// The twenty-one headshots, exported from Figma (Career Page Cleanup, node
+// 2979:4455) where each photo is labelled with its owner's name and country.
+//
+// Cropped to head-and-shoulders before committing: the exports are waist-up
+// portraits, so a plain square centre-crop lands on the chest. Each face was
+// located with macOS Vision (VNDetectFaceRectangles) and the crop taken as a
+// square 2.6x the face box, centred on it and biased 12% of a face-height upward
+// so the eyes sit above the middle. That per-photo measurement matters: the
+// detected face ranges from 10% of frame width (Gautam, a distant shot) to 50%
+// (Robin, a close-up), so one fixed crop would have been wrong for most of them.
+// 256px square at q86 — 8x the 32px pin, so retina-sharp at ~12KB each.
+import harshalImg from "../../assets/people/harshal-maniyar.jpg";
+import bhanuImg from "../../assets/people/bhanu-mahajan.jpg";
+import prachiImg from "../../assets/people/prachi-kamble.jpg";
+import gautamImg from "../../assets/people/gautam-bagga.jpg";
+import shreyImg from "../../assets/people/shrey.jpg";
+import davidImg from "../../assets/people/david-seymor.jpg";
+import marielleImg from "../../assets/people/marielle.jpg";
+import joolsImg from "../../assets/people/jools.jpg";
+import robinImg from "../../assets/people/robin-walsh.jpg";
+import michaelImg from "../../assets/people/adeniran-michael.jpg";
+import solomonImg from "../../assets/people/ajibode-solomon.jpg";
+import mohammedImg from "../../assets/people/mohammed-husien.jpg";
+import ahmedImg from "../../assets/people/ahmed-sammy.jpg";
+import mirnaImg from "../../assets/people/mirna-abdo.jpg";
+import mernaImg from "../../assets/people/merna-elgezawy.jpg";
+import peterImg from "../../assets/people/peter.jpg";
+import damienImg from "../../assets/people/damien-pang.jpg";
+import joeyImg from "../../assets/people/joey-panithan.jpg";
+import anqiImg from "../../assets/people/anqi-zhao.jpg";
+import summerImg from "../../assets/people/summer-xia.jpg";
+import danImg from "../../assets/people/dan-teo.jpg";
+
 // Country flags, 72x72 PNGs named by ISO 3166-1 alpha-2 — the same set and
 // naming the ListWithUs demand map uses.
 import flagGB from "../../assets/flags/gb.png";
 import flagNG from "../../assets/flags/ng.png";
 import flagEG from "../../assets/flags/eg.png";
-import flagVN from "../../assets/flags/vn.png";
+import flagTH from "../../assets/flags/th.png";
 import flagCN from "../../assets/flags/cn.png";
 import flagIN from "../../assets/flags/in.png";
 
@@ -35,12 +62,8 @@ interface Person {
   flag: string;
   /** Real [latitude, longitude] — where the face sits on the sphere. */
   location: [number, number];
-  /**
-   * Optional. Six of the twenty-one have a headshot in the repo; the rest fall
-   * back to an initials avatar. Drop a JPG into ../../assets and add the import
-   * to promote someone to a real photo — nothing else changes.
-   */
-  photo?: string;
+  /** Head-and-shoulders crop. All twenty-one have one. */
+  photo: string;
 }
 
 // The twenty-one people, grouped by country.
@@ -64,32 +87,32 @@ interface Person {
 // moving one pin can push a different pair into collision.
 const PEOPLE: Person[] = [
   // ---- United Kingdom ----
-  { name: "David", department: "Product", country: "United Kingdom", flag: flagGB, location: [57.338, 20.742], photo: davidImg },
-  { name: "Marielle", department: "Partnerships", country: "United Kingdom", flag: flagGB, location: [70.331, -10.406] },
-  { name: "Jools", department: "Partnerships", country: "United Kingdom", flag: flagGB, location: [40.634, -26.185] },
-  { name: "Robin Walsh", department: "Business Development", country: "United Kingdom", flag: flagGB, location: [42.654, 7.993] },
+  { name: "David Seymor", department: "Product", country: "United Kingdom", flag: flagGB, location: [57.338, 20.742], photo: davidImg },
+  { name: "Marielle", department: "Partnerships", country: "United Kingdom", flag: flagGB, location: [70.331, -10.406], photo: marielleImg },
+  { name: "Jools", department: "Partnerships", country: "United Kingdom", flag: flagGB, location: [40.634, -26.185], photo: joolsImg },
+  { name: "Robin Walsh", department: "Business Development", country: "United Kingdom", flag: flagGB, location: [42.654, 7.993], photo: robinImg },
   // ---- Nigeria ----
-  { name: "Solomon", department: "Business Development", country: "Nigeria", flag: flagNG, location: [-7.446, 15.407], photo: solomonImg },
-  { name: "Michael", department: "Business Development", country: "Nigeria", flag: flagNG, location: [4.653, -2.814] },
+  { name: "Ajibode Solomon", department: "Business Development", country: "Nigeria", flag: flagNG, location: [-7.446, 15.407], photo: solomonImg },
+  { name: "Adeniran Michael", department: "Business Development", country: "Nigeria", flag: flagNG, location: [4.653, -2.814], photo: michaelImg },
   // ---- Egypt ----
-  { name: "Mohammed Husien", department: "Operations", country: "Egypt", flag: flagEG, location: [24.95, 40.979] },
-  { name: "Ahmed Sammy", department: "Supply", country: "Egypt", flag: flagEG, location: [41.959, 40.934] },
-  { name: "Merna", department: "Business Development", country: "Egypt", flag: flagEG, location: [25.437, 17.501], photo: mernaImg },
-  { name: "Mirna", department: "Employee Experience", country: "Egypt", flag: flagEG, location: [12.205, 20.796] },
-  { name: "Peter", department: "Operations", country: "Egypt", flag: flagEG, location: [11.866, 41.215] },
-  // ---- Southeast Asia ----
-  { name: "Damien", department: "Growth", country: "Vietnam", flag: flagVN, location: [12.277, 125.729] },
-  { name: "Joey", department: "Supply", country: "Vietnam", flag: flagVN, location: [-0.19, 123.647] },
+  { name: "Mohammed Husien", department: "Operations", country: "Egypt", flag: flagEG, location: [24.95, 40.979], photo: mohammedImg },
+  { name: "Ahmed Sammy", department: "Supply", country: "Egypt", flag: flagEG, location: [41.959, 40.934], photo: ahmedImg },
+  { name: "Merna Elgezawy", department: "Business Development", country: "Egypt", flag: flagEG, location: [25.437, 17.501], photo: mernaImg },
+  { name: "Mirna Abdo", department: "Employee Experience", country: "Egypt", flag: flagEG, location: [12.205, 20.796], photo: mirnaImg },
+  { name: "Peter", department: "Operations", country: "Egypt", flag: flagEG, location: [11.866, 41.215], photo: peterImg },
+  // ---- Thailand ----
+  { name: "Damien Pang", department: "Growth", country: "Thailand", flag: flagTH, location: [12.277, 125.729], photo: damienImg },
+  { name: "Joey Panithan Ittisan", department: "Supply", country: "Thailand", flag: flagTH, location: [-0.19, 123.647], photo: joeyImg },
   // ---- China ----
-  { name: "Anqi", department: "Operations", country: "China", flag: flagCN, location: [49.36, 128.042] },
-  { name: "Summer", department: "Market Expansion", country: "China", flag: flagCN, location: [48.092, 99.15] },
-  { name: "Dan", department: "Global Operations", country: "China", flag: flagCN, location: [26.432, 126.061], photo: danImg },
+  { name: "Anqi Zhao", department: "Operations", country: "China", flag: flagCN, location: [49.36, 128.042], photo: anqiImg },
+  { name: "Summer Xia", department: "Market Expansion", country: "China", flag: flagCN, location: [48.092, 99.15], photo: summerImg },
+  { name: "Dan Teo", department: "Global Operations", country: "China", flag: flagCN, location: [26.432, 126.061], photo: danImg },
   // ---- India ----
-  { name: "Bhanu", department: "Supply", country: "India", flag: flagIN, location: [15.462, 91.442], photo: bhanuImg },
-  { name: "Prachi", department: "Marketing", country: "India", flag: flagIN, location: [31.119, 87.299] },
-  { name: "Harshal", department: "Product", country: "India", flag: flagIN, location: [28.596, 65.814], photo: harshalImg },
-  { name: "Shrey", department: "Data", country: "India", flag: flagIN, location: [15.109, 69.039] },
-  { name: "Gautam Bagga", department: "Growth", country: "India", flag: flagIN, location: [2.519, 75.072] },
+  { name: "Bhanu Mahajan", department: "Supply", country: "India", flag: flagIN, location: [15.462, 91.442], photo: bhanuImg },
+  { name: "Prachi Kamble", department: "Marketing", country: "India", flag: flagIN, location: [31.119, 87.299], photo: prachiImg },
+  { name: "Harshal Maniyar", department: "Product", country: "India", flag: flagIN, location: [28.596, 65.814], photo: harshalImg },
+  { name: "Shrey", department: "Data", country: "India", flag: flagIN, location: [15.109, 69.039], photo: shreyImg },
+  { name: "Gautam Bagga", department: "Growth", country: "India", flag: flagIN, location: [2.519, 75.072], photo: gautamImg },
 ];
 
 
@@ -242,26 +265,6 @@ const project = (
  * shader as flat dots — it cannot render an image. They are positioned every frame
  * by projecting their lat/long through the current rotation.
  */
-/**
- * First letters of the first two words — "Gautam Bagga" -> "GB", "Jools" -> "J".
- * Used for the initials avatar when someone has no headshot in the repo yet.
- */
-const initialsOf = (name: string) =>
-  name
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase();
-
-/**
- * Six fixed tints, picked by name length so a person keeps the same colour on
- * the server and the client — a random pick would differ between the two and
- * React would warn about the mismatch on hydration.
- */
-const AVATAR_TINTS = ["#E9D5FF", "#FDE68A", "#BFDBFE", "#C7F0DB", "#FBCFE8", "#FED7AA"];
-
 const Globe = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -545,30 +548,14 @@ const Globe = () => {
                   role="button"
                   aria-label={`${person.name}, ${person.department}, ${person.country}`}
                 >
-                  {person.photo ? (
-                    <Image
-                      src={person.photo}
-                      alt=""
-                      className={styles.avatarImg}
-                      width={32}
-                      height={32}
-                      isEagerLoad
-                    />
-                  ) : (
-                    // Stand-in for the fifteen without a headshot. Shares
-                    // .avatarImg so the ring, shadow and hover lift are identical
-                    // and a card does not shift when a real JPG lands later.
-                    <span
-                      aria-hidden="true"
-                      className={`${styles.avatarImg} ${styles.avatarInitials}`}
-                      style={{
-                        background:
-                          AVATAR_TINTS[person.name.length % AVATAR_TINTS.length],
-                      }}
-                    >
-                      {initialsOf(person.name)}
-                    </span>
-                  )}
+                  <Image
+                    src={person.photo}
+                    alt=""
+                    className={styles.avatarImg}
+                    width={32}
+                    height={32}
+                    isEagerLoad
+                  />
 
                   {/* The card. Always rendered so its fade-in and fade-out both
                       animate — mounting it on hover would make the entry jump,
