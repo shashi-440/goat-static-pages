@@ -532,6 +532,19 @@ const Globe = () => {
                       ref={statMarkRef}
                       animationData={stat.lottie}
                       size={32}
+                      // 1.7x. The box stays 32px so this column's figure stays
+                      // level with the other two — each column sizes itself, and a
+                      // taller visual here would push its own number down.
+                      //
+                      // The magnification is not about empty canvas: this comp's
+                      // ink already fills 92% of its 500px square, so at 1x it
+                      // renders 29px of art in a 32px box. The problem is that its
+                      // neighbours are three overlapping 32px circles spanning
+                      // 76px, so a single 32px glyph reads as the small one beside
+                      // them. 1.7x puts the art at ~50px, which carries comparable
+                      // weight. It overflows the box, which the 16px gap under the
+                      // stack absorbs — the same trade amberscholar makes.
+                      scale={1.7}
                       // `play` stays false: the icon renders its settled frame and
                       // waits. Hovering the stat calls replay() — see the handler
                       // on the <Reveal> below.

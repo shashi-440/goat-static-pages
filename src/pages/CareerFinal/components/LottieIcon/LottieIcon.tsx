@@ -1,4 +1,4 @@
-import { useEffect, useImperativeHandle, useRef, forwardRef } from "react";
+import { CSSProperties, useEffect, useImperativeHandle, useRef, forwardRef } from "react";
 import styles from "./LottieIcon.module.scss";
 
 export interface LottieIconHandle {
@@ -11,6 +11,13 @@ interface LottieIconProps {
   animationData: any;
   /** Square edge in px — matches the static icons it replaces. */
   size?: number;
+  /**
+   * Visual magnification of the artwork, applied as a transform so it costs no
+   * layout. Use it when a mark has to hold its own beside a physically wider
+   * neighbour: the box stays `size`, only the art grows. Overflow is expected and
+   * is absorbed by whatever gap sits below.
+   */
+  scale?: number;
   /** Play once as soon as this turns true (used for the staggered scroll-in). */
   play?: boolean;
 }
@@ -27,7 +34,7 @@ interface LottieIconProps {
  * Honours prefers-reduced-motion by rendering the last frame statically.
  */
 const LottieIcon = forwardRef<LottieIconHandle, LottieIconProps>(
-  ({ animationData, size = 32, play = false }, ref) => {
+  ({ animationData, size = 32, scale = 1, play = false }, ref) => {
     const hostRef = useRef<HTMLDivElement>(null);
     const animRef = useRef<any>(null);
     const reduceRef = useRef(false);
@@ -91,7 +98,7 @@ const LottieIcon = forwardRef<LottieIconHandle, LottieIconProps>(
       <div
         ref={hostRef}
         className={styles.icon}
-        style={{ height: size, width: size }}
+        style={{ height: size, width: size, "--icon-scale": scale } as CSSProperties}
         aria-hidden="true"
       />
     );

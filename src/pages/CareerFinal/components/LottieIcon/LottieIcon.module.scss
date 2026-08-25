@@ -3,6 +3,10 @@
 .icon {
   display: block;
   flex-shrink: 0;
+  // Magnifies the ARTWORK without changing the layout box, so a mark can be made
+  // to carry the same visual weight as a wider neighbour while the line it sits
+  // on keeps its height. Defaults to 1, so every existing caller is unaffected.
+  transform: scale(var(--icon-scale, 1));
 
   svg {
     display: block;
