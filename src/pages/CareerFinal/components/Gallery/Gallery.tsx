@@ -3,97 +3,55 @@ import wrapperHOC from "@Utils/wrapperHOC";
 import Reveal from "../../../AboutUsV2/components/Reveal/Reveal";
 import styles from "./Gallery.module.scss";
 
+// The real office photos, exported from Figma (Career Page Cleanup, node
+// 2979:4454 — the "indian" section) and committed here. They arrived as 4096x2731
+// PNGs at ~10MB each, 142MB for the set; resized to 820px wide JPEGs at q72 they
+// are ~115KB each, in line with the crew-*.jpg already in this folder. 820 is 2x
+// the 400px card width, so they stay sharp on a retina display.
+import life01 from "../../assets/life/life-01.jpg";
+import life02 from "../../assets/life/life-02.jpg";
+import life03 from "../../assets/life/life-03.jpg";
+import life04 from "../../assets/life/life-04.jpg";
+import life05 from "../../assets/life/life-05.jpg";
+import life06 from "../../assets/life/life-06.jpg";
+import life07 from "../../assets/life/life-07.jpg";
+import life08 from "../../assets/life/life-08.jpg";
+import life09 from "../../assets/life/life-09.jpg";
+import life10 from "../../assets/life/life-10.jpg";
+import life11 from "../../assets/life/life-11.jpg";
+import life12 from "../../assets/life/life-12.jpg";
+import life13 from "../../assets/life/life-13.jpg";
+
 interface Shot {
   /** Short caption, used as the image's accessible description. */
   label: string;
-  /**
-   * Remote placeholder (Unsplash office stock) so the carousel has real content
-   * to show. Swap each for a local import once the real photos exist — these are
-   * hotlinked and should not ship to production.
-   */
+  /** Local import — these are the real photos, not hotlinked stock. */
   src: string;
 }
 
-// PLACEHOLDER PHOTOS — hotlinked Unsplash, sixteen DISTINCT images, no repeats.
-// Every URL was checked to return 200.
+// The real office photos — thirteen of them, no repeats.
 //
-// Chosen for colour and people rather than empty rooms: the previous set was
-// muted office interiors, which looked flat once the dark background came off
-// and the photos had to carry the section on their own. Dark concert and
-// architectural shots were deliberately rejected — against a white backdrop they
-// read as holes in the strip.
+// This replaces sixteen hotlinked Unsplash URLs which the previous comment here
+// flagged as not shippable. Thirteen rather than sixteen is fine: each row shows
+// the whole deck at a different offset, so the count only sets how long a row
+// takes to loop, not whether the arc is continuous.
 //
-// These are stand-ins: replace each `src` with a local import of the real photo
-// and nothing else here changes.
-//
-// Card count drives the geometry: CARDS.length cards are spaced evenly around a
-// full 360deg ring, so adding or removing one re-spaces the cylinder
-// automatically. Sixteen puts ~8 across the viewport, matching the reference.
+// Labels describe the shot for the accessible description; the images themselves
+// are decorative (alt="") since the section is a mood piece, not information.
 const CARDS: Shot[] = [
-  {
-    label: "Conference talk",
-    src: "https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=820&h=560&q=72&auto=format&fit=crop",
-  },
-  {
-    label: "Students on campus",
-    src: "https://images.unsplash.com/photo-1543269865-cbf427effbad?w=820&h=560&q=72&auto=format&fit=crop",
-  },
-  {
-    label: "Working together",
-    src: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=820&h=560&q=72&auto=format&fit=crop",
-  },
-  {
-    label: "Festival lights",
-    src: "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=820&h=560&q=72&auto=format&fit=crop",
-  },
-  {
-    label: "Studio session",
-    src: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=820&h=560&q=72&auto=format&fit=crop",
-  },
-  {
-    label: "Sunset offsite",
-    src: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=820&h=560&q=72&auto=format&fit=crop",
-  },
-  {
-    label: "Long table dinner",
-    src: "https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=820&h=560&q=72&auto=format&fit=crop",
-  },
-  {
-    label: "Workshop wall",
-    src: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=820&h=560&q=72&auto=format&fit=crop",
-  },
-  {
-    label: "Bright standup",
-    src: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=820&h=560&q=72&auto=format&fit=crop",
-  },
-  {
-    label: "Hands in",
-    src: "https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?w=820&h=560&q=72&auto=format&fit=crop",
-  },
-  {
-    label: "Drinks after work",
-    src: "https://images.unsplash.com/photo-1541532713592-79a0317b6b77?w=820&h=560&q=72&auto=format&fit=crop",
-  },
-  {
-    label: "Team lunch",
-    src: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=820&h=560&q=72&auto=format&fit=crop",
-  },
-  {
-    label: "Group portrait",
-    src: "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=820&h=560&q=72&auto=format&fit=crop",
-  },
-  {
-    label: "Collaboration",
-    src: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=820&h=560&q=72&auto=format&fit=crop",
-  },
-  {
-    label: "Open-plan desks",
-    src: "https://images.unsplash.com/photo-1552581234-26160f608093?w=820&h=560&q=72&auto=format&fit=crop",
-  },
-  {
-    label: "Pair programming",
-    src: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=820&h=560&q=72&auto=format&fit=crop",
-  },
+  { label: "Screening in the lounge", src: life01 },
+  { label: "Diwali at the office", src: life02 },
+  { label: "Beanbag corner", src: life03 },
+  { label: "Foosball table", src: life04 },
+  { label: "Board games over lunch", src: life05 },
+  { label: "The open-plan floor", src: life06 },
+  { label: "Working together", src: life07 },
+  { label: "Table football crowd", src: life08 },
+  { label: "All-hands circle", src: life09 },
+  { label: "Breakout seating", src: life10 },
+  { label: "Team celebration", src: life11 },
+  { label: "Desks at full tilt", src: life12 },
+  { label: "Afternoon in the lounge", src: life13 },
 ];
 
 // Three rows, each carrying the FULL deck rotated by a different offset.
@@ -109,7 +67,9 @@ const CARDS: Shot[] = [
 // duplicates now, so the offsets only have to be distinct — they no longer need
 // to avoid landing two copies of one photo side by side.
 const ROW_COUNT = 3;
-const ROW_OFFSET = [0, 6, 11];
+// Offsets are ~1/3 of the deck apart so the three rows never show the same photo
+// at the same angle. Re-spaced for thirteen cards (was 0/6/11 for sixteen).
+const ROW_OFFSET = [0, 4, 9];
 const ROWS: Shot[][] = Array.from({ length: ROW_COUNT }, (_, r) => {
   const k = ROW_OFFSET[r] % CARDS.length;
   return [...CARDS.slice(k), ...CARDS.slice(0, k)];
