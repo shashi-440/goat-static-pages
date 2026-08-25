@@ -175,6 +175,25 @@
   width: 40px;
 }
 
+// Stand-in for the nine people without a photo in the repo yet. Deliberately
+// shares the .avatar box exactly — same 40px circle and flex-basis — so a card
+// does not shift when a real JPG replaces it later.
+.avatarInitials {
+  align-items: center;
+  border-radius: 50%;
+  color: rgba(17, 25, 40, 0.72);
+  display: flex;
+  flex: 0 0 40px;
+  font-size: 14px;
+  font-weight: 600;
+  height: 40px;
+  justify-content: center;
+  letter-spacing: 0.2px;
+  line-height: 1;
+  user-select: none;
+  width: 40px;
+}
+
 .authorText {
   min-width: 0;
 }
