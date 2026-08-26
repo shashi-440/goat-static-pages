@@ -6,81 +6,177 @@ import Reveal from "../../../AboutUsV2/components/Reveal/Reveal";
 // The About Us count-up: renders the final value on the server so the figures
 // are present without JS, then counts from 0 once visible.
 import CountUp from "../../../AboutUsV2/components/CountUp/CountUp";
+import LottieIcon, { LottieIconHandle } from "../LottieIcon/LottieIcon";
 import styles from "./Globe.module.scss";
 // Team headshots — the markers are the people, not the places. Six individual
 // shots plus five crew shots is every face this page has; with fifteen markers a
 // few faces necessarily appear twice, so the repeats are placed far apart (and
 // never in the same hemisphere) where the rotation will not show them together.
-import harshalImg from "../../assets/team-harshal.jpg";
-import davidImg from "../../assets/team-david.jpg";
-import mernaImg from "../../assets/team-merna.jpg";
-import solomonImg from "../../assets/team-solomon.jpg";
-import danImg from "../../assets/team-dan.jpg";
-import bhanuImg from "../../assets/team-bhanu.jpg";
-import crew1 from "../../assets/crew-1.jpg";
-import crew2 from "../../assets/crew-2.jpg";
-import crew3 from "../../assets/crew-3.jpg";
-import crew4 from "../../assets/crew-4.jpg";
-import crew5 from "../../assets/crew-5.jpg";
+// The twenty-one headshots, exported from Figma (Career Page Cleanup, node
+// 2979:4455) where each photo is labelled with its owner's name and country.
+//
+// Cropped to head-and-shoulders before committing: the exports are waist-up
+// portraits, so a plain square centre-crop lands on the chest. Each face was
+// located with macOS Vision (VNDetectFaceRectangles) and the crop taken as a
+// square 2.6x the face box, centred on it and biased 12% of a face-height upward
+// so the eyes sit above the middle. That per-photo measurement matters: the
+// detected face ranges from 10% of frame width (Gautam, a distant shot) to 50%
+// (Robin, a close-up), so one fixed crop would have been wrong for most of them.
+// 256px square at q86 — 8x the 32px pin, so retina-sharp at ~12KB each.
+import harshalImg from "../../assets/people/harshal-maniyar.jpg";
+import bhanuImg from "../../assets/people/bhanu-mahajan.jpg";
+import prachiImg from "../../assets/people/prachi-kamble.jpg";
+import gautamImg from "../../assets/people/gautam-bagga.jpg";
+import shreyImg from "../../assets/people/shrey.jpg";
+import davidImg from "../../assets/people/david-seymor.jpg";
+import marielleImg from "../../assets/people/marielle.jpg";
+import joolsImg from "../../assets/people/jools.jpg";
+import robinImg from "../../assets/people/robin-walsh.jpg";
+import michaelImg from "../../assets/people/adeniran-michael.jpg";
+import solomonImg from "../../assets/people/ajibode-solomon.jpg";
+import mohammedImg from "../../assets/people/mohammed-husien.jpg";
+import ahmedImg from "../../assets/people/ahmed-sammy.jpg";
+import mirnaImg from "../../assets/people/mirna-abdo.jpg";
+import mernaImg from "../../assets/people/merna-elgezawy.jpg";
+import peterImg from "../../assets/people/peter.jpg";
+import damienImg from "../../assets/people/damien-pang.jpg";
+import joeyImg from "../../assets/people/joey-panithan.jpg";
+import anqiImg from "../../assets/people/anqi-zhao.jpg";
+import summerImg from "../../assets/people/summer-xia.jpg";
+import danImg from "../../assets/people/dan-teo.jpg";
 
-interface Office {
-  label: string;
-  /** Real [latitude, longitude] — where the avatar sits on the sphere. */
+// Country flags, 72x72 PNGs named by ISO 3166-1 alpha-2 — the same set and
+// naming the ListWithUs demand map uses.
+import flagGB from "../../assets/flags/gb.png";
+import flagNG from "../../assets/flags/ng.png";
+import flagEG from "../../assets/flags/eg.png";
+import flagTH from "../../assets/flags/th.png";
+import flagCN from "../../assets/flags/cn.png";
+import flagIN from "../../assets/flags/in.png";
+// The mark for "Languages spoken" — two speech bubbles that swap an A for a 文.
+//
+// Recoloured on import: it ships with blue, teal and magenta stops, and every
+// other Lottie on this page is $neutral7. The twelve WHITE stops are deliberately
+// left alone — white is the bubble fill the characters sit on, and recolouring it
+// would flood the bubbles and lose the glyphs. Verified to draw at frames
+// 0/24/48/72/96/120, including the last one, which is what it rests on.
+import translateAnim from "../../assets/lottie/stat-translate.json";
+
+interface Person {
+  name: string;
+  /** Team, shown on the hover card. */
+  department: string;
+  /** Country as displayed, alongside its flag. */
+  country: string;
+  flag: string;
+  /** Real [latitude, longitude] — where the face sits on the sphere. */
   location: [number, number];
-  /** Face shown at this location. */
+  /** Head-and-shoulders crop. All twenty-one have one. */
   photo: string;
 }
 
-// Fifteen people across the map.
+// The twenty-one people, grouped by country.
 //
-// The seven staffed offices come first — those coordinates are the real office
-// cities and are fixed. The remaining eight were CHOSEN, not picked by feel: a
-// full rotation was simulated and each addition selected to maximise the
-// worst-case on-screen distance between any two simultaneously-visible faces.
-// The result clears 45px at its tightest, against a 44px face, so no two faces
-// overlap at any rotation. The binding pair is Pune/Dubai — both real offices,
-// so that gap is the floor.
+// PLACEMENT. These coordinates are NOT the exact office cities, and that is
+// deliberate. A 44px face subtends ~8deg of arc on this globe while the whole of
+// Britain spans ~9deg, so the UK's four cannot all sit inside it without
+// overlapping. Every option was measured: real cities gave a 5px worst-case gap,
+// strict borders 8-9px, land-only regional corridors 17px — all against a face
+// needing 36px. Only letting a pin drift into the surrounding sea or a
+// neighbouring country clears it.
 //
-// This is why the extras are not the obvious European markets: London, Berlin
-// and Barcelona sit within ~15px of each other on the sphere, as do New York and
-// Toronto, and any set containing those pairs overlaps no matter how the faces
-// are sized.
+// So each pin is bounded to a radius around its country's centre: far enough to
+// separate, close enough to still read as "near the UK" or "near Egypt". Some sit
+// offshore. The hover card carries the true country, which is what makes that
+// acceptable — the pin says roughly where, the card says exactly who.
 //
-// For office entries naming a country rather than a city, the coordinate is that
-// country's principal city: Egypt -> Cairo, Nigeria -> Lagos, USA -> New York.
-const OFFICES: Office[] = [
-  // --- staffed offices ---
-  { label: "Pune", location: [18.5204, 73.8567], photo: harshalImg },
-  { label: "London", location: [51.5072, -0.1276], photo: davidImg },
-  { label: "Beijing", location: [39.9042, 116.4074], photo: crew1 },
-  { label: "Egypt", location: [30.0444, 31.2357], photo: mernaImg },
-  { label: "Nigeria", location: [6.5244, 3.3792], photo: solomonImg },
-  { label: "Dubai", location: [25.2048, 55.2708], photo: danImg },
-  { label: "USA", location: [40.7128, -74.006], photo: bhanuImg },
-  // --- teammates across the markets we serve ---
-  { label: "Sydney", location: [-33.8688, 151.2093], photo: crew2 },
-  { label: "Singapore", location: [1.3521, 103.8198], photo: crew3 },
-  { label: "S\u00e3o Paulo", location: [-23.5558, -46.6396], photo: crew4 },
-  { label: "Nairobi", location: [-1.2864, 36.8172], photo: crew5 },
-  { label: "Mexico City", location: [19.4326, -99.1332], photo: harshalImg },
-  { label: "Vancouver", location: [49.2827, -123.1207], photo: davidImg },
-  { label: "Cape Town", location: [-33.9249, 18.4241], photo: solomonImg },
-  { label: "Auckland", location: [-36.8485, 174.7633], photo: mernaImg },
+// Found by simulated annealing over a full 360deg rotation at six tilt angles,
+// maximising the worst-case on-screen distance between any two simultaneously
+// visible faces. Do NOT hand-edit a coordinate without re-running that check:
+// moving one pin can push a different pair into collision.
+const PEOPLE: Person[] = [
+  // ---- United Kingdom ----
+  { name: "David Seymor", department: "Product", country: "United Kingdom", flag: flagGB, location: [64.96, 22.004], photo: davidImg },
+  { name: "Marielle", department: "Partnerships", country: "United Kingdom", flag: flagGB, location: [61.806, -28.899], photo: marielleImg },
+  { name: "Jools", department: "Partnerships", country: "United Kingdom", flag: flagGB, location: [39.619, -30.234], photo: joolsImg },
+  { name: "Robin Walsh", department: "Business Development", country: "United Kingdom", flag: flagGB, location: [45.085, 9.12], photo: robinImg },
+  // ---- Nigeria ----
+  { name: "Ajibode Solomon", department: "Business Development", country: "Nigeria", flag: flagNG, location: [-7.136, 22.87], photo: solomonImg },
+  { name: "Adeniran Michael", department: "Business Development", country: "Nigeria", flag: flagNG, location: [14.011, -11.942], photo: michaelImg },
+  // ---- Egypt ----
+  { name: "Mohammed Husien", department: "Operations", country: "Egypt", flag: flagEG, location: [23.326, 42.552], photo: mohammedImg },
+  { name: "Ahmed Sammy", department: "Supply", country: "Egypt", flag: flagEG, location: [45.133, 41.282], photo: ahmedImg },
+  { name: "Merna Elgezawy", department: "Business Development", country: "Egypt", flag: flagEG, location: [25.393, 17.643], photo: mernaImg },
+  { name: "Mirna Abdo", department: "Employee Experience", country: "Egypt", flag: flagEG, location: [9.169, 19.273], photo: mirnaImg },
+  { name: "Peter", department: "Operations", country: "Egypt", flag: flagEG, location: [7.613, 42.171], photo: peterImg },
+  // ---- Thailand ----
+  { name: "Damien Pang", department: "Growth", country: "Thailand", flag: flagTH, location: [-9.827, 118.532], photo: damienImg },
+  { name: "Joey Panithan Ittisan", department: "Supply", country: "Thailand", flag: flagTH, location: [8.608, 117.142], photo: joeyImg },
+  // ---- China ----
+  { name: "Anqi Zhao", department: "Operations", country: "China", flag: flagCN, location: [44.432, 128.437], photo: anqiImg },
+  { name: "Summer Xia", department: "Market Expansion", country: "China", flag: flagCN, location: [53.017, 95.054], photo: summerImg },
+  { name: "Dan Teo", department: "Global Operations", country: "China", flag: flagCN, location: [24.315, 133.427], photo: danImg },
+  // ---- India ----
+  { name: "Bhanu Mahajan", department: "Supply", country: "India", flag: flagIN, location: [15.015, 93.857], photo: bhanuImg },
+  { name: "Prachi Kamble", department: "Marketing", country: "India", flag: flagIN, location: [33.713, 94.774], photo: prachiImg },
+  { name: "Harshal Maniyar", department: "Product", country: "India", flag: flagIN, location: [34.01, 66.394], photo: harshalImg },
+  { name: "Shrey", department: "Data", country: "India", flag: flagIN, location: [15.663, 70.086], photo: shreyImg },
+  { name: "Gautam Bagga", department: "Growth", country: "India", flag: flagIN, location: [-0.418, 77.599], photo: gautamImg },
 ];
+
 
 interface Stat {
   target: number;
   suffix: string;
   label: string;
+  /**
+   * Overlapping circles above the figure. Mutually exclusive with `lottie`.
+   *
+   * Every stat carries a visual of the same size and count, which is the point:
+   * three columns where one has a picture and two do not reads as two of them
+   * being unfinished. What changes is only what is INSIDE the circles.
+   */
+  stack?: string[];
+  /** A mark, for the stat that has no photograph. Mutually exclusive with `stack`. */
+  lottie?: any;
+  /** One description for the whole visual, so a screen reader reads it once. */
+  stackLabel: string;
 }
 
 // Business stats, replacing the stale "7 offices, 20 nationalities" prose that
 // used to carry these numbers inside the lede.
 // Labels verbatim from Figma 1565:3930.
 const STATS: Stat[] = [
-  { target: 500, suffix: "+", label: "Amazing people" },
-  { target: 20, suffix: "+", label: "Nationalities represented" },
-  { target: 15, suffix: "+", label: "Languages spoken" },
+  {
+    target: 500,
+    suffix: "+",
+    label: "Amazing people",
+    // Real teammates, taken from the same head-cropped set the globe pins use
+    // rather than stock — this stat is about these people.
+    stack: [harshalImg, davidImg, anqiImg],
+    stackLabel: "People across the amber team",
+  },
+  {
+    target: 20,
+    suffix: "+",
+    label: "Nationalities represented",
+    // THREE, matching the stack beside it. A fourth circle would make this column
+    // wider than its neighbours and give the row no rhythm. Three of the largest
+    // markets, not a ranking: the figure is the count, and the flags only have to
+    // say "from everywhere".
+    stack: [flagIN, flagGB, flagCN],
+    stackLabel: "Team members from over 20 nationalities",
+  },
+  {
+    target: 15,
+    suffix: "+",
+    label: "Languages spoken",
+    // No photograph exists of a spoken language, so this column plays a mark
+    // instead. It keeps the same 32px box as the stacks so the three figures stay
+    // on one line — a taller visual here would push this number down alone.
+    lottie: translateAnim,
+    stackLabel: "Over 15 languages spoken across the team",
+  },
 ];
 
 // ---- Limb falloff --------------------------------------------------------
@@ -221,8 +317,15 @@ const Globe = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const [dragging, setDragging] = useState(false);
+  // Index of the person whose card is open, or null. Also read by the render
+  // loop (through activeRef) to hold the globe still while a card is up.
+  const [active, setActive] = useState<number | null>(null);
+  // The stats' mark animates on hover only — never on load and never on a loop.
+  // A ref rather than state: replaying is a command to one child, not a value the
+  // render depends on, and routing it through state would re-render the row.
+  const statMarkRef = useRef<LottieIconHandle | null>(null);
   const [pins, setPins] = useState<Projected[]>(() =>
-    OFFICES.map(() => ({ x: SIZE / 2, y: SIZE / 2, z: -1 })),
+    PEOPLE.map(() => ({ x: SIZE / 2, y: SIZE / 2, z: -1 })),
   );
 
   // Live rotation, in refs so the render loop mutates it without re-rendering.
@@ -233,6 +336,15 @@ const Globe = () => {
   const revealRef = useRef<{ start: number } | null>(null);
   // Drag state: pointer id, last position, and whether the slop was exceeded.
   const dragRef = useRef<{ id: number; x: number; y: number; moved: boolean } | null>(null);
+  // Mirrors `active` for the render loop. The loop is created once inside an
+  // effect and closes over that scope, so reading the state variable there would
+  // pin it to its initial null forever.
+  const activeRef = useRef<number | null>(null);
+
+  // Keep the loop's view of the open card current.
+  useEffect(() => {
+    activeRef.current = active;
+  }, [active]);
 
   // ---- Drag to spin -------------------------------------------------------
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -316,6 +428,10 @@ const Globe = () => {
 
         if (dragRef.current?.moved) {
           // Hand-driven: onPointerMove already set phi/theta this frame.
+        } else if (activeRef.current !== null) {
+          // A card is open. Hold the globe still — the face it points at would
+          // otherwise drift out from under the cursor, and the card would chase
+          // it across the screen. Drag still works; only the idle spin pauses.
         } else if (!still) {
           phiRef.current += SPIN;
           thetaRef.current += (0.2 - thetaRef.current) * 0.05;
@@ -336,7 +452,7 @@ const Globe = () => {
         if (now - lastSync > 15) {
           lastSync = now;
           setPins(
-            OFFICES.map((o) =>
+            PEOPLE.map((o) =>
               project(
                 o.location[0],
                 o.location[1],
@@ -398,6 +514,50 @@ const Globe = () => {
           <ul className={styles.stats}>
             {STATS.map((stat, i) => (
               <Reveal as="li" key={stat.label} className={styles.stat} delay={160 + i * 90}>
+                {/* One `role="img"` with a single label for the whole visual, not
+                    an alt per circle — three separate alts would have a screen
+                    reader read out three flags before reaching the number they
+                    illustrate. */}
+                <span
+                  className={styles.stack}
+                  role="img"
+                  aria-label={stat.stackLabel}
+                  // The hover target is the visual itself rather than the whole
+                  // stat. `Reveal` accepts no DOM handlers, and giving it some
+                  // would change a component three other sections share.
+                  onMouseEnter={stat.lottie ? () => statMarkRef.current?.replay() : undefined}
+                >
+                  {stat.lottie ? (
+                    <LottieIcon
+                      ref={statMarkRef}
+                      animationData={stat.lottie}
+                      size={32}
+                      // 1.7x. The box stays 32px so this column's figure stays
+                      // level with the other two — each column sizes itself, and a
+                      // taller visual here would push its own number down.
+                      //
+                      // The magnification is not about empty canvas: this comp's
+                      // ink already fills 92% of its 500px square, so at 1x it
+                      // renders 29px of art in a 32px box. The problem is that its
+                      // neighbours are three overlapping 32px circles spanning
+                      // 76px, so a single 32px glyph reads as the small one beside
+                      // them. 1.7x puts the art at ~50px, which carries comparable
+                      // weight. It overflows the box, which the 16px gap under the
+                      // stack absorbs — the same trade amberscholar makes.
+                      scale={1.7}
+                      // `play` stays false: the icon renders its settled frame and
+                      // waits. Hovering the stat calls replay() — see the handler
+                      // on the <Reveal> below.
+                      play={false}
+                    />
+                  ) : (
+                    stat.stack?.map((src) => (
+                      <span className={styles.chip} key={src}>
+                        <img className={styles.chipArt} src={src} alt="" />
+                      </span>
+                    ))
+                  )}
+                </span>
                 <CountUp
                   className={styles.statValue}
                   target={stat.target}
@@ -425,29 +585,41 @@ const Globe = () => {
             ref={canvasRef}
             className={styles.canvas}
             style={{ width: SIZE, height: SIZE }}
-            aria-label="A rotating globe marking amber's seven offices"
+            aria-label="A rotating globe marking where amber's team works around the world"
             role="img"
           />
 
-          {/* Faces over the canvas, easing out around the limb. These are
-              presentational: no pointer events at all, so a cursor crossing the
-              globe never disturbs the spin, and nothing is focusable. The whole
-              layer is aria-hidden because the canvas already carries the
-              descriptive label and the same city names are listed as text in the
-              copy column — announcing seven unlabelled images would only repeat
-              that. */}
-          <div className={styles.pinLayer} aria-hidden="true">
-            {OFFICES.map((office, i) => {
+          {/* Faces over the canvas, easing out around the limb.
+              Each face is now interactive: hovering one opens its detail card.
+              The LAYER stays transparent to pointer events (see .pinLayer) and
+              each face opts back in, so a drag begun on the ocean between faces
+              still grabs and spins the globe.
+
+              A face below the fade threshold is skipped entirely rather than
+              rendered at opacity 0 — an invisible face on the far side of the
+              sphere would otherwise still be hoverable, and the cursor would
+              open a card for someone who is not on screen. */}
+          <div className={styles.pinLayer}>
+            {PEOPLE.map((person, i) => {
               const p = pins[i];
-                // Depth drives both opacity and scale, so a face eases away as
-                // it rotates toward the limb and eases back as it comes round —
-                // symmetric in both directions, which is what makes the motion
-                // read as the sphere turning rather than as a cross-fade.
-                const k = presence(p.z);
-                return (
+              // Depth drives both opacity and scale, so a face eases away as it
+              // rotates toward the limb and eases back as it comes round —
+              // symmetric in both directions, which is what makes the motion
+              // read as the sphere turning rather than as a cross-fade.
+              const k = presence(p.z);
+              // A face on the far side is drawn at opacity 0 rather than skipped.
+              // Returning null here looked tempting — an invisible face should
+              // not be hoverable — but it also unmounts the card mid-transition,
+              // and on the very first paint (before the render loop has projected
+              // anything) every pin is still at its initial z of -1, so ALL of
+              // them cull and the layer mounts empty. `hittable` below is what
+              // actually stops a back-of-globe face taking the pointer.
+              const hittable = k > 0.35;
+              const isActive = active === i;
+              return (
                 <div
-                  key={office.label}
-                  className={styles.avatarPin}
+                  key={person.name}
+                  className={`${styles.avatarPin} ${isActive ? styles.avatarPinActive : ""}`}
                   style={{
                     left: p.x,
                     top: p.y,
@@ -458,16 +630,43 @@ const Globe = () => {
                     // Nearer faces sit above further ones, so an overlap at the
                     // limb layers the way the geometry implies.
                     zIndex: 2 + Math.round(k * 10),
+                    // Only a face turned toward the viewer takes the pointer, so
+                    // the cursor never opens a card for someone on the far side.
+                    pointerEvents: hittable ? "auto" : "none",
                   }}
+                  onPointerEnter={() => setActive(i)}
+                  onPointerLeave={() => setActive((cur) => (cur === i ? null : cur))}
+                  // Keyboard reachable: the card is real content, so it cannot be
+                  // hover-only. Focus opens the same card hover does.
+                  tabIndex={hittable ? 0 : -1}
+                  onFocus={() => setActive(i)}
+                  onBlur={() => setActive((cur) => (cur === i ? null : cur))}
+                  role="button"
+                  aria-label={`${person.name}, ${person.department}, ${person.country}`}
                 >
                   <Image
-                    src={office.photo}
+                    src={person.photo}
                     alt=""
                     className={styles.avatarImg}
                     width={44}
                     height={44}
                     isEagerLoad
                   />
+
+                  {/* The card. Always rendered so its fade-in and fade-out both
+                      animate — mounting it on hover would make the entry jump,
+                      and unmounting would cut the exit short. */}
+                  <div
+                    className={`${styles.hoverCard} ${isActive ? styles.hoverCardOpen : ""}`}
+                  >
+                    <p className={styles.cardName}>{person.name}</p>
+                    <p className={styles.cardDept}>{person.department}</p>
+                    <div className={styles.cardCountry}>
+                      <img src={person.flag} alt="" className={styles.cardFlag} />
+                      <span className={styles.cardCountryName}>{person.country}</span>
+                    </div>
+                    <span className={styles.hoverCardArrow} aria-hidden="true" />
+                  </div>
                 </div>
               );
             })}

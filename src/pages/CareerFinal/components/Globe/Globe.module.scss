@@ -89,15 +89,16 @@
   width: 100%;
 }
 
+// Left-aligned, matching the amberscholar row. It was centred, which worked when
+// the column held only a figure and a label — but the visual above them is a
+// left-flush stack, and a centred figure under it looked misregistered.
+//
+// `gap` is dropped in favour of explicit margins on `.stack` (16px) and
+// `.statLabel` (10px): the three elements want two different gaps, not one.
 .stat {
-  // Figure centred over its label. The label is always the wider of the two, so
-  // centring is what makes each figure sit visually above the middle of its own
-  // column rather than hanging off the left edge.
-  align-items: center;
+  align-items: flex-start;
   display: flex;
   flex-direction: column;
-  // Figma's 4px.
-  gap: 4px;
   // Sized by content, not stretched. The label is the wider element in every
   // column, so it sets the width — which means the column does NOT change width
   // as the figure counts up through digit counts. That is what keeps the row
@@ -119,21 +120,129 @@
 // 26px rather than the About Us spec's 30px. That spec is for a row spanning a
 // full centred section; here the three sit inside a 594px copy column beside the
 // globe, where 30px read as oversized against the 18px body copy above them.
+// 30px/36px, matching the amberscholar stats row. Was 26px/32px, which sat below
+// the scale that row uses and made the same three-figure pattern read as a
+// smaller, secondary version of it.
+// ---- Stat visuals -------------------------------------------------------
+// Every stat carries one of these, all the same 32px height and the same count.
+// Three columns where one has a picture and two do not reads as two of them being
+// unfinished; keeping the shape constant and changing only what is inside the
+// circles makes the row read as one set.
+//
+// 16px under the visual, against 10px under the figure: the figure and its label
+// are one pair, and the wider gap is what separates that pair from the visual
+// without stranding it above them.
+.stack {
+  align-items: center;
+  align-self: flex-start;
+  display: inline-flex;
+  height: 32px;
+  margin-bottom: 16px;
+}
+
+.chip {
+  background: #fff;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  // Declared flat here rather than only in the hover rule, so the shadow has
+  // something to transition FROM — appearing from nothing jumps on frame one.
+  box-shadow: 0 0 0 rgba(32, 32, 32, 0);
+  flex-shrink: 0;
+  height: 32px;
+  overflow: hidden;
+  position: relative;
+  // The fan below moves TRANSFORMS, not the negative margin that creates the
+  // overlap: animating that margin would relayout the whole row every frame.
+  transition:
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.45s ease;
+  width: 32px;
+
+  // Negative margin, not `gap` — the circles are meant to overlap. The first is
+  // left alone so the stack starts flush with the column's left edge, in line
+  // with the figure and label below it.
+  & + & {
+    margin-left: -10px;
+  }
+}
+
+// Hairline inside the white ring, so a pale flag still has an edge against the
+// white section behind it.
+.chip::after {
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(32, 32, 32, 0.1);
+  content: "";
+  inset: 0;
+  position: absolute;
+}
+
+.chipArt {
+  display: block;
+  height: 100%;
+  // `cover` on purpose: the headshots are portrait crops and the flags are
+  // square, and both have to fill a circle. `contain` would letterbox them.
+  object-fit: cover;
+  width: 100%;
+}
+
+// Hover unwinds the overlap left to right, so the stack opens like a hand of
+// cards rather than sliding as a block. The per-circle delay is what makes it one
+// connected movement; on the way out these rules stop applying, so it closes as a
+// single gesture.
+//
+// Triggered from the whole `.stat`, not the stack: a 76px target next to the
+// number it belongs to feels like a mis-hover rather than an invitation.
+.stat:hover {
+  .chip {
+    box-shadow: 0 6px 16px rgba(32, 32, 32, 0.16);
+    transform: translateY(-3px);
+  }
+
+  .chip:nth-child(2) {
+    transform: translate3d(7px, -3px, 0);
+    transition-delay: 40ms;
+  }
+
+  .chip:nth-child(3) {
+    transform: translate3d(14px, -3px, 0);
+    transition-delay: 80ms;
+  }
+}
+
+// The lift IS the interaction, so there is nothing worth keeping without it — a
+// shadow on its own reads as a hover state that failed to finish.
+@media (prefers-reduced-motion: reduce) {
+  .chip {
+    transition: none;
+  }
+
+  .stat:hover .chip,
+  .stat:hover .chip:nth-child(2),
+  .stat:hover .chip:nth-child(3) {
+    box-shadow: 0 0 0 rgba(32, 32, 32, 0);
+    transform: none;
+  }
+}
+
 .statValue {
   color: #202020;
-  font-size: 26px;
+  font-size: 30px;
   font-weight: 550;
   letter-spacing: -0.3px;
-  line-height: 32px;
+  line-height: 36px;
+  white-space: nowrap;
 }
 
 // Figma's 16px/20px at weight 450, same as the About Us stat labels.
+// 16px/20px, also from amberscholar. `text-align: center` is dropped with it —
+// the visual, figure and label are left-aligned as one column now, and a centred
+// label under a left-aligned stack looked misregistered.
 .statLabel {
   color: #636363;
-  font-size: 14px;
-  font-weight: 450;
-  line-height: 18px;
-  text-align: center;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 20px;
+  margin-top: 10px;
   // One line each. Wrapping was what made the row look misaligned — a two-line
   // label pushed its own column taller than its neighbours.
   white-space: nowrap;
@@ -152,10 +261,11 @@
   cursor: grabbing;
 }
 
-// Holds the pins so the whole layer gets one mouseleave, which is what releases
-// the latched selection when the cursor leaves the globe.
+// Holds the pins. Transparent to pointer events itself — each face opts back in
+// (see `.avatarPin`) — so the layer never intercepts a drag aimed at the globe.
 .pinLayer {
   inset: 0;
+  pointer-events: none;
   position: absolute;
 }
 
@@ -175,12 +285,28 @@
 // COBE's own markers cannot be used — it draws them as flat dots inside its
 // shader and has no way to render an image — so these are HTML over the canvas.
 //
-// Presentational only: `pointer-events: none` means a cursor crossing the globe
-// never interacts with a face, which is what keeps the idle spin undisturbed.
+// The LAYER is transparent to pointer events (`pointer-events: none` on
+// `.pinLayer`) while each face re-enables them for itself. That combination is
+// what lets a face be hovered for its card while a drag begun anywhere else —
+// including the ocean between faces — still grabs and spins the globe.
 // `left`/`top` are the projected point and the translate centres the face on it.
 .avatarPin {
+  // 44px. The faces were 32px, which read small on a 622px globe.
+  //
+  // Getting here needed the PLACEMENT re-solved, not just the number changed: at
+  // the old coordinates the tightest pair (David/Robin Walsh) cleared only 34.6px,
+  // so 36px already overlapped. Widening each person's allowed drift from their
+  // country's centre to 22deg and re-annealing lifts the worst-case gap to 49.1px
+  // (now binding on Harshal/Shrey), which holds a 44px face with 5px to spare.
+  //
+  // Re-run the gap check before changing either number — they are a pair.
   height: 44px;
-  pointer-events: none;
+  // Interactive now, so a face can be hovered for its card. `pointer-events` is
+  // set back to `auto` EXPLICITLY: the parent `.pinLayer` sets `none` so drags
+  // over empty ocean reach the globe, and that inherits — without this line the
+  // faces inherit `none` too and nothing is ever hoverable.
+  cursor: pointer;
+  pointer-events: auto;
   position: absolute;
   // NO transition at all. Opacity and scale are now driven per-frame from the
   // pin's projected depth, so the easing lives in the depth ramp itself; a CSS
@@ -188,6 +314,115 @@
   // globe it is pinned to. `transform` is set inline for the same reason — it
   // carries the limb scale as well as the centring translate.
   width: 44px;
+}
+
+/* ------------------------------------------------------------- hover card */
+
+// The detail card for one person. Anchored to its pin and lifted above it, with
+// the arrow below pointing back down at the face.
+//
+// Positioned with `bottom: 100%` rather than a translate so it grows upward from
+// the face regardless of how tall the content is — a two-line department does not
+// push the card down over the pin.
+//
+// Motion: fade + a 6px rise + a hair of scale, all on one transform, easing on a
+// gentle custom curve. `visibility` rides along so a hidden card is not a
+// focus/hit target mid-fade. The transition is on the CARD, not the pin — the pin
+// is re-styled every frame by the render loop, and a transition there would fight
+// those writes (see `.avatarPin`).
+.hoverCard {
+  background: #fff;
+  border-radius: 14px;
+  bottom: calc(100% + 12px);
+  box-shadow:
+    0 1px 2px rgba(17, 25, 40, 0.06),
+    0 12px 32px rgba(17, 25, 40, 0.16);
+  left: 50%;
+  opacity: 0;
+  padding: 12px 14px;
+  pointer-events: none;
+  position: absolute;
+  transform: translate(-50%, 6px) scale(0.96);
+  transition:
+    opacity 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s linear 260ms;
+  visibility: hidden;
+  // Wide enough for a full name and department on one line each, capped so a
+  // long department wraps rather than stretching the card across the globe.
+  width: max-content;
+  max-width: 210px;
+  z-index: 40;
+}
+
+// Shown state. `visibility` flips immediately on the way in (no delay) so the
+// fade is visible from its first frame.
+.hoverCardOpen {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+  transition:
+    opacity 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s;
+  visibility: visible;
+}
+
+// The arrow. A rotated square rather than a border triangle so the card's own
+// shadow reads continuously around it.
+.hoverCardArrow {
+  background: #fff;
+  bottom: -4px;
+  height: 9px;
+  left: 50%;
+  position: absolute;
+  transform: translateX(-50%) rotate(45deg);
+  width: 9px;
+}
+
+.cardName {
+  color: $neutral9;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.1px;
+  line-height: 18px;
+  margin: 0;
+  // Keeps the name on one line; the card sizes to content up to its max-width.
+  white-space: nowrap;
+}
+
+.cardDept {
+  color: $neutral6;
+  font-size: 12.5px;
+  font-weight: 400;
+  line-height: 17px;
+  margin: 2px 0 0;
+}
+
+// Flag + country, separated from the name block by a hairline.
+.cardCountry {
+  align-items: center;
+  border-top: 1px solid rgba(17, 25, 40, 0.08);
+  display: flex;
+  gap: 6px;
+  margin-top: 9px;
+  padding-top: 8px;
+}
+
+.cardFlag {
+  border-radius: 2px;
+  display: block;
+  flex: 0 0 16px;
+  height: 12px;
+  object-fit: cover;
+  width: 16px;
+}
+
+.cardCountryName {
+  color: $neutral7;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  white-space: nowrap;
 }
 
 // White ring + soft shadow so a face reads as sitting ON the globe and stays
@@ -198,8 +433,33 @@
   display: block;
   height: 100%;
   object-fit: cover;
+  // Only the ring and shadow animate. The pin's own transform carries the limb
+  // scale and is rewritten every frame, so growing the face on hover has to
+  // happen on this inner element instead — a transform here composes with the
+  // pin's rather than being overwritten by it.
+  transition:
+    box-shadow 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
   width: 100%;
 }
+
+// Hovered (or keyboard-focused) face: lifts slightly and takes a warmer, thicker
+// ring so the selected person is obvious even in a dense cluster.
+.avatarPin:hover .avatarImg,
+.avatarPin:focus-visible .avatarImg {
+  box-shadow:
+    0 0 0 3px #fff,
+    0 0 0 5px rgba(255, 87, 113, 0.9),
+    0 6px 18px rgba(0, 0, 0, 0.28);
+  transform: scale(1.14);
+}
+
+// The pin that owns an open card sits above its neighbours, so its card and ring
+// are never clipped by a face projected nearer the viewer.
+.avatarPinActive {
+  z-index: 30 !important;
+}
+
 
 // The globe is a fixed 622px, so below ~1190px the copy column drops under the
 // ~500px the three labels need and the row would wrap 2 + 1 — the ragged shape

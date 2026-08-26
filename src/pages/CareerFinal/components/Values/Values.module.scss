@@ -31,11 +31,20 @@
   text-align: center;
 }
 
-// Four columns on desktop, wrapping to two then one. `max-width` matches the
-// 1352px content width the rest of the page uses (1512 - 2x80 gutter).
+// THREE columns on desktop, not four. At four the text column is 290px, which is
+// ~41 characters a line at 14px — the bottom of the readable 45-75 range, and the
+// reason this grid read as cramped: the longest bodies broke into six very short
+// lines. Three columns give ~400px and ~50 characters at the larger 16px size
+// below, and drop the worst card to five lines.
+//
+// NINE cards over three columns, so all three rows are full — the short-row rule
+// that used to cap the last card's divider is gone with it.
+//
+// `max-width` matches the 1352px content width the rest of the page uses
+// (1512 - 2x80 gutter).
 .grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   list-style: none;
   margin: 0;
   max-width: 1352px;
@@ -56,7 +65,11 @@
   display: flex;
   flex-direction: column;
   opacity: 0;
-  padding: 24px;
+  // 28px, up from 24px. The vertical rule is inset 12px from the cell edge, so
+  // the visible gutter between two bodies is padding x2 minus nothing — at 24px
+  // that is 48px of space carrying a 1px line, which read as tight once the
+  // copy grew. 28px gives the rule room to breathe on both sides.
+  padding: 28px;
   position: relative;
   transform: translateY(18px);
   transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
@@ -78,8 +91,9 @@
 }
 
 // No rule at the start of a row — otherwise every row opens with a stray line
-// against the section's left edge.
-.card:nth-child(4n + 1)::before {
+// against the section's left edge. Every THIRD cell now, following the column
+// count above.
+.card:nth-child(3n + 1)::before {
   display: none;
 }
 
@@ -92,11 +106,12 @@
 // to reflow when the column count changes.
 // The rule sits on the cell's top edge, so the row it opens needs more headroom
 // than the first row does — without this the line crowds the icon under it.
-.card:nth-child(n + 5) {
+// Cards 4-8 open the second and third rows at three columns.
+.card:nth-child(n + 4) {
   padding-top: 40px;
 }
 
-.card:nth-child(n + 5)::after {
+.card:nth-child(n + 4)::after {
   background-image: linear-gradient(
     to right,
     rgba(229, 231, 235, 0.1),
@@ -123,22 +138,29 @@
   width: 32px;
 }
 
+// 10px below the title rather than 8px: the body is 16px now, so the old gap
+// left the two blocks reading as one paragraph.
 .cardTitle {
   color: $neutral9;
   font-size: 18px;
   font-weight: 500;
-  line-height: 24px;
-  margin: 0 0 8px;
+  line-height: 26px;
+  margin: 0 0 10px;
 }
 
-// 14px/18px is Figma's spec. It is smaller than this page's usual 18px body,
-// but these are eight dense cards rather than running prose — matching the
-// larger size would push the grid well past a screen height.
+// 16px/26px, up from Figma's 14px/18px.
+//
+// Two separate problems there. The size was set to keep eight cards inside a
+// screen height at four columns — but 14px is below this page's body scale
+// everywhere else, so this section alone read as fine print. And 18px leading on
+// 14px text is a ratio of 1.29, tight enough that the lines visually merge;
+// body copy wants 1.5-1.6. At 16/26 (1.63) the lines separate cleanly, and the
+// wider three-column measure absorbs the larger size without adding lines.
 .cardBody {
   color: $neutral6;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
-  line-height: 18px;
+  line-height: 26px;
   margin: 0;
 }
 
@@ -150,14 +172,15 @@
   }
 }
 
-// Two columns: the divider rule has to reset on every odd cell instead of every
-// fourth, and a horizontal rule appears between the rows that now exist.
+// Two columns. The divider rule resets on every odd cell instead of every third,
+// and the row-opening rule moves to every card from the third on.
 @media (max-width: 1100px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .card:nth-child(4n + 1)::before {
+  // The desktop reset was every 3rd cell; at two columns it is every odd one.
+  .card:nth-child(3n + 1)::before {
     display: block;
   }
 
@@ -165,16 +188,15 @@
     display: none;
   }
 
-  // Four rows now, not two: the desktop rule (cards 5-8) no longer marks a row
+  // Four rows now, not three: the desktop rule (cards 4-8) no longer marks a row
   // boundary, so it is cleared and re-applied to every card from the third on.
-  .card:nth-child(n + 5)::after {
+  .card:nth-child(n + 4)::after {
     display: none;
   }
 
-  // Headroom follows the rule: at two columns every card from the third on opens
-  // a row, so the desktop-only rule for cards 5-8 is replaced.
-  .card:nth-child(n + 5) {
-    padding-top: 24px;
+  // Headroom follows the rule.
+  .card:nth-child(n + 4) {
+    padding-top: 28px;
   }
 
   .card:nth-child(n + 3) {
@@ -220,19 +242,20 @@
   }
 
   // One column, so every card opens its own row — a single uniform rhythm
-  // replaces the per-row headroom above.
+  // replaces the per-row headroom above. Covers both the desktop (n+4) and
+  // tablet (n+3) rules.
   .card:nth-child(n + 3),
-  .card:nth-child(n + 5) {
+  .card:nth-child(n + 4) {
     padding-top: 24px;
   }
 
   .card::before,
-  .card:nth-child(4n + 1)::before,
+  .card:nth-child(3n + 1)::before,
   .card:nth-child(odd)::before {
     display: none;
   }
 
-  .card:nth-child(n + 5)::after,
+  .card:nth-child(n + 4)::after,
   .card:nth-child(n + 3)::after {
     display: none;
   }

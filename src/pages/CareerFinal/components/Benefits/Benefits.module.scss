@@ -1,10 +1,15 @@
-// "Benefits" — a 3 x 2 card grid on the page's dark band.
+// "Benefits" — a 3 x 2 card grid on the v2 section grey.
 //
-// Card treatment follows the convention the other dark sections use: a #1d1d1d
-// fill lifted off a #151515 band by a 1px white-at-10% hairline. Without the
-// border the cards and the band are only 8 levels apart and the grid dissolves.
+// Was a dark band (#151515 with #1d1d1d cards). It is #f7f7f7 now, the same grey
+// AboutUsV2's WhyAmberExists and the ListWithUs Faq/Testimonials sections use, so
+// the page shares one light palette instead of carrying a single dark island
+// between two white sections (Globe above, Values below).
+//
+// Card treatment inverts with it: a white fill on the grey band, lifted by a
+// hairline rather than a shadow. White-on-grey is only 8 levels apart, the same
+// separation problem the dark treatment had, so the border is doing the work.
 .section {
-  background: #151515;
+  background: #f7f7f7;
   display: flex;
   justify-content: center;
   padding: 96px var(--page-gutter);
@@ -31,8 +36,9 @@
 }
 
 // 40px/-0.72px, the scale every other section title on this page uses.
+// #202020, the colour AboutUsV2's grey section uses for the same 40px heading.
 .heading {
-  color: #fff;
+  color: #202020;
   font-size: 40px;
   font-weight: 600;
   letter-spacing: -0.72px;
@@ -40,10 +46,9 @@
   margin: 0;
 }
 
-// White at 70% rather than a flat grey: it stays keyed to the band if the
-// background tone is ever adjusted.
+// $neutral6, the body grey the other light v2 sections use for a section lede.
 .lede {
-  color: rgba(255, 255, 255, 0.7);
+  color: $neutral6;
   font-size: 18px;
   font-weight: 400;
   line-height: 28px;
@@ -69,28 +74,78 @@
   width: 100%;
 }
 
+// The grid cell. This is the `Reveal`, so its transform belongs to the entrance
+// animation — the tilt lives two levels down instead.
+// The grid cell, and the PERSPECTIVE HOST. Perspective has to sit on the parent
+// of the rotating element — declared on the rotating element itself it flattens
+// the effect to a 2D skew.
+//
+// This is also the `Reveal`, so its own transform belongs to the entrance
+// animation and the tilt must not be applied here.
+.cardOuter {
+  display: flex;
+  min-width: 0;
+  perspective: 900px;
+}
+
+// Mouse target and tilt reference. Carries no paint of its own — it exists so the
+// pointer maths has a stable, unrotated box to measure against. Rotating the same
+// element you are measuring makes the cursor's position within it shift as it
+// tips, which feeds back into the next frame and makes the tilt jitter.
 .card {
-  background: #1d1d1d;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  --tilt-x: 0deg; // written by JS from the cursor's height within the card
+
+  display: flex;
+  width: 100%;
+}
+
+// The card surface AND the rotating layer. The background, border and radius live
+// here rather than on `.card` so the whole card tips — previously they sat on the
+// unrotated parent and only the contents moved inside a static frame.
+.tilt {
+  background: #fff;
+  border: 1px solid rgba(17, 25, 40, 0.08);
   border-radius: 16px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 32px;
+  min-height: 232px;
+  padding: 26px;
+  transform: rotateX(var(--tilt-x));
+  transform-style: preserve-3d;
+  transition: transform 0.12s ease-out;
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tilt {
+    transform: none;
+    transition: none;
+  }
+}
+
+// Leads the card, above the title. `margin-bottom` rather than relying on the
+// column gap so the icon-to-title distance is tuned independently of the
+// title-to-body one.
+.cardIcon {
+  display: block;
+  height: 30px;
+  margin-bottom: 6px;
+  width: 30px;
 }
 
 .cardTitle {
-  color: #fff;
+  color: $neutral9;
   font-size: 18px;
   font-weight: 600;
   line-height: 24px;
   margin: 0;
 }
 
-// #b6bcc4 rather than a dimmer grey: on this band it holds roughly 8.6:1, so the
-// copy reads as body text rather than receding into the card.
+// $neutral8 on white holds comfortably above 7:1, so the copy reads as body text
+// rather than receding into the card.
 .cardBody {
-  color: #b6bcc4;
+  color: $neutral8;
   font-size: 16px;
   font-weight: 400;
   line-height: 26px;
