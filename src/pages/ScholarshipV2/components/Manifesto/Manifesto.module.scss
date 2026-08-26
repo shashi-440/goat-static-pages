@@ -41,11 +41,8 @@ $erase: 0.5;
   width: 100%;
 }
 
-// Holds the passages in the middle of the screen while the section scrolls past
-// underneath them.
-//
-// `position: relative` because the two passages are absolutely stacked inside it — they
-// occupy the same screen space and cross over, so neither can be in flow.
+// Holds the passage in the middle of the screen while the section scrolls past underneath
+// it.
 .sticky {
   align-items: center;
   display: flex;
@@ -60,23 +57,6 @@ $erase: 0.5;
   // Defaults high so the passage is fully legible before hydration and with JS disabled;
   // the effect only ever takes brightness away from a readable baseline.
   --lit: 999;
-  --out: -9999;
-
-  opacity: 1;
-
-  // Stacked, not sequential. The two passages take turns in one frame, so they share the
-  // same box and cross over inside it; laid out in flow they would be two paragraphs one
-  // above the other and there would be nothing to cross.
-  //
-  // The JS also flips `visibility` on whichever is faded out — opacity alone still leaves
-  // it catching pointer events and joining text selections dragged across it.
-  left: 50%;
-  // Above the ground and nothing more; the two only ever need to beat the section, not
-  // each other, because exactly one of them is visible at a time.
-  z-index: 0;
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
 
   color: #fff;
   font-size: 40px;
@@ -84,37 +64,57 @@ $erase: 0.5;
   letter-spacing: -0.6px;
   line-height: 58px;
   margin: 0;
-  // 1040, up from 940.
-  //
-  // Measured, not nudged: with the face cluster now holding its full width at all times,
-  // the first passage set in THREE lines at 940 and two at anything from 1000 up. 1040
-  // takes the two-line setting with 40px of headroom, so a small font or tracking change
-  // will not flip it back. The second passage is unaffected — it holds its eight lines
-  // from 940 all the way to 1060, so this buys the first passage its line break for free.
+  // 1040, measured rather than nudged: with the face cluster holding its full width at all
+  // times, the opening sentence set in THREE lines at 940 and two at anything from 1000 up.
+  // 1040 takes the two-line setting with 40px of headroom, so a small font or tracking
+  // change will not flip it back.
   max-width: 1040px;
   text-align: center;
-  // Prevents a lone word on the last line, which a centred passage shows up badly.
-  text-wrap: balance;
   width: 100%;
+
+  // ── IN FLOW, not absolutely centred ───────────────────────────────────────
+  // This carried `position: absolute` with `left/top: 50%` and a `translate(-50%, -50%)`,
+  // because there were TWO paragraphs sharing one box and crossing over inside it. With one
+  // passage there is nothing to stack against, and `.sticky` already centres its child —
+  // so the positioning, the transform and the `z-index` all went. That also frees
+  // `transform` entirely: the JS no longer has to restate the centring every time it wrote
+  // a drift offset.
+
+  // `pretty`, not `balance`. Balance was right for a two-line sentence — it stops a lone
+  // word on the last line, which a centred passage shows up badly. This passage is ten
+  // lines, and balancing is capped at a handful of lines in browsers that implement it, so
+  // it would silently do nothing here. `pretty` has no such limit and still avoids the
+  // orphan.
+  text-wrap: pretty;
 }
 
-// EVERY passage after the first starts hidden.
-//
-// This is the baseline the server ships, and it has to be right on its own: both paragraphs
-// are absolutely stacked in the same box, so with both at `opacity: 1` they rendered on top
-// of each other as one unreadable overlap until the script ran. Written as a stylesheet rule
-// rather than an inline style so the reduced-motion block below can still override it — an
-// inline default would win over any media query.
-// `visibility` only, NOT opacity.
-//
-// The words carry their own brightness now, so the paragraph's opacity is never written by
-// the script — leaving `opacity: 0` here would hide the second passage permanently. Hiding
-// it by visibility still fixes what this rule is for: both paragraphs are absolutely stacked
-// in the same box, and shipped visible they render on top of each other as one unreadable
-// overlap until the script runs.
-.text + .text {
-  visibility: hidden;
+// ── The section's height is the constraint, so the type steps down with it ──
+// Ten lines at 58px is ~630px of text before the stanza gaps. The sticky child is exactly
+// 100vh and clips what does not fit, so on a short window the merged passage would lose
+// its last lines with no scrollbar to recover them. Two steps, each keeping the whole
+// passage inside its frame — and `max-height`, not `max-width`, because height is what
+// runs out.
+@media (max-height: 820px) {
+  .text {
+    font-size: 34px;
+    letter-spacing: -0.5px;
+    line-height: 48px;
+  }
 }
+
+@media (max-height: 700px) {
+  .text {
+    font-size: 29px;
+    letter-spacing: -0.4px;
+    line-height: 41px;
+  }
+}
+
+// ── `.text + .text` IS GONE ────────────────────────────────────────────────
+// It set `visibility: hidden` on every paragraph after the first, because both were
+// absolutely stacked in the same box and shipped visible they rendered on top of each other
+// as one unreadable overlap until the script ran. There is one paragraph now, so there is
+// nothing to hide and nothing that can overlap.
 
 // An authored line break between stanzas. A `<br>` would work, but this carries its own
 // spacing — the three sentences need air between them or they read as one slab, and a bare
@@ -131,23 +131,16 @@ $erase: 0.5;
 // No transition: --lit changes every frame with a fractional value, so the ramp is
 // already continuous. A transition on top would fight it and lag behind the scroll.
 .tok {
-  // TWO edges, multiplied.
+  // ONE edge. `--lit` brings a word up from the dim floor as the reading reaches it.
   //
-  // The first (`--lit`) brings a word up from the dim floor as the reading reaches it — the
-  // original effect. The second (`--out`) takes it back to nothing as the ERASE edge passes,
-  // which is how the first passage leaves: word by word, in the same direction it arrived,
-  // rather than the whole paragraph cross-fading as one block.
-  //
-  // That matters because the two passages are wildly different sizes — two lines against
-  // eight. Cross-fading them meant a small slab and a large slab both half-present at once,
-  // which reads as a glitch however long you give it. Erasing word by word means the screen
-  // is only ever clearing or filling, never showing two things.
-  //
-  // `--out` defaults far below any index, so nothing is erased until the edge is driven.
-  opacity: calc(
-    clamp(#{$dim}, #{$dim} + (var(--lit) - var(--i)) * #{$ramp}, 1) *
-      clamp(0, 1 - (var(--out) - var(--i)) * #{$erase}, 1)
-  );
+  // ⚠️  There were TWO, multiplied: a second `--out` edge took each word back to nothing as
+  // an ERASE sweep passed, which is how the first of two passages used to leave — word by
+  // word, in the same direction it arrived. That existed because the two passages were
+  // wildly different sizes (two lines against eight) and cross-fading them put a small slab
+  // and a large slab on screen half-present together, which read as a glitch at any
+  // duration. One passage never leaves, so the erase edge and its whole `--out` mechanism
+  // are gone.
+  opacity: clamp(#{$dim}, #{$dim} + (var(--lit) - var(--i)) * #{$ramp}, 1);
 }
 
 // inline-block would let each word be a line-breaking unit but also introduces the
@@ -247,10 +240,9 @@ $erase: 0.5;
 // ————————————————————————————————————————————————————————————————
 // Reduced motion
 //
-// Nothing is pinned and nothing crosses over, so the whole conceit is gone — which means
-// the two passages cannot stay stacked on top of each other. They become what they would
-// have been without the effect: two paragraphs, one after the other, in a section only as
-// tall as they need. The JS hands both a finished `--lit` under the same query.
+// Nothing is pinned, so the whole conceit is gone: the passage becomes what it would have
+// been without the effect — one paragraph in a section only as tall as it needs. The JS
+// hands it a finished `--lit` under the same query.
 // ————————————————————————————————————————————————————————————————
 @media (prefers-reduced-motion: reduce) {
   .section {
@@ -265,13 +257,12 @@ $erase: 0.5;
     position: static;
   }
 
-  .text,
-  .text + .text {
-    left: auto;
-    position: static;
-    top: auto;
-    transform: none;
-    visibility: visible;
+  // Unpinned, the height constraint that drove the two `max-height` steps above no longer
+  // applies — nothing is clipping the passage — so the type returns to full size.
+  .text {
+    font-size: 40px;
+    letter-spacing: -0.6px;
+    line-height: 58px;
   }
 
   .face {

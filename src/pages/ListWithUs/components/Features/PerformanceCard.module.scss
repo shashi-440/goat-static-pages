@@ -1,0 +1,347 @@
+// A month of a property's numbers. Sits in the card's media window and fills it.
+//
+// ⚠️  THE MARGIN IS SHADOW CLEARANCE. `.media` clips with `overflow: hidden`, so a shadow shows only
+// as far as this margin reaches — the panel used to sit flush and read as printed onto the card.
+// Bottom stays 0: the art is meant to bleed off the foot.
+.card {
+  background: #fff;
+  border: 1px solid #eceef1;
+  border-radius: 10px;
+  // Three layers — a tight edge, a close contact shadow, a wider lift — with radii inside the 18px
+  // margin or they would be cut.
+  box-shadow:
+    0 1px 2px rgba(17, 25, 40, 0.05),
+    0 4px 8px rgba(17, 25, 40, 0.06),
+    0 10px 18px rgba(17, 25, 40, 0.07);
+  display: flex;
+  flex-direction: column;
+  // ⚠️  `min-height: 100%`, NOT `100% + 24px`. The overhang was copied from the receipt, where the
+  // extra height is deliberately BLANK so a tilt can cover the corners. Here there is no tilt and
+  // the content flows into it, so the last row — the date axis — ended up below the window and was
+  // clipped. The panel is exactly its window now and everything is inside it.
+  //
+  // The earlier check on this passed because it asked "is the panel at least as tall as the window",
+  // which was true and irrelevant. What matters is whether the CONTENT ends inside it.
+  margin: 12px 18px 0;
+  min-height: 100%;
+  padding: 13px 14px 12px;
+  transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.34s ease;
+  width: calc(100% - 36px);
+}
+
+/* --------------------------------------------------------------------- head */
+
+.head {
+  align-items: baseline;
+  display: flex;
+  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  font-weight: 500;
+  justify-content: space-between;
+  letter-spacing: 0.6px;
+  line-height: 13px;
+}
+
+.headL {
+  color: #737373;
+}
+
+.headR {
+  color: #a3a3a3;
+}
+
+/* --------------------------------------------------------------------- hero */
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  padding-top: 12px;
+}
+
+.heroLabel {
+  color: #6b7280;
+  font-size: 10.5px;
+  line-height: 15px;
+}
+
+.heroRow {
+  align-items: baseline;
+  display: flex;
+  gap: 8px;
+}
+
+// The one figure with real size on it. Everything else in the panel is 9-13px, so this is what makes
+// the headline metric the headline.
+.heroValue {
+  color: #111928;
+  font-feature-settings: "tnum" 1;
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.6px;
+  line-height: 32px;
+}
+
+// ⚠️  A TINTED PILL, NOT BARE GREEN TEXT. Green type floating next to a 26px figure was the panel's
+// only other colour and it read as an afterthought; a pill makes it a component of the metric.
+.heroDelta {
+  align-items: center;
+  background: rgba(3, 152, 85, 0.1);
+  border-radius: 999px;
+  color: #027a48;
+  display: inline-flex;
+  font-size: 10.5px;
+  font-weight: 600;
+  gap: 4px;
+  line-height: 15px;
+  padding: 3px 8px;
+}
+
+// The arrow, drawn with a clip rather than a glyph: "▲" renders at a different size and baseline in
+// every font, and this one has to sit on the digits' optical centre.
+.heroArrow {
+  background: currentColor;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  height: 6px;
+  width: 7px;
+}
+
+// Names the baseline the delta is measured against. A delta with no baseline is a number the reader
+// cannot check.
+.heroVs {
+  color: #9aa4b8;
+  font-size: 10px;
+  line-height: 15px;
+}
+
+/* -------------------------------------------------------------------- chart */
+
+// ⚠️  `flex: 1` — THE CHART IS WHAT ABSORBS THE SLACK. That is the whole reason this panel fills its
+// frame: the head, hero, metrics and axis are all their natural height and the chart takes whatever
+// is left, so the card is full at any height rather than only at the one it was measured against.
+// The floor stops it collapsing to a line if the card is ever made much shorter.
+.chart {
+  flex: 1;
+  margin-top: 6px;
+  min-height: 56px;
+  position: relative;
+  // A few px of right room so the head of the line is not cut in half by the padding edge. The last
+  // data point sits at x=100, i.e. exactly on the chart's right edge, so without this the tip dot
+  // loses its outer ring.
+  padding-right: 5px;
+
+  // ⚠️  GRIDLINES, and they are load-bearing rather than decorative. The series rises steeply from
+  // bottom-left, which left the top-left third of the chart as blank white — the same void the whole
+  // panel had before, just smaller. Two faint rules give that space something to be, and they are
+  // what makes the line read as plotted against something rather than drawn.
+  //
+  // Drawn as a repeating gradient rather than elements so they cannot fall out of step with the
+  // chart's height: two lines at the thirds, whatever that height turns out to be.
+  &::before {
+    background:
+      linear-gradient(#eef1f5, #eef1f5) 0 33.33% / 100% 1px no-repeat,
+      linear-gradient(#eef1f5, #eef1f5) 0 66.66% / 100% 1px no-repeat;
+    content: "";
+    inset: 0 5px 0 0;
+    position: absolute;
+  }
+}
+
+// ⚠️  `preserveAspectRatio: none` is set on the element in the markup, and the SVG stretches
+// non-uniformly to fill this box. That is deliberate — the path is authored on a 0-100 x-axis so it
+// can span whatever width the card ends up at. The consequence is handled in two places: the stroke
+// carries `vector-effect: non-scaling-stroke` so it stays 1.5px instead of being squashed, and the
+// head of the line is a CSS dot rather than an SVG circle, which would stretch into an ellipse.
+.svg {
+  display: block;
+  height: 100%;
+  // Over the gridlines, so the area fill and the line read as plotted on top of them.
+  position: relative;
+  width: 100%;
+}
+
+// The head of the line. Positioned from the generated end point, so it cannot drift away from the
+// path if the series changes.
+// Drops from the head of the line to the axis, so the last value is anchored to a position on the
+// time scale rather than floating. Fades out downward — a solid rule would compete with the series.
+.guide {
+  background: linear-gradient(180deg, rgba(28, 100, 242, 0.28), rgba(28, 100, 242, 0));
+  bottom: 0;
+  position: absolute;
+  width: 1px;
+}
+
+.tip {
+  background: #1c64f2;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(28, 100, 242, 0.25);
+  height: 8px;
+  transition: box-shadow 0.34s ease;
+  margin: -4px 0 0 -4px;
+  position: absolute;
+  width: 8px;
+}
+
+/* ------------------------------------------------------------------ metrics */
+
+.rule {
+  background: #eceef1;
+  height: 1px;
+  margin-top: 4px;
+  width: 100%;
+}
+
+.metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 11px 0 0;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.metricHead {
+  align-items: baseline;
+  display: flex;
+  gap: 8px;
+}
+
+.metricLabel {
+  color: #6b7280;
+  flex: 1;
+  font-size: 11px;
+  line-height: 16px;
+}
+
+.metricValue {
+  color: #111928;
+  font-feature-settings: "tnum" 1;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 17px;
+}
+
+// Fixed width so the two deltas share a right edge; left to size themselves the values above them
+// would step in and out by a pixel or two per row.
+.metricDelta {
+  color: #027a48;
+  font-size: 9.5px;
+  font-weight: 600;
+  line-height: 14px;
+  text-align: right;
+  width: 34px;
+}
+
+.metricDown {
+  color: #d92d20;
+}
+
+// A hair of inset shadow so the bar sits IN the track rather than on top of it. At 4px tall that is
+// the difference between a progress bar and a coloured line.
+.track {
+  background: #eef1f5;
+  border-radius: 999px;
+  box-shadow: inset 0 1px 1px rgba(17, 25, 40, 0.05);
+  display: block;
+  height: 5px;
+  overflow: hidden;
+}
+
+.fill {
+  border-radius: 999px;
+  display: block;
+  height: 100%;
+}
+
+// ⚠️  ONE HUE PER METRIC. Both bars used to be the chart's blue, which made three different measures
+// look like one measure repeated — the "two tone" problem in a sentence. A down metric keeps its own
+// hue rather than turning red or grey: the delta pill already states the direction, grey reads as
+// DISABLED, and red reads as an alert, which 31% conversion is not.
+.barTeal {
+  background: linear-gradient(90deg, #55b5a6, #3f9e91);
+}
+
+.barIndigo {
+  background: linear-gradient(90deg, #7d7ff0, #6466e9);
+}
+
+
+
+/* --------------------------------------------------------------------- axis */
+
+// The date range, as a chart's axis labels. Present because a trend line with no time on it is the
+// detail that gives away a decorative chart.
+.axis {
+  color: #a3a3a3;
+  display: flex;
+  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 8.5px;
+  justify-content: space-between;
+  letter-spacing: 0.7px;
+  // The middle label is centred in its own share of the row, so the three read as a scale rather than
+  // as two ends with something floating between them.
+  text-align: center;
+  line-height: 12px;
+  // ⚠️  NO BOTTOM PADDING — the card carries 12px of its own, and doubling them put the axis 11px
+  // below the window and clipped it. Measured, not guessed: `lastElementChild.bottom` against the
+  // media window's floor.
+  padding: 9px 0 0;
+
+  span:first-child {
+    text-align: left;
+  }
+
+  span:last-child {
+    text-align: right;
+  }
+
+  span {
+    flex: 1;
+  }
+}
+/* --------------------------------------------------------------------- hover */
+
+// ⚠️  GATED ON A REAL POINTER. Without `(hover: hover) and (pointer: fine)` a touch device applies the
+// hover state on tap and then LEAVES IT APPLIED until something else is tapped — a card stuck in its
+// lifted state with no way to dismiss it.
+//
+// ⚠️  THE SHADOW DEEPENS BY ALPHA, NOT BY BLUR, and that is a hard constraint rather than a
+// preference. `.media` clips with `overflow: hidden`, so these radii were sized to fit inside the
+// panel's own margin — growing them on hover would push the shadow past the clip and the lift would
+// arrive with a straight cut edge on two sides. Alpha costs no geometry.
+//
+// ⚠️  `prefers-reduced-motion` DROPS THE TRANSITION AND THE MOVE, keeping only the shadow. The point
+// of the gesture is "this is a surface"; that survives without the 2px, and a translate is exactly
+// what a reader who asked for no motion asked not to get.
+
+// The panel-specific half: the head of the series gains a wider ring, as though the last reading were
+// being pointed at. A ring rather than anything that moves the dot — the dot marks a position on the
+// axis, and nudging it would misplace the value it stands for.
+@media (hover: hover) and (pointer: fine) {
+  .card:hover {
+    box-shadow:
+      0 1px 2px rgba(17, 25, 40, 0.07),
+      0 4px 8px rgba(17, 25, 40, 0.09),
+      0 10px 18px rgba(17, 25, 40, 0.11);
+    transform: translateY(-2px);
+  }
+
+  .card:hover .tip {
+    box-shadow: 0 0 0 4px rgba(28, 100, 242, 0.14);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .tip {
+    transition: none;
+  }
+
+  .card:hover {
+    transform: none;
+  }
+}

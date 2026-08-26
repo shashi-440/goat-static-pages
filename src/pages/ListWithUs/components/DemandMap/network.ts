@@ -66,6 +66,16 @@ import hk from "../../assets/flags/hk.png";
 import it from "../../assets/flags/it.png";
 import nz from "../../assets/flags/nz.png";
 import sg from "../../assets/flags/sg.png";
+// SVG rather than PNG, and only these five. The set above was rasterised because those
+// flags are drawn at 18px on a hover card where a coat of arms is a smudge; these are
+// ORIGIN flags, and origins no longer draw a flag at all — they draw a face. Kept
+// accurate anyway, because the day one of them is shown is not the day to discover the
+// data was a placeholder.
+import jp from "../../assets/flags/jp.svg";
+import kr from "../../assets/flags/kr.svg";
+import kz from "../../assets/flags/kz.svg";
+import ru from "../../assets/flags/ru.svg";
+import tr from "../../assets/flags/tr.svg";
 
 /**
  * Partner wordmarks — the same eight files the hero's logo wall uses, so the map
@@ -119,6 +129,11 @@ export interface PropertyCity extends Place {
   weight: number;
   /** ILLUSTRATIVE enquiry count — printed on the map. See the file header. */
   enquiries: number;
+  /**
+   * Bookings that came out of those enquiries. ILLUSTRATIVE, and DERIVED — see `withBookings`
+   * below rather than looking for it in the rows.
+   */
+  bookings: number;
   /**
    * Properties amber lists in this city — buildings, not rooms. ILLUSTRATIVE.
    *
@@ -175,80 +190,103 @@ export interface PropertyCity extends Place {
  * re-derived before being switched back on. The Mapbox globe ignores these entirely:
  * it uses Mapbox's own symbol-collision engine for label placement.
  */
-export const PROPERTIES: PropertyCity[] = [
+/**
+ * Bookings per city, DERIVED from its enquiries rather than typed alongside them.
+ *
+ * ⚠️  Deliberately not a second column of hand-written numbers. Two independent figures for
+ * the same city is two things to keep in step, and the failure is silent and embarrassing in
+ * exactly one direction: a bookings count that drifts above its enquiries count claims more
+ * bookings than enquiries, printed side by side in the same tooltip. Deriving makes that
+ * impossible.
+ *
+ * The rate VARIES by city rather than being one multiplier, because a flat 22% across
+ * eighteen cities is the first thing anyone would spot — and it varies with something real,
+ * the city's `weight` (its relative inbound demand), so the busy markets convert a little
+ * better. 19% at weight 1 up to 24% at weight 5.
+ *
+ * Rounded to whole bookings, and floored at 1 so a small market never prints "0 bookings"
+ * beside a live enquiry count.
+ */
+const bookingsFor = (enquiries: number, weight: number) =>
+  Math.max(1, Math.round(enquiries * (0.19 + 0.0125 * (weight - 1))));
+
+const withBookings = (rows: Omit<PropertyCity, "bookings">[]): PropertyCity[] =>
+  rows.map((c) => ({ ...c, bookings: bookingsFor(c.enquiries, c.weight) }));
+
+export const PROPERTIES: PropertyCity[] = withBookings([
   // prettier-ignore
   { label: "London", country: "UK", flag: gb, location: [51.5072, -0.1276], weight: 5,
-    enquiries: 412, properties: 24, filled: 96, avgBooking: 1900,
+    enquiries: 4182, properties: 24, filled: 96, avgBooking: 1900,
     label_at: { dx: 30, dy: 22, align: "left" } },
   // prettier-ignore
   { label: "Manchester", country: "UK", flag: gb, location: [53.4808, -2.2426], weight: 4,
-    enquiries: 268, properties: 17, filled: 95, avgBooking: 1500,
+    enquiries: 2736, properties: 17, filled: 95, avgBooking: 1500,
     label_at: { dx: -38, dy: -36.9, align: "right" } },
   // prettier-ignore
   { label: "Dublin", country: "Ireland", flag: ie, location: [53.3498, -6.2603], weight: 3,
-    enquiries: 188, properties: 12, filled: 94, avgBooking: 1700,
+    enquiries: 1904, properties: 12, filled: 94, avgBooking: 1700,
     label_at: { dx: -21.3, dy: -63.4, align: "right" } },
   // prettier-ignore
   { label: "Paris", country: "France", flag: fr, location: [48.8566, 2.3522], weight: 3,
-    enquiries: 133, properties: 10, filled: 92, avgBooking: 1600,
+    enquiries: 1357, properties: 10, filled: 92, avgBooking: 1600,
     label_at: { dx: 20, dy: 26, align: "left" } },
   // prettier-ignore
   { label: "Berlin", country: "Germany", flag: de, location: [52.52, 13.405], weight: 3,
-    enquiries: 121, properties: 9, filled: 91, avgBooking: 1400,
+    enquiries: 1238, properties: 9, filled: 91, avgBooking: 1400,
     label_at: { dx: 0, dy: -26, align: "left" } },
   // prettier-ignore
   { label: "Barcelona", country: "Spain", flag: es, location: [41.3874, 2.1686], weight: 3,
-    enquiries: 104, properties: 8, filled: 93, avgBooking: 1300,
+    enquiries: 1061, properties: 8, filled: 93, avgBooking: 1300,
     label_at: { dx: 14, dy: 24, align: "left" } },
   // prettier-ignore
   { label: "Florence", country: "Italy", flag: it, location: [43.7696, 11.2558], weight: 2,
-    enquiries: 62, properties: 5, filled: 95, avgBooking: 1200,
+    enquiries: 638, properties: 5, filled: 95, avgBooking: 1200,
     label_at: { dx: 18, dy: 20, align: "left" } },
   // prettier-ignore
   { label: "New York", country: "USA", flag: us, location: [40.7128, -74.006], weight: 5,
-    enquiries: 331, properties: 19, filled: 97, avgBooking: 2400,
+    enquiries: 3364, properties: 19, filled: 97, avgBooking: 2400,
     label_at: { dx: -22, dy: 26, align: "right" } },
   // prettier-ignore
   { label: "Chicago", country: "USA", flag: us, location: [41.8781, -87.6298], weight: 3,
-    enquiries: 176, properties: 11, filled: 94, avgBooking: 1800,
+    enquiries: 1792, properties: 11, filled: 94, avgBooking: 1800,
     label_at: { dx: -24, dy: -20, align: "right" } },
   // prettier-ignore
   { label: "Los Angeles", country: "USA", flag: us, location: [34.0522, -118.2437], weight: 3,
-    enquiries: 154, properties: 12, filled: 93, avgBooking: 2100,
+    enquiries: 1573, properties: 12, filled: 93, avgBooking: 2100,
     label_at: { dx: 22, dy: 18, align: "left" } },
   // prettier-ignore
   { label: "Toronto", country: "Canada", flag: ca, location: [43.6532, -79.3832], weight: 4,
-    enquiries: 243, properties: 16, filled: 96, avgBooking: 1700,
+    enquiries: 2468, properties: 16, filled: 96, avgBooking: 1700,
     label_at: { dx: -28, dy: 0, align: "right" } },
   // prettier-ignore
   { label: "Vancouver", country: "Canada", flag: ca, location: [49.2827, -123.1207], weight: 3,
-    enquiries: 168, properties: 11, filled: 95, avgBooking: 1800,
+    enquiries: 1714, properties: 11, filled: 95, avgBooking: 1800,
     label_at: { dx: 22, dy: -18, align: "left" } },
   // prettier-ignore
   { label: "Sydney", country: "Australia", flag: au, location: [-33.8688, 151.2093], weight: 4,
-    enquiries: 257, properties: 15, filled: 96, avgBooking: 2000,
+    enquiries: 2613, properties: 15, filled: 96, avgBooking: 2000,
     label_at: { dx: -28, dy: 0, align: "right" } },
   // prettier-ignore
   { label: "Melbourne", country: "Australia", flag: au, location: [-37.8136, 144.9631], weight: 4,
-    enquiries: 214, properties: 14, filled: 95, avgBooking: 1800,
+    enquiries: 2179, properties: 14, filled: 95, avgBooking: 1800,
     label_at: { dx: -26, dy: 22, align: "right" } },
   // prettier-ignore
   { label: "Auckland", country: "New Zealand", flag: nz, location: [-36.8485, 174.7633], weight: 2,
-    enquiries: 96, properties: 7, filled: 90, avgBooking: 1500,
+    enquiries: 983, properties: 7, filled: 90, avgBooking: 1500,
     label_at: { dx: -26, dy: -20, align: "right" } },
   // prettier-ignore
   { label: "Dubai", country: "UAE", flag: ae, location: [25.2048, 55.2708], weight: 2,
-    enquiries: 88, properties: 7, filled: 89, avgBooking: 1600,
+    enquiries: 897, properties: 7, filled: 89, avgBooking: 1600,
     label_at: { dx: 20, dy: 20, align: "left" } },
   // prettier-ignore
   { label: "Singapore", country: "Singapore", flag: sg, location: [1.3521, 103.8198], weight: 2,
-    enquiries: 79, properties: 6, filled: 92, avgBooking: 1900,
+    enquiries: 812, properties: 6, filled: 92, avgBooking: 1900,
     label_at: { dx: 20, dy: 18, align: "left" } },
   // prettier-ignore
   { label: "Hong Kong", country: "Hong Kong", flag: hk, location: [22.3193, 114.1694], weight: 2,
-    enquiries: 71, properties: 5, filled: 90, avgBooking: 1700,
+    enquiries: 726, properties: 5, filled: 90, avgBooking: 1700,
     label_at: { dx: 20, dy: -18, align: "left" } },
-];
+]);
 
 /**
  * Where the demand comes from — ONE ENTRY PER COUNTRY, not per city.
@@ -272,7 +310,27 @@ export interface SourceCountry extends Place {
   via: string;
 }
 
+/**
+ * Where the demand comes from.
+ *
+ * ── Two halves, and the second one was missing ──────────────────────────────
+ * This started as the classic international-student source list — India, China, Nigeria,
+ * Pakistan and so on — which is correct about the biggest flows and a bad picture of the
+ * business. Drawn on a map it said amber is a one-way pipe out of South Asia and West
+ * Africa: no arc ever started in Europe, and no student ever moved WITHIN their own
+ * country, when domestic moves are a large share of any student housing market.
+ *
+ * So the list now carries both: the long-haul source markets it always had, and near-haul
+ * and domestic origins in Europe and North America. A student going Birmingham to London
+ * or Lyon to Paris is as real a booking as one going Mumbai to London, and without them
+ * the whole of the northern hemisphere sat there as a destination and never as a home.
+ *
+ * ⚠️ Each origin is a COUNTRY, positioned at one representative city — deliberately not
+ * the same city amber lists in, so a domestic arc has somewhere to travel from. Adding a
+ * row here is enough; nothing keys off the length of this list.
+ */
 export const ORIGINS: SourceCountry[] = [
+  // Long-haul source markets.
   { label: "India", country: "India", via: "Mumbai", flag: ind, location: [19.076, 72.8777] },
   { label: "China", country: "China", via: "Shanghai", flag: cn, location: [31.2304, 121.4737] },
   { label: "Nigeria", country: "Nigeria", via: "Lagos", flag: ng, location: [6.5244, 3.3792] },
@@ -286,6 +344,33 @@ export const ORIGINS: SourceCountry[] = [
   { label: "Indonesia", country: "Indonesia", via: "Jakarta", flag: id, location: [-6.2088, 106.8456] },
   { label: "Philippines", country: "Philippines", via: "Manila", flag: ph, location: [14.5995, 120.9842] },
   { label: "Brazil", country: "Brazil", via: "Sao Paulo", flag: br, location: [-23.5505, -46.6333] },
+
+  // ── The northern band ──────────────────────────────────────────────────────
+  // Added because the map had a hole in it. Between roughly 35°N and 60°N — the whole of
+  // Russia, Central Asia and north-east Asia — there was not one origin, so any stop that
+  // centred on a northern city (Berlin, London, Toronto) framed several thousand miles of
+  // empty green. All five are real student-source markets; they were simply missing.
+  //
+  // What is still empty up there is Siberia above ~60°, Greenland and Arctic Canada, and
+  // that stays empty: nobody lives there and amber lists nowhere in it.
+  { label: "Turkey", country: "Turkey", via: "Istanbul", flag: tr, location: [41.0082, 28.9784] },
+  { label: "Russia", country: "Russia", via: "Moscow", flag: ru, location: [55.7558, 37.6173] },
+  { label: "Kazakhstan", country: "Kazakhstan", via: "Almaty", flag: kz, location: [43.222, 76.8512] },
+  { label: "South Korea", country: "South Korea", via: "Seoul", flag: kr, location: [37.5665, 126.978] },
+  { label: "Japan", country: "Japan", via: "Tokyo", flag: jp, location: [35.6762, 139.6503] },
+
+  // Near-haul and domestic. Each sits in a city amber does NOT list in, so the arc from
+  // it has a distance to cover — an origin dropped on its own destination draws nothing.
+  { label: "United Kingdom", country: "United Kingdom", via: "Birmingham", flag: gb, location: [52.4862, -1.8904] },
+  { label: "Ireland", country: "Ireland", via: "Cork", flag: ie, location: [51.8985, -8.4756] },
+  { label: "France", country: "France", via: "Lyon", flag: fr, location: [45.764, 4.8357] },
+  { label: "Germany", country: "Germany", via: "Munich", flag: de, location: [48.1351, 11.582] },
+  { label: "Spain", country: "Spain", via: "Madrid", flag: es, location: [40.4168, -3.7038] },
+  { label: "Italy", country: "Italy", via: "Milan", flag: it, location: [45.4642, 9.19] },
+  { label: "Netherlands", country: "Netherlands", via: "Rotterdam", flag: nl, location: [51.9244, 4.4777] },
+  { label: "United States", country: "United States", via: "Houston", flag: us, location: [29.7604, -95.3698] },
+  { label: "Canada", country: "Canada", via: "Calgary", flag: ca, location: [51.0447, -114.0719] },
+  { label: "Australia", country: "Australia", via: "Perth", flag: au, location: [-31.9505, 115.8605] },
 ];
 
 export interface Route {

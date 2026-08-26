@@ -1,0 +1,418 @@
+// Same frame as the page's other white bands: 80px gutters, a 1280px measure and the 120px
+// bottom rhythm.
+//
+// ⚠️  96px TOP, which is the one exception to this page's rule that every band owns only the
+// space BELOW itself. `WhyPartners` sits directly above and it is a bordered band — its own
+// `padding: 96px 80px` sits INSIDE its `border-bottom`, so that padding separates its content
+// from the rule and leaves nothing between the rule and whatever comes next. Any section landing
+// under that border has to bring its own top padding or its heading sits on the line.
+//
+// `Steps` carried this 96px for exactly that reason until this section was inserted between the
+// two; it moved here with the position, and Steps dropped to a 0 top since it now follows a
+// normal 120px bottom.
+.section {
+  align-items: center;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 96px var(--pad) 120px;
+  width: 100%;
+
+  // The section's own gutter, named so the rail can both cancel it and restore it. It is the
+  // distance from the window edge to the 1280px measure: the padding, plus whatever slack sits
+  // beside a maxed-out `.inner` on a wide screen. Deriving it beats hard-coding 80px, which is
+  // only correct at exactly 1440px.
+  --pad: 80px;
+  --gutter: calc((100vw - min(1280px, 100vw - 2 * var(--pad))) / 2);
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  max-width: 1280px;
+  width: 100%;
+}
+
+.heading {
+  color: #111928;
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -1px;
+  line-height: 48px;
+  margin: 0 0 48px;
+}
+
+/* ---------------------------------------------------------------- the track */
+
+// Runs END TO END on BOTH sides: out past the 1280px measure to each window edge, so a
+// partly-scrolled card is cut by the window rather than stopping short of it with a stripe of
+// page beside it. The gutter it cancels is restored as PADDING on the track below — the two
+// must stay equal and opposite.
+.viewport {
+  margin-left: calc(-1 * var(--gutter));
+  margin-right: calc(-1 * var(--gutter));
+  overflow-x: auto;
+  // ⚠️  EXPLICIT, and not redundant. Per spec a `visible` axis computes to `auto` when the other
+  // axis is not visible, so `overflow-x: auto` alone silently makes this a VERTICALLY scrolling
+  // box too — and Reveal starts every card at translateY(32px), which is 32px of real content
+  // below the box. That is a stray vertical scrollbar on the rail.
+  overflow-y: hidden;
+  // Snap positions are measured from the padding edge, so without this the first card snaps to
+  // the window edge instead of to the measure.
+  scroll-padding-left: var(--gutter);
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  width: auto;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.track {
+  display: flex;
+  gap: 24px;
+  // Restores, as padding, exactly what the viewport cancelled as margin. The leading one puts
+  // the first card on the measure at rest; the trailing one lets the LAST card come to rest on
+  // the measure too, instead of stopping half off the window edge.
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
+  // ⚠️  REQUIRED for `padding-right` above to do anything at all. As a block-level flex box the
+  // track's used width is the viewport's, and the cards — which do not shrink — simply overflow
+  // it; its trailing padding then sits inside that box, hundreds of px left of where the cards
+  // actually end, contributing nothing to the scrollable width.
+  width: max-content;
+}
+
+// Copy at the top, art below it running off the bottom edge — Partner With Us's `Benefits`
+// card. Width comes from `--card-w`, set on the track by the component because it depends on
+// the number of cards, which CSS cannot see; the fallback is the three-up fraction so a card is
+// never widthless if the property fails to land.
+//
+// ⚠️  NO LEFT PADDING on the card itself. `.copy` and `.media` apply the inset separately, so
+// art can opt out of it — while it lived here, a full-bleed panel could only try to escape with
+// a negative margin and `.media`'s own `overflow: hidden` clipped that straight back.
+.card {
+  background: #f7f7f7;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  gap: 24px;
+  height: 452px;
+  overflow: hidden;
+  padding: 28px 0 0 0;
+  scroll-snap-align: start;
+  width: var(--card-w, calc((100% - 48px) / 3));
+
+  --card-inset: 28px;
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 var(--card-inset);
+}
+
+.cardTitle {
+  color: #111928;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  line-height: 28px;
+  margin: 0;
+}
+
+.cardBody {
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22px;
+  margin: 0;
+}
+
+// Just the WINDOW: it takes whatever height the copy leaves and clips whatever is inside it, so
+// a two-line title and a three-line one still produce a level row. The panel frames itself.
+.media {
+  flex: 1;
+  // The left inset, applied here rather than by the card, so a card can drop it.
+  margin-left: var(--card-inset);
+  min-height: 0;
+  overflow: hidden;
+}
+
+// Cancels the media window's left inset so it spans the card's full width. TWO DIFFERENT JOBS use
+// this, and the second is not obvious from the name:
+//
+//   · THE GLOBE BLEEDS. A picture of the earth with a margin down one side reads as the planet
+//     floating in a box.
+//   · THE RECEIPT, BOOKING AND PERFORMANCE PANELS CENTRE. They inset themselves with their own equal
+//     margins, and those margins can only centre the panel if the window they sit in is the card's
+//     full width. Inside the default window — 28px in on the left, flush on the right — symmetric
+//     margins land the panel 46px from one edge and 18px from the other.
+//
+// It has to be cancelled HERE rather than escaped from inside with a negative margin, because
+// `.media`'s own `overflow: hidden` clips that straight back to the inset window.
+.mediaBleed {
+  margin-left: 0;
+}
+
+// The globe's host, and the fallback panel's. `height: 100%` so the globe's own absolutely
+// positioned stage has a box to fill; the fallback panel inside it is in normal flow and
+// unaffected.
+.globeBox {
+  height: 100%;
+  position: relative;
+  width: 100%;
+}
+
+// The panels fit the window's WIDTH and leave only by the BOTTOM. A screenshot cropped on the
+// right reads as more app continuing past the edge; a drawn panel cropped on the right just
+// reads as severed text, because its own right column is a value that has to be whole to mean
+// anything.
+//
+// `min-height: 100%` so the panel reaches the card's bottom edge rather than stopping mid-card
+// and leaving a band of bare card colour under it, which reads as a panel that failed to load.
+.art {
+  box-shadow: 0 12px 32px rgba(17, 25, 40, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 100%;
+  width: 100%;
+}
+
+/* --------------------------------------------------------- source markets */
+
+.marketRow {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+// A 1px ring rather than a border: flags are rectangles of solid colour and several of these
+// have a white band at an edge, which dissolves into the panel without one.
+.flag {
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px rgba(16, 24, 40, 0.12);
+  flex-shrink: 0;
+  height: 12px;
+  object-fit: cover;
+  width: 16px;
+}
+
+.marketName {
+  color: #111928;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 16px;
+  white-space: nowrap;
+  width: 52px;
+}
+
+.marketTrack {
+  background: #eef0f3;
+  border-radius: 999px;
+  flex: 1;
+  height: 5px;
+  overflow: hidden;
+}
+
+.marketFill {
+  background: #1c64f2;
+  border-radius: 999px;
+  display: block;
+  height: 100%;
+}
+
+// Fixed width and tabular, so the column of percentages shares one right edge — left to size
+// themselves the bars would step in and out by a pixel or two per row.
+.marketPct {
+  color: #6b7280;
+  font-feature-settings: "tnum" 1;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 14px;
+  text-align: right;
+  width: 24px;
+}
+
+/* -------------------------------------------------------------- fee sheet */
+
+.feeRow {
+  align-items: baseline;
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 0;
+}
+
+.feeLabel {
+  color: #4b5563;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+}
+
+// The zeroes carry the whole panel, so they are the only ink here with weight and size on them.
+.feeZero {
+  color: #111928;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  line-height: 24px;
+}
+
+.feeNote {
+  color: #9ca3af;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 16px;
+}
+
+/* ----------------------------------------------------------- booking trail */
+
+.trail {
+  display: flex;
+  flex-direction: column;
+}
+
+.trailRow {
+  display: flex;
+  gap: 10px;
+}
+
+// The dot and its connector share one column so the line runs through the dots' centres. The
+// column is `relative` and the line is absolute, so the line can span the row's full height
+// whatever the label wraps to.
+.trailMark {
+  flex-shrink: 0;
+  position: relative;
+  width: 10px;
+}
+
+.trailDot {
+  background: #fff;
+  border: 1.5px solid #d1d5db;
+  border-radius: 50%;
+  display: block;
+  height: 10px;
+  margin-top: 4px;
+  position: relative;
+  width: 10px;
+  z-index: 1;
+}
+
+.trailDotDone {
+  background: #1c64f2;
+  border-color: #1c64f2;
+}
+
+.trailLine {
+  background: #e5e7eb;
+  bottom: 0;
+  left: 4px;
+  position: absolute;
+  top: 14px;
+  width: 1.5px;
+}
+
+.trailLabel {
+  color: #111928;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  padding-bottom: 12px;
+}
+
+// The step still open. Lighter, not struck through: it has not failed, it has not happened yet.
+.trailLabelOpen {
+  color: #9ca3af;
+}
+
+/* ------------------------------------------------------------- performance */
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 3px 0;
+}
+
+.metricHead {
+  align-items: baseline;
+  display: flex;
+  gap: 8px;
+}
+
+.metricLabel {
+  color: #6b7280;
+  flex: 1;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 16px;
+}
+
+.metricValue {
+  color: #111928;
+  font-feature-settings: "tnum" 1;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.metricDelta {
+  color: #039855;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 14px;
+  width: 34px;
+}
+
+.metricDown {
+  color: #d92d20;
+}
+
+.metricTrack {
+  background: #eef0f3;
+  border-radius: 999px;
+  height: 5px;
+  overflow: hidden;
+}
+
+.metricFill {
+  background: #1c64f2;
+  border-radius: 999px;
+  display: block;
+  height: 100%;
+}
+
+/* ── THE DRAWN SUPPORT PANEL'S STYLES ARE GONE ────────────────────────────
+   `.chatRow`, `.bubbleOut`, `.bubbleIn`, `.chatAgent`, `.agentFace`, `.agentName` and
+   `.typing` lived here, for the static support panel. That panel was replaced by the ported
+   `SupportChat`, which brings its own stylesheet — see the note in Features.tsx. */
+
+@media (max-width: 900px) {
+  .section {
+    // --gutter is derived from --pad, so the rail's bleed and the track's padding both follow
+    // this one change.
+    --pad: 24px;
+    padding-bottom: 80px;
+  }
+
+  .heading {
+    font-size: 30px;
+    letter-spacing: -0.6px;
+    line-height: 38px;
+    margin-bottom: 32px;
+  }
+
+  // Overrides `--card-w` at every count: three-up is not an option on a phone, so the card is
+  // always just under a viewport width and the peek always survives — it is the only thing
+  // telling a touch reader the row scrolls.
+  .card {
+    height: 430px;
+    width: min(320px, 82vw);
+  }
+}

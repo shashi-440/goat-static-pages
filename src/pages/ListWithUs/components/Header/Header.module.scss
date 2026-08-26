@@ -1,17 +1,15 @@
-// Rail + navbar move as one fixed block. The shared navbar module positions the
-// <nav> itself `fixed; top: 0`, which would slide it over the rail — .navbar
-// below hands positioning back to this stack.
-// The whole stack slides up by the rail's height on the first scroll, so the
-// rail travels out through the top of the viewport and the navbar lands on the
-// top edge. Scroll back to 0 and it rides down again. The offset is set inline
-// from the rail's measured height (see Header.tsx).
+// The fixed wrapper. The shared navbar module positions the <nav> itself
+// `fixed; top: 0`, and `.navbar` below hands positioning back to this stack, so this
+// is what actually pins the bar.
+//
+// The `transform` and its transition are gone with the announcement rail — the stack
+// used to slide up by the rail's measured height on first scroll. With one child there
+// is nothing to slide away from. See the note in Header.tsx.
 .stack {
   left: 0;
   position: fixed;
   right: 0;
   top: 0;
-  transform: translateY(0);
-  transition: transform 0.35s ease;
   z-index: 100;
 }
 
@@ -19,51 +17,11 @@
   position: relative;
 }
 
-// Announcement rail — Figma node 2456:6003.
-//
-// Blue tint rather than the node's neutral #f7f7f7. `#eff4ff` is the same pale blue the
-// page already uses for its quiet blue surfaces — the numbered tokens and badges in the
-// "Why partners" cards — so the rail reads as part of the palette instead of as a grey
-// strip above it, and it ties to the `#1466ff` CTA sitting in it.
-.rail {
-  align-items: center;
-  background: #eff4ff;
-  display: flex;
-  gap: 8px;
-  height: 42px;
-  justify-content: center;
-  padding: 12px 24px;
-  width: 100%;
-}
-
-.railText {
-  color: #111928;
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 18px;
-  margin: 0;
-  white-space: nowrap;
-}
-
-.railStrong {
-  font-weight: 600;
-}
-
-.railCta {
-  color: #1466ff !important;
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 18px;
-  text-decoration: none;
-  white-space: nowrap;
-
-  &:hover,
-  &:active,
-  &:focus {
-    color: #1466ff !important;
-    text-decoration: underline;
-  }
-}
+/* ── THE ANNOUNCEMENT RAIL'S STYLES ARE GONE ───────────────────────────────
+   `.rail`, `.railText`, `.railStrong` and `.railCta` lived here — a 42px pale-blue strip
+   (#eff4ff, matched to the page's other quiet blue surfaces) holding a sentence and a
+   "Get now" link. Removed with the markup; see the note in Header.tsx for what else came
+   out with it. */
 
 // The design's nav links are 14px medium rather than the shared 16px/600.
 // The colour is pinned on every state because the site's global

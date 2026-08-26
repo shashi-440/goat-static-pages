@@ -6,28 +6,32 @@ import { GLOBE_READY_EVENT } from "../GlobeTravel/GlobeTravel";
 // Shared with About Us / Scholarship rather than copied, so every v2 page uses
 // one scroll-reveal.
 import Reveal from "../../../AboutUsV2/components/Reveal/Reveal";
+/**
+ * The headline's animated mark.
+ *
+ * Shared from Scholarship rather than rebuilt, and NOT CareerV2's `LottieIcon`, which is
+ * otherwise the same idea: that one hosts the animation in a `<div>`, and a `<div>` inside an
+ * `<h1>` is invalid — a heading takes phrasing content only. `InlineLottie` hosts it in a
+ * `<span>` so it can sit in the line legitimately, and it dynamically imports lottie-web
+ * (~250KB, client-only) so it stays out of both the page chunk and the server bundle.
+ */
+import InlineLottie from "../../../ScholarshipV2/components/InlineLottie/InlineLottie";
+import hotelRoom from "../../assets/lottie/hotel-room.json";
 import styles from "./Hero.module.scss";
-import avatar1 from "../../assets/avatar-1.png";
-import avatar2 from "../../assets/avatar-2.png";
-import avatar3 from "../../assets/avatar-3.png";
 import wrapperHOC from "@Utils/wrapperHOC";
 
 /**
  * Hero — Figma node 2483:9807.
  *
- * A centred stack on white: a large headline with the avatar cluster inline in it, the lede
- * and pill CTA under it, and the globe below — sized so it leaves through the bottom of the
- * viewport rather than sitting politely inside the section.
+ * A centred stack on white: a large two-line headline, the lede and pill CTA under it, and
+ * the globe below — sized so it leaves through the bottom of the viewport rather than
+ * sitting politely inside the section.
  *
  * This replaced a two-column arrangement (copy left, globe right). Only the ARRANGEMENT
  * changed: the ground is still white and the copy, the CTA's colour and the CTA's size are
  * all as they were. A blue gradient with white type and a black pill was tried here from a
  * reference and reverted — see the notes in the stylesheet for what it took and why it
  * went.
- *
- * The design positions the avatar cluster absolutely into a run of spaces in the
- * headline; here it is a real inline element between "front of" and "millions",
- * so the gap stays correct when the headline rewraps.
  *
  * The globe is `DemandGlobe`, a Mapbox 3D globe of the demand arriving into amber-listed
  * cities, and it does NOT live in this component — it is a single fixed layer owned by
@@ -51,13 +55,13 @@ import wrapperHOC from "@Utils/wrapperHOC";
  * document the whole time (hidden by opacity, as `Reveal` already does), so nothing
  * reflows and the entrance costs no layout shift.
  */
-const AVATARS = [
-  // Each avatar carries its own crop from the node — the source photos are not
-  // framed identically, so one shared object-position would misalign the faces.
-  { src: avatar1, alt: "", left: "-7.5%", top: "-7.5%", size: "115%" },
-  { src: avatar2, alt: "", left: "-17%", top: "-19.74%", size: "134%" },
-  { src: avatar3, alt: "", left: "0.18%", top: "2.56%", size: "100%" },
-];
+// ── THE AVATAR CLUSTER LIVED HERE ───────────────────────────────────────────
+// Three cropped faces, sized in `em` so they tracked the headline's `clamp()`, sitting
+// inline between "front of" and "millions of students". Removed with the headline they were
+// set into: they were a device for making "millions of students" concrete, and the copy no
+// longer makes a claim about students that wants illustrating. `avatar-1/2/3.png` are still
+// in `assets/`, and the `.avatars` / `.avatar` / `.avatarImage` rules went from the
+// stylesheet with this.
 
 // The header watches for the `data-lwu-hero` attribute to know when the hero is
 // half past, which is when its CTA appears in the bar. Same trick as the About Us
@@ -154,29 +158,37 @@ const Hero = () => {
   return (
     <section className={styles.hero} data-lwu-hero>
       <div className={styles.copy}>
+        {/* Broken at the comma, which is the only place it can break: the two halves are
+            the setup and the turn, and "not your / inbox" would split the phrase that
+            carries the whole line. Kept as two lines rather than one because the section
+            is built around a two-line headline — one long line at the top of the `clamp()`
+            range runs most of the way across a wide display and stops reading as a
+            centred stack. */}
         <Reveal as="h1" className={styles.title} hold={!copyIn}>
-          List your property in
-          <br />
-          front of{" "}
-          <span className={styles.avatars} aria-hidden="true">
-            {AVATARS.map((avatar, i) => (
-              // eslint-disable-next-line react/no-array-index-key
-              <span className={styles.avatar} key={i}>
-                <img
-                  src={avatar.src}
-                  alt=""
-                  className={styles.avatarImage}
-                  style={{
-                    left: avatar.left,
-                    top: avatar.top,
-                    width: avatar.size,
-                    height: avatar.size,
-                  }}
-                />
-              </span>
-            ))}
+          {/* ⚠️  The explicit `{" "}` on both sides are REAL SPACE CHARACTERS and they are not
+              decorative. JSX strips the whitespace around an element that sits on its own
+              line, so without them `h1.textContent` reads "Fill yourrooms," — the visual gap
+              would be `.mark`'s margin, which exists only in layout. A screen reader, a
+              crawler and a copy-paste all get the joined string. Measured before adding them. */}
+          Fill your{" "}
+          <span className={styles.mark}>
+            {/* A 0.9em layout box with the art scaled up inside it, so the mark tracks the
+                headline's `clamp()` instead of being pinned to one viewport — this h1 runs
+                34px to 56px, and a fixed px box would be half the cap height at one end and
+                over it at the other.
+
+                `scale` does the visible work: the comp is a 1080 square whose ink sits well
+                inside it, so at 1x the room renders far smaller than its box implies. Scaling
+                the host costs no layout, where growing `size` would stretch the line box.
+
+                `delay` waits for the copy: the headline itself is gated on the globe being
+                ready (`hold={!copyIn}`), so a mark that played on mount would have run while
+                the line was still hidden. */}
+            <InlineLottie data={hotelRoom} size={50} scale={1.9} delay={620} />
           </span>{" "}
-          millions of students
+          rooms,
+          <br />
+          not your inbox.
         </Reveal>
 
         <Reveal className={styles.lede} delay={120} hold={!copyIn}>

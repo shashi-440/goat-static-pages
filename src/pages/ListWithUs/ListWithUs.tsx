@@ -5,10 +5,10 @@ import Header from "./components/Header/Header";
 import Hero from "./components/Hero/Hero";
 import GlobeTravel from "./components/GlobeTravel/GlobeTravel";
 import WhyPartners from "./components/WhyPartners/WhyPartners";
+import Features from "./components/Features/Features";
 import Steps from "./components/Steps/Steps";
 import Tools from "./components/Tools/Tools";
 import Audience from "./components/Audience/Audience";
-import Video from "./components/Video/Video";
 import Testimonials from "./components/Testimonials/Testimonials";
 import Faq from "./components/Faq/Faq";
 import Cta from "./components/Cta/Cta";
@@ -40,15 +40,34 @@ const ListWithUs = () => (
     <GlobeTravel />
 
     <Hero />
-    <WhyPartners />
-    <Steps />
-    <Tools />
-    <Audience />
-    <Video />
-    <Testimonials />
-    <Faq />
-    <Cta />
-    <FooterDesktop />
+    {/* ⚠️  EVERYTHING BELOW THE HERO SITS IN ONE STACKING CONTEXT ABOVE THE GLOBE, and that is what
+        lets the hero reserve only as much height as the shrunken globe needs.
+
+        The globe is a `position: fixed` layer at z-index 1, so it paints over static content —
+        which meant the hero's slot had to reserve enough room that the shrinking globe could never
+        reach the next section, and the difference between that reserve and the shrunken globe was
+        dead white space. Raising this block above the layer removes the constraint: the globe slides
+        UNDER the content as the page scrolls, so the reserve can match the shrunken size exactly.
+
+        The background is load-bearing too — without it the globe would show through the gaps between
+        sections that do not set one of their own. */}
+    <div className={styles.belowHero}>
+      <WhyPartners />
+      {/* The five things a partner gets, on the same card rail Partner With Us uses. Sits here
+          rather than lower down because it answers the questions "Why partners list with amber"
+          raises, before the page moves on to how listing works. */}
+      <Features />
+      <Steps />
+      <Tools />
+      <Audience />
+      {/* `Video` — "Begin your journey with amber", the Grow with us player — was here,
+          between Audience and Testimonials. Removed from the page; the component is still in
+          `components/Video/` with its assets, so putting it back is this line plus its import. */}
+      <Testimonials />
+      <Faq />
+      <Cta />
+      <FooterDesktop />
+    </div>
   </div>
 );
 

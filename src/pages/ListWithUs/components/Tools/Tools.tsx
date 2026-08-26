@@ -1,515 +1,396 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import Image from "@Components/Image";
 import Reveal from "../../../AboutUsV2/components/Reveal/Reveal";
-import mock from "../mock/mock.module.scss";
 import styles from "./Tools.module.scss";
-import panelAnalytics from "../../assets/panel-analytics.jpg";
-import panelPromos from "../../assets/panel-promos.jpg";
-import panelReviews from "../../assets/panel-reviews.jpg";
-import enquiryIcon from "../../assets/icons/enquiry.svg";
-import triDown from "../../assets/icons/tri-down.svg";
 import triUp from "../../assets/icons/tri-up.svg";
-import starBadge from "../../assets/icons/star-badge.svg";
 import starFilled from "../../assets/icons/star-filled.svg";
 import starEmpty from "../../assets/icons/star-empty.svg";
+/**
+ * A real photograph in the listing chip's thumbnail slot.
+ *
+ * It is the same frame `Steps` uses for Chapter Spitalfields, deliberately — the two sections
+ * name the same property, and a listing row whose thumbnail is a grey square is the single
+ * clearest tell that a mock-up was drawn rather than captured.
+ */
+import thumbChapter from "../../assets/step-thumb-1.jpg";
+/**
+ * The review author's avatar.
+ *
+ * A PHOTOGRAPH, where this was initials in a tinted circle. Initials are what an interface
+ * falls back to when it has no picture of someone — so a mock-up that shows them is quietly
+ * saying this account has never been filled in, and every avatar in the illustration being a
+ * fallback is one of the tells that reads as unfinished.
+ *
+ * This is one of the three hero portraits, freed when the h1's avatar cluster was removed. It
+ * is the same crop the hero used, so the face is already framed for a small circle.
+ */
+import reviewerAvatar from "../../assets/avatar-1.png";
+/**
+ * The amber connect lockup, for LIGHT grounds.
+ *
+ * ⚠️  The source ships two files whose names are the wrong way round from how they read:
+ * `amber-connect-logo.svg` carries the wordmark in #0A0A0A and is the one for a white
+ * section, while `amber-connect-logo-dark.svg` is #F5F5F5 — the DARK-BACKGROUND variant, not
+ * the dark-ink one. Only the light-ground file is in the repo, since every band that shows
+ * this is white; the other is in the same source folder if a dark section ever needs it.
+ */
+import amberConnect from "../../assets/logos/amber-connect.svg";
 import wrapperHOC from "@Utils/wrapperHOC";
 
 /**
- * "Tools to manage your property" — Figma node 2483:9240.
+ * "Tools to manage your property" — a horizontal rail of cards: a gradient tile with one
+ * small piece of amber connect floating on it, and the copy underneath.
  *
- * The three media panels stack and scroll; the list on the left holds its place
- * beside them. Whichever panel currently fills most of the viewport is the one
- * the list points at — that entry opens to show its description and the other
- * two collapse back to a label, which is the design's "tab · active" variant
- * applied one at a time. The entries stay clickable and scroll to their panel.
+ * ── Why the art is a CHIP and not a dashboard ───────────────────────────────
+ * Each tile used to hold a full connect panel — a 319px card with a crumb, a featured block,
+ * a column header and three or four data rows — first at native size, then scaled to 83%.
+ * Both were wrong, and scaling was the worse of the two: it shrank 11px type to 9px, so the
+ * art was simultaneously the busiest thing on the page and the least legible. A whole
+ * dashboard is not a picture of a feature, it is a picture of an application.
+ *
+ * So each card carries ONE FRAGMENT instead: the listing that just published, the offer
+ * that is running, the number that moved, the review that landed. Three rows, ~244px, at a
+ * type size nobody has to lean in for — and the tile's ground stays visible around it, which
+ * is what makes it read as a product surface rather than a screenshot pasted on a colour.
+ *
+ * These are drawn for this section rather than borrowed from `../mock`: those classes are
+ * tuned to a 319px panel, and at chip scale their paddings and rules are all a size too big.
+ *
+ * ── Why a rail ─────────────────────────────────────────────────────────────
+ * This section was a 424px tab column beside a stack of tall media panels, pinned and
+ * pointing at whichever panel filled the viewport. That shape is fixed at three: every entry
+ * costs a screen of vertical page, so a fourth tool meant four screens before the next
+ * section. A rail costs the same height whether it holds three cards or nine — entries go in
+ * `CARDS` and the track gets longer. Same move, mechanics and reasoning as Partner With Us's
+ * `Benefits`, so the two pages share one rail idiom.
  */
 
-const BOOKINGS_BY_MONTH = [46, 62, 54, 78, 70, 96, 84, 108];
-const BOOKINGS_HIGHLIGHT_FROM = 6;
-const MONTHS = ["J", "F", "M", "A", "M", "J", "J", "A"];
+/**
+ * ── WHY THESE ARE BUILT THE WAY THEY ARE ────────────────────────────────────
+ * The first pass at these chips was a label, a big number and a badge. That is a STAT
+ * WIDGET, not a product surface — it reports a value, and reporting a value is what every
+ * generic dashboard illustration does, which is exactly why it read as filler.
+ *
+ * What separates the reference's floating fragments from that is AFFORDANCE: each one shows
+ * a control a person could reach for — a composer with a send button, a file chip, a set of
+ * mode pills. You can tell it is software because you can tell what you would touch.
+ *
+ * So every chip here carries exactly one live control and nothing decorative:
+ *
+ *   · Listings  -> a publish TOGGLE, over a real photograph of the property.
+ *   · Boost     -> a discount SLIDER with its handle off-centre.
+ *   · Analytics -> a range SELECT, and a chart with a value called out on it.
+ *   · Reviews   -> a rating BREAKDOWN, which is the thing you actually read a 4.7 from.
+ *
+ * One control, not three: a chip with a toggle and a slider and a dropdown is a settings
+ * panel, and we are back to drawing an application.
+ */
 
-const CAMPAIGNS = [
-  { name: "Summer stay offer", note: "Sept intake · London", status: "SCHEDULED", tone: "blue" },
-  { name: "Returning guest rate", note: "All properties", status: "ACTIVE", tone: "green" },
-  { name: "Referral boost", note: "Ended 12 Jul", status: "ENDED", tone: "grey" },
+const Stars = ({ filled }: { filled: number }) => (
+  <span className={styles.chipStars}>
+    {[0, 1, 2, 3, 4].map((i) => (
+      <img
+        key={i}
+        src={i < filled ? starFilled : starEmpty}
+        alt=""
+        className={styles.chipStar}
+      />
+    ))}
+  </span>
+);
+
+const Caret = () => (
+  <svg
+    className={styles.caret}
+    width="8"
+    height="5"
+    viewBox="0 0 8 5"
+    fill="none"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path d="M1 1L4 4L7 1" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+  </svg>
+);
+
+/* ------------------------------------------------------------- the four chips */
+
+const ListingChip = () => (
+  <div className={styles.chip}>
+    <div className={styles.chipRow}>
+      {/* Not lazy and not the shared `Image`: it is 40px, it is inside the art, and the
+          shared component's fade-and-scale entrance would have it swim into place after
+          the card has already arrived. */}
+      <img src={thumbChapter} alt="" className={styles.chipThumb} />
+      <span className={styles.chipStack}>
+        <span className={styles.chipTitle}>Chapter Spitalfields</span>
+        <span className={styles.chipNote}>London · 24 rooms</span>
+      </span>
+    </div>
+
+    <span className={styles.chipRule} />
+
+    <div className={styles.chipBetween}>
+      <span className={styles.chipMeta}>Published</span>
+      {/* Drawn ON, because the row above it is a live listing. A toggle drawn off would be
+          a card advertising a property that is not visible. */}
+      <span className={styles.toggle} aria-hidden="true">
+        <span className={styles.toggleKnob} />
+      </span>
+    </div>
+  </div>
+);
+
+const BoostChip = () => (
+  <div className={styles.chip}>
+    <div className={styles.chipBetween}>
+      <span className={styles.chipMeta}>Early bird 2026/27</span>
+      <span className={styles.chipLive}>
+        <i className={styles.chipDot} />
+        Live
+      </span>
+    </div>
+
+    <div className={styles.chipOffer}>
+      <span className={styles.chipValue}>15%</span>
+      <span className={styles.chipUnit}>off</span>
+    </div>
+
+    {/* The handle sits at 15 of a 0–30 range, so the control agrees with the number above it
+        — a slider parked at a value its own label contradicts is the kind of detail that
+        makes a mock-up feel invented. */}
+    <span className={styles.slider} aria-hidden="true">
+      <span className={styles.sliderFill} />
+      <span className={styles.sliderKnob} />
+    </span>
+
+    <span className={styles.chipNote}>Sept intake · all studios</span>
+  </div>
+);
+
+const AnalyticsChip = () => (
+  <div className={styles.chip}>
+    <div className={styles.chipBetween}>
+      <span className={styles.chipMeta}>Bookings</span>
+      <span className={styles.chipSelect}>
+        30 days
+        <Caret />
+      </span>
+    </div>
+
+    <div className={styles.chipFigure}>
+      <span className={styles.chipValue}>4,849</span>
+      <span className={styles.chipDelta}>
+        <img src={triUp} alt="" className={styles.chipDeltaIcon} />
+        12%
+      </span>
+    </div>
+
+    {/* An area chart rather than eight divs. Bars at this size are a row of stubs; a curve
+        reads as a trend, which is what the copy beside it promises. `preserveAspectRatio` is
+        default, so the path stretches to the chip's measure and needs no JS to size.
+
+        The gradient id is namespaced. SVG ids are GLOBAL to the document, not scoped by the
+        CSS module, and this chip renders once per page today but the rail is built to grow. */}
+    <svg className={styles.area} viewBox="0 0 224 58" fill="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="lwuToolsArea" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#1c64f2" stopOpacity="0.18" />
+          <stop offset="100%" stopColor="#1c64f2" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M0 44C16 42 24 30 42 32C60 34 68 42 86 38C104 34 112 20 130 22C148 24 156 15 174 11C192 7 206 13 224 6V58H0V44Z"
+        fill="url(#lwuToolsArea)"
+      />
+      <path
+        d="M0 44C16 42 24 30 42 32C60 34 68 42 86 38C104 34 112 20 130 22C148 24 156 15 174 11C192 7 206 13 224 6"
+        stroke="#1c64f2"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <circle cx="224" cy="6" r="3" fill="#fff" stroke="#1c64f2" strokeWidth="1.8" />
+    </svg>
+  </div>
+);
+
+const REVIEW_SPLIT = [
+  { stars: 5, share: 68 },
+  { stars: 4, share: 21 },
+  { stars: 3, share: 8 },
 ];
 
-const REVIEWS = [
-  { name: "Patrick John", note: "Urbanest Tower Bridge · Google", stars: 5 },
-  { name: "Sarah Mitchell", note: "Chapter Spitalfields · Facebook", stars: 3 },
-  { name: "James Chen", note: "iQ Shoreditch · Ambassador", stars: 4 },
-  { name: "Emily Watson", note: "Unite Students · Google", stars: 2 },
-];
+const ReviewChip = () => (
+  <div className={styles.chip}>
+    <div className={styles.chipBetween}>
+      <div className={styles.chipFigure}>
+        <span className={styles.chipValue}>4.7</span>
+        <Stars filled={5} />
+      </div>
+      <span className={styles.chipNote}>312 reviews</span>
+    </div>
 
-const TABS = [
+    {/* The breakdown, not another headline number. A 4.7 on its own is a claim; the split
+        under it is the evidence, and it is what a partner actually opens this screen to read. */}
+    <span className={styles.bars} aria-hidden="true">
+      {REVIEW_SPLIT.map((row) => (
+        <span className={styles.barRow} key={row.stars}>
+          <span className={styles.barNum}>{row.stars}</span>
+          <span className={styles.barTrack}>
+            <span className={styles.barFill} style={{ width: `${row.share}%` }} />
+          </span>
+          <span className={styles.barPct}>{row.share}%</span>
+        </span>
+      ))}
+    </span>
+
+    <span className={styles.chipRule} />
+
+    <div className={styles.chipRow}>
+      <img src={reviewerAvatar} alt="" className={styles.chipAvatar} />
+      <span className={styles.chipStack}>
+        <span className={styles.chipTitle}>Patrick John</span>
+        <span className={styles.chipNote}>Urbanest Tower Bridge</span>
+      </span>
+    </div>
+  </div>
+);
+
+/**
+ * ⚠️  ORDER IS THE WORKFLOW, not a ranking. It runs the way a partner meets these tools:
+ * get the listing up, push it, read what it did, answer what came back. Analytics used to
+ * lead, which meant the section opened on a report about a listing the reader has not been
+ * shown how to create.
+ *
+ * ── `tone` is the tile's ground ─────────────────────────────────────────────
+ * One supplied gradient per card: deep blue, iris, prism, mint. `tone` names the class
+ * DIRECTLY, which is why the values read as class names rather than as colours — the
+ * alternative was a lookup object mapping "mint" to `styles.tileMint`, which is a second
+ * place to edit every time a ground is added. The default (no `tone`) is `.tile`'s own blue.
+ *
+ * ⚠️  Three of the four are PALE, and the chip on them is white — so the deep blue on the
+ * first card is load-bearing rather than decorative. It is what stops the row reading as a
+ * wash, and it is on the FIRST card so the section opens on the saturated one. If the
+ * grounds are ever reshuffled, keep a deep one at the start.
+ */
+const CARDS = [
   {
-    id: "analytics",
-    label: "Real-time analytics",
-    body: "Get instant insights into performance trends so you can act quickly and make informed business decisions.",
-    image: panelAnalytics,
+    id: "listings",
+    label: "Manage listings",
+    body: "Create and update listings easily through our integrated content management system.",
+    art: <ListingChip />,
   },
   {
     id: "promotions",
-    label: "Customisable promotions & offers",
-    body: "Run early-bird pricing, seasonal offers and returning-guest rates across any part of your portfolio.",
-    image: panelPromos,
+    label: "Boost your listings",
+    // ⚠️  DRAFT SECOND SENTENCE. The brief for this entry arrived as "Use our" and stopped
+    // mid-phrase, so the rest is written from what the chip beside it shows — Connect's
+    // campaigns, with an early-bird offer running. Replace with the intended wording; the
+    // label and the chip are the parts that were specified.
+    body: "Use our campaign tools to run early-bird pricing, seasonal offers and returning-guest rates across any part of your portfolio.",
+    art: <BoostChip />,
+    tone: "tileIris",
+  },
+  {
+    id: "analytics",
+    label: "Analytics",
+    body: "Get instant insights into performance trends so you can act quickly and make informed business decisions.",
+    art: <AnalyticsChip />,
+    tone: "tilePrism",
   },
   {
     id: "reviews",
     label: "Guest reviews & ratings",
     body: "See every review as it lands, across Google, Facebook and amber's own student ambassadors.",
-    image: panelReviews,
+    art: <ReviewChip />,
+    tone: "tileMint",
   },
 ];
 
+/** How many cards sit across the measure while they still fit, and the gap between them. */
+const ACROSS = 3;
+const GAP = 24;
+
 /**
- * Height of the navbar, which is the only part of the header stack still fixed
- * once the announcement rail has scrolled out. Everything reads against this
- * line: the sticky list rests on it, a click scrolls its panel to it, and a
- * panel's progress is how far it has travelled past it.
+ * A card's width. Fixed once there are more cards than fit, so the extra ones overflow into
+ * a scrollable track instead of every card getting thinner as entries are added.
  */
-const HEADER_OFFSET = 104;
+const cardWidth = (count: number) =>
+  count > ACROSS ? "356px" : `calc((100% - ${GAP * (ACROSS - 1)}px) / ${ACROSS})`;
 
-const badgeTone = (tone: string) => {
-  if (tone === "blue") return mock.badgeBlue;
-  if (tone === "grey") return mock.badgeGrey;
-  return mock.badgeGreen;
-};
-
-const Stars = ({ filled }: { filled: number }) => (
-  <span className={styles.stars}>
-    {[0, 1, 2, 3, 4].map((i) => (
-      <img key={i} src={i < filled ? starFilled : starEmpty} alt="" className={styles.star} />
-    ))}
-  </span>
-);
-
-const AnalyticsCard = () => (
-  <div className={styles.card}>
-    <div className={mock.crumb}>
-      <span className={mock.crumbL}>INSIGHTS</span>
-      <span className={mock.crumbR}>LAST 30 DAYS</span>
-    </div>
-
-    <div className={styles.cardTabs}>
-      <span className={styles.cardTab}>
-        <span className={styles.cardTabLabelActive}>OVERVIEW</span>
-        <span className={styles.cardTabUnderline} />
-      </span>
-      <span className={styles.cardTab}>
-        <span className={styles.cardTabInner}>
-          <img src={enquiryIcon} alt="" className={styles.cardTabIcon} />
-          <span className={styles.cardTabLabel}>ENQUIRY ANALYTICS</span>
-        </span>
-      </span>
-    </div>
-
-    <span className={mock.rule} />
-
-    <div className={`${styles.stats} ${styles.sp14}`}>
-      <div className={mock.stat}>
-        <span className={mock.label}>Total bookings</span>
-        <span className={mock.statValue}>4,849</span>
-        <span className={mock.delta}>
-          <img src={triDown} alt="" className={mock.deltaIcon} />
-          <span className={`${mock.deltaValue} ${mock.deltaDown}`}>3%</span>
-          <span className={mock.deltaNote}>vs last week</span>
-        </span>
-        <span className={`${mock.bar} ${mock.barViolet} ${styles.fullBar}`} />
-      </div>
-      <div className={mock.stat}>
-        <span className={mock.label}>Invoiced</span>
-        <span className={mock.statValue}>243</span>
-        <span className={mock.delta}>
-          <img src={triUp} alt="" className={mock.deltaIcon} />
-          <span className={`${mock.deltaValue} ${mock.deltaUp}`}>1%</span>
-          <span className={mock.deltaNote}>vs last week</span>
-        </span>
-        <span className={`${mock.bar} ${mock.barTeal} ${styles.fullBar}`} />
-      </div>
-    </div>
-
-    <span className={`${mock.rule} ${styles.sp14}`} />
-
-    <span className={`${styles.sectionLabel} ${styles.sp14}`}>BOOKINGS BY MONTH</span>
-
-    <div className={styles.chart}>
-      {BOOKINGS_BY_MONTH.map((height, i) => (
-        <span
-          // eslint-disable-next-line react/no-array-index-key
-          key={i}
-          className={`${styles.chartBar} ${
-            i >= BOOKINGS_HIGHLIGHT_FROM ? styles.chartBarOn : styles.chartBarOff
-          }`}
-          style={{ height, "--i": i } as React.CSSProperties}
-        />
-      ))}
-    </div>
-
-    <div className={styles.months}>
-      {MONTHS.map((month, i) => (
-        // eslint-disable-next-line react/no-array-index-key
-        <span className={styles.month} key={i}>
-          {month}
-        </span>
-      ))}
-    </div>
-
-    <span className={`${mock.rule} ${styles.sp14}`} />
-
-    <span className={`${styles.cardCta} ${styles.sp12}`}>VIEW FULL REPORT</span>
-  </div>
-);
-
-const PromosCard = () => (
-  <div className={styles.card}>
-    <div className={styles.promoCrumb}>
-      <span className={styles.promoLabel}>CAMPAIGNS</span>
-      <span className={styles.promoNew}>New</span>
-    </div>
-
-    <span className={`${mock.rule} ${styles.sp12}`} />
-
-    <div className={styles.featured}>
-      <div className={mock.row}>
-        <span className={styles.featuredLabel}>EARLY BIRD 2026/27</span>
-        <span className={`${mock.badge} ${mock.badgeGreen}`}>ACTIVE</span>
-      </div>
-      <div className={styles.featuredValue}>
-        <span className={mock.statValue}>15% off</span>
-        <span className={styles.featuredNote}>· all studios · until 31 Aug</span>
-      </div>
-    </div>
-
-    <span className={`${mock.rule} ${styles.sp14}`} />
-
-    <div className={`${mock.th} ${styles.sp10} ${styles.thSpaced}`}>
-      <span>CAMPAIGN</span>
-      <span>STATUS</span>
-    </div>
-
-    {CAMPAIGNS.map((campaign, i) => (
-      <div className={styles.listGroup} key={campaign.name}>
-        <span className={mock.rule} />
-        <div className={styles.listRow} style={{ "--i": i } as React.CSSProperties}>
-          <div className={mock.entry}>
-            <span className={mock.entryTitle}>{campaign.name}</span>
-            <span className={mock.entryNote}>{campaign.note}</span>
-          </div>
-          <span className={`${mock.badge} ${badgeTone(campaign.tone)}`}>{campaign.status}</span>
-        </div>
-      </div>
-    ))}
-    <span className={mock.rule} />
-  </div>
-);
-
-const ReviewsCard = () => (
-  <div className={styles.card}>
-    <div className={mock.crumb}>
-      <span className={mock.crumbL}>REVIEWS</span>
-      <span className={mock.crumbR}>THIS MONTH</span>
-    </div>
-
-    <span className={`${mock.rule} ${styles.sp12}`} />
-
-    <div className={`${styles.stats} ${styles.sp14}`}>
-      <div className={mock.stat}>
-        <span className={mock.label}>Average rating</span>
-        <span className={styles.ratingValue}>
-          <img src={starBadge} alt="" className={styles.ratingStar} />
-          <span className={mock.statValue}>4.7</span>
-        </span>
-        <span className={mock.delta}>
-          <img src={triDown} alt="" className={mock.deltaIcon} />
-          <span className={`${mock.deltaValue} ${mock.deltaDown}`}>16%</span>
-          <span className={mock.deltaNote}>vs last week</span>
-        </span>
-        <span className={`${mock.bar} ${mock.barViolet} ${styles.fullBar}`} />
-      </div>
-      <div className={mock.stat}>
-        <span className={mock.label}>Total ratings</span>
-        <span className={mock.statValue}>12</span>
-        <span className={mock.delta}>
-          <img src={triUp} alt="" className={mock.deltaIcon} />
-          <span className={`${mock.deltaValue} ${mock.deltaUp}`}>15%</span>
-          <span className={mock.deltaNote}>vs last week</span>
-        </span>
-        <span className={`${mock.bar} ${mock.barTeal} ${styles.fullBar}`} />
-      </div>
-    </div>
-
-    <span className={`${mock.rule} ${styles.sp14}`} />
-
-    <div className={`${mock.th} ${styles.sp10} ${styles.thSpaced}`}>
-      <span>REVIEW</span>
-      <span>RATING</span>
-    </div>
-
-    {REVIEWS.map((review, i) => (
-      <div className={styles.listGroup} key={review.name}>
-        <span className={mock.rule} />
-        <div className={styles.listRow} style={{ "--i": i } as React.CSSProperties}>
-          <div className={mock.entry}>
-            <span className={mock.entryTitle}>{review.name}</span>
-            <span className={mock.entryNote}>{review.note}</span>
-          </div>
-          <Stars filled={review.stars} />
-        </div>
-      </div>
-    ))}
-    <span className={mock.rule} />
-  </div>
-);
-
-const CARDS: Record<string, () => JSX.Element> = {
-  analytics: AnalyticsCard,
-  promotions: PromosCard,
-  reviews: ReviewsCard,
-};
-
-const Tools = () => {
-  const [active, setActive] = useState(0);
-  // One flag per panel. Set when the panel is reached, and cleared for all
-  // three once the section is entirely off screen — so the mocks introduce
-  // themselves again on the next visit, but hold still while you are reading.
-  const [revealed, setRevealed] = useState<boolean[]>(() => TABS.map(() => false));
-  const activeRef = useRef(0);
-  const sectionRef = useRef<HTMLElement>(null);
-  const bodyRef = useRef<HTMLDivElement>(null);
-  const railRef = useRef<HTMLDivElement>(null);
-  /** Last slack written to the rail, so a scroll frame only touches style on change. */
-  const slackRef = useRef(-1);
-  const panelRefs = useRef<Array<HTMLDivElement | null>>([]);
-  const fillRefs = useRef<Array<HTMLSpanElement | null>>([]);
-
-  useEffect(() => {
-    let raf = 0;
-
-    const measure = () => {
-      raf = 0;
-      const body = bodyRef.current;
-      const rail = railRef.current;
-      if (!body || !rail) return;
-
-      const rect = body.getBoundingClientRect();
-      const railHeight = rail.offsetHeight;
-
-      // The rail is let go at the moment the last panel's top edge arrives at
-      // the same line the rail rests on — the two are level right then, so the
-      // column reads as belonging beside that card, and from there they travel
-      // up together still level. Left alone, sticky holds until the body's
-      // bottom catches the rail's, which keeps the column parked near the top
-      // while the last card sits lower down, out of line with it.
-      //
-      // Slack beneath the rail ends the stick early: sticky may not carry an
-      // element's margin box out of its container, so a bottom margin of the
-      // difference between the two heights releases it exactly there. Skipped
-      // when the layout stacks and the rail is no longer sticky, where the
-      // margin would just be a gap.
-      const sticky = window.getComputedStyle(rail).position === "sticky";
-      const lastPanel = panelRefs.current[panelRefs.current.length - 1];
-      const lastHeight = lastPanel ? lastPanel.offsetHeight : 0;
-      const slack = sticky
-        ? Math.max(0, Math.min(lastHeight - railHeight, rect.height - railHeight))
-        : 0;
-      if (slack !== slackRef.current) {
-        slackRef.current = slack;
-        rail.style.marginBottom = slack ? `${slack}px` : "";
-      }
-
-      // The lines run over exactly that pinned stretch, so the last one lands
-      // full at the same moment the section is released and starts to travel.
-      const travel = Math.max(1, rect.height - railHeight - slack);
-      const stage = Math.min(1, Math.max(0, (HEADER_OFFSET - rect.top) / travel));
-
-      // Split evenly between the entries, so each carries the same share of the
-      // scroll and no entry can run out of room.
-      const count = TABS.length;
-      const current = Math.min(count - 1, Math.floor(stage * count));
-
-      fillRefs.current.forEach((fill, i) => {
-        if (!fill) return;
-
-        // Only the entry being read carries a line. An entry already passed
-        // holds its full width but fades out, so the handover is one line
-        // giving way to the next rather than a row of finished lines stacking
-        // up; the width reset happens behind the fade and is never seen.
-        // Written straight to the node because this runs on every scroll frame.
-        const filled = Math.min(1, Math.max(0, stage * count - i));
-        fill.style.transform = `scaleX(${i === current ? filled : Number(i < current)})`;
-        fill.style.opacity = i === current ? "1" : "0";
-      });
-
-      // Only the index is React state, and it changes a handful of times per
-      // pass rather than once a frame.
-      if (current !== activeRef.current) {
-        activeRef.current = current;
-        setActive(current);
-      }
-    };
-
-    const onScroll = () => {
-      if (!raf) raf = window.requestAnimationFrame(measure);
-    };
-
-    measure();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-
-    return () => {
-      if (raf) window.cancelAnimationFrame(raf);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-    };
-  }, []);
-
-  useEffect(() => {
-    const panels = panelRefs.current;
-    if (!panels.some(Boolean)) return undefined;
-
-    const reduced =
-      typeof window.matchMedia === "function" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    // Nothing to play, but the mocks still have to be legible, so mark them
-    // shown rather than leaving them in their starting state.
-    if (reduced || typeof IntersectionObserver === "undefined") {
-      setRevealed(TABS.map(() => true));
-      return undefined;
-    }
-
-    // Panels stay observed rather than being dropped once they fire. The flag
-    // already being set is what stops a replay while you are moving about
-    // inside the section; clearing it is what allows one.
-    const panelObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          const i = panels.indexOf(entry.target as HTMLDivElement);
-          if (i < 0) return;
-          setRevealed((prev) => {
-            if (prev[i]) return prev;
-            const next = prev.slice();
-            next[i] = true;
-            return next;
-          });
-        });
-      },
-      { threshold: 0.25 },
-    );
-    panels.forEach((panel) => panel && panelObserver.observe(panel));
-
-    // Rearms the set the moment the section is completely off screen. A zero
-    // threshold means "not one pixel of it showing", and the observer does not
-    // care whether it went off the top or the bottom, so coming back from
-    // either direction replays. The reset itself happens out of sight.
-    const section = sectionRef.current;
-    const sectionObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) return;
-          setRevealed((prev) => (prev.some(Boolean) ? TABS.map(() => false) : prev));
-        });
-      },
-      { threshold: 0 },
-    );
-    if (section) sectionObserver.observe(section);
-
-    return () => {
-      panelObserver.disconnect();
-      sectionObserver.disconnect();
-    };
-  }, []);
-
-  const goTo = useCallback((i: number) => {
-    const panel = panelRefs.current[i];
-    if (!panel) return;
-
-    const reduced =
-      typeof window.matchMedia === "function" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    window.scrollTo({
-      top: panel.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET,
-      behavior: reduced ? "auto" : "smooth",
-    });
-  }, []);
-
-  return (
-    <section className={styles.section} ref={sectionRef}>
-      <div className={styles.inner}>
+const Tools = () => (
+  <section className={styles.section}>
+    <div className={styles.inner}>
+      <div className={styles.head}>
         <Reveal as="h2" className={styles.heading}>
           Tools to manage your property
         </Reveal>
 
-        <div className={styles.body} ref={bodyRef}>
-          <div className={styles.rail} ref={railRef}>
-            {/* Not a tablist: the panels are all on the page at once and scroll
-                position, not this control, decides which one is being read. */}
-            <nav className={styles.tabs} aria-label="Property management tools">
-              {TABS.map((tab, i) => {
-                const isActive = i === active;
-                return (
-                  <button
-                    type="button"
-                    key={tab.id}
-                    aria-current={isActive || undefined}
-                    className={`${styles.tab} ${isActive ? styles.tabActive : ""}`}
-                    onClick={() => goTo(i)}
-                  >
-                    <span className={styles.tabLabel}>{tab.label}</span>
-                    <span className={styles.tabBody}>{tab.body}</span>
-                    <span className={styles.tabTrack} aria-hidden="true">
-                      <span
-                        className={styles.tabFill}
-                        ref={(node) => {
-                          fillRefs.current[i] = node;
-                        }}
-                      />
-                    </span>
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
+        {/* `amber connect` is the product these chips are pieces OF, and the section never
+            said so — it read as four unnamed features. On the right of the heading rather
+            than inside a sentence, which is where amber puts this attribution elsewhere (the
+            "Powered by amber+" lockup on Move-In Ready).
 
-          <div className={styles.panels}>
-            {TABS.map((tab, i) => {
-              const Card = CARDS[tab.id];
-              return (
-                <div
-                  key={tab.id}
-                  className={`${styles.panel} ${revealed[i] ? styles.alive : ""}`}
-                  ref={(node) => {
-                    panelRefs.current[i] = node;
-                  }}
-                >
-                  {/* isNotLazy so the photo is simply there: the shared Image
-                      otherwise fades and scales it in once it loads, and these
-                      are the backdrop rather than something to announce. At
-                      ~100KB each they cost little to load with the page. */}
-                  <Image
-                    src={tab.image}
-                    alt=""
-                    className={styles.panelImage}
-                    width="100%"
-                    height="100%"
-                    isNotLazy
-                  />
-                  <span className={styles.panelWash} aria-hidden="true" />
-                  <div className={`${mock.bezel} ${styles.bezel}`}>
-                    <Card />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+            `alt` names the PRODUCT only: "Powered by" is this paragraph's own text, so
+            repeating it in the alt would have a screen reader say it twice.
+
+            Width and height are the file's own 155x28 so the box is reserved before the SVG
+            lands and the heading row cannot jump; `.poweredLogo` then drives the rendered
+            size off height alone. */}
+        <p className={styles.poweredBy}>
+          Powered by{" "}
+          <img
+            src={amberConnect}
+            alt="amber connect"
+            className={styles.poweredLogo}
+            width={155}
+            height={28}
+          />
+        </p>
+      </div>
+
+      {/* ── NO CHEVRONS, AND THEREFORE NO STATE ────────────────────────────
+          The rail had a pair of disc buttons and the machinery to drive them: a scroll
+          listener throttled to a frame, a measured card pitch, a stop count derived from the
+          track's real scroll distance, and three pieces of state for the index and the two
+          disabled edges. All of it existed to move a track that the browser already moves.
+
+          They are gone, so the rail is now CSS: a scroll-snapping overflow container. A
+          trackpad, a wheel, a touch drag and the keyboard all still scroll it, and the peek
+          of the next card at the window's edge is the affordance — which is what it was doing
+          anyway, since the chevrons sat up beside the heading rather than on the track.
+
+          ⚠️  If chevrons ever come back, they need all of that machinery back with them: the
+          buttons cannot be driven off an index alone, because a native swipe moves the track
+          without going through any handler and leaves the back button greyed out while the
+          track is plainly scrolled in. Partner With Us's Benefits still has the working
+          version to copy. */}
+      <div className={styles.viewport}>
+        <div
+          className={styles.track}
+          style={{ "--card-w": cardWidth(CARDS.length) } as React.CSSProperties}
+        >
+          {CARDS.map((card, i) => (
+            <Reveal as="article" className={styles.railCard} key={card.id} delay={i * 80}>
+              {/* Art first, copy under it, and the art is a self-contained tile rather than
+                  the top half of a grey card. The chip is centred on the tile with the ground
+                  visible all round it — nothing is cropped, because at this size there is
+                  nothing worth cropping. */}
+              <div
+                className={`${styles.tile} ${card.tone ? styles[card.tone] : ""}`}
+              >
+                {card.art}
+              </div>
+
+              <div className={styles.copy}>
+                <h3 className={styles.cardTitle}>{card.label}</h3>
+                <p className={styles.cardBody}>{card.body}</p>
+              </div>
+            </Reveal>
+          ))}
         </div>
       </div>
-    </section>
-  );
-};
+    </div>
+  </section>
+);
 
 export default wrapperHOC(Tools, {
   componentName: "Tools-ListWithUs",

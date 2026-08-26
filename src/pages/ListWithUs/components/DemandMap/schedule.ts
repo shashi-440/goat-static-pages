@@ -14,8 +14,15 @@ import { PROPERTIES, ROUTES } from "./network";
  * Slower than it needs to be to look smooth, on purpose: the arc is carrying the
  * sentence "this demand came from there and arrived here", and at the 1800ms tried
  * first the eye could not follow one line to its end before the next launched.
+ *
+ * Raised 2800 -> 4000 when the globe went to its hero size. Nothing about the timing
+ * changed; the DISTANCE did. The same 2800ms crossing a sphere 1.7x wider is 1.7x the
+ * pixels per second, and an arc that read as travelling at the old size read as being
+ * fired at the new one. The globe's tour spends this figure — see SEND_TO_MS there,
+ * which closes the launch window a full ARC_MS before a stop ends so the last arc lands
+ * rather than being flown out from under.
  */
-export const ARC_MS = 2800;
+export const ARC_MS = 4000;
 
 /** Fraction of an arc's life spent flying; the rest is the tail catching up. */
 export const FLY = 0.72;
@@ -107,16 +114,32 @@ const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 export const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 
-export const phaseFor = (slot: Slot, elapsed: number): Phase => {
-  const p = ((((elapsed - slot.at) % CYCLE_MS) + CYCLE_MS) % CYCLE_MS) / ARC_MS;
-  if (p > 1) return { active: false, head: 0, tail: 0, landed: 0 };
+/**
+ * One arc's shape at `age` milliseconds since it launched.
+ *
+ * Split out of `phaseFor` so a caller that schedules its own launches — the globe's
+ * city tour fires every arc at one destination, on its own clock — gets the identical
+ * comet: same ease, same tail catch-up, same arrival pulse. The alternative was a
+ * second copy of these three lines, which is how two renderers of the same graphic
+ * drift apart.
+ */
+export const phaseAt = (age: number): Phase => {
+  const p = age / ARC_MS;
+  if (p < 0 || p > 1) return { active: false, head: 0, tail: 0, landed: 0 };
   return {
     active: true,
-    head: easeOut(clamp01(p / FLY)),
+    // easeInOut, not easeOut. easeOut starts at full speed and only decelerates, so the
+    // arc left its origin like something fired and the face riding it snapped away from
+    // the flag it had just been standing on. Easing both ends means it gathers speed,
+    // crosses, and settles — which is what "travelling" looks like.
+    head: easeInOut(clamp01(p / FLY)),
     tail: easeInOut(clamp01((p - (1 - FLY)) / FLY)),
     landed: clamp01(((p - FLY) * ARC_MS) / PULSE_MS),
   };
 };
+
+export const phaseFor = (slot: Slot, elapsed: number): Phase =>
+  phaseAt(((((elapsed - slot.at) % CYCLE_MS) + CYCLE_MS) % CYCLE_MS));
 
 /**
  * How lit an origin is while it is sending: up fast as the arc leaves, held for

@@ -31,33 +31,34 @@
 
 /* --------------------------------------------------------- avatar cluster */
 
-// Sits inline on the second line of the headline. 3 x 44px overlapping by 20px
-// = 92px wide, matching the node.
+// Sits inline after "Your audience." — 3 x 44px overlapping by 20px = 92px wide.
+//
+// `vertical-align: middle` rather than baseline: these are 44px discs on a 56px line,
+// and aligning their baseline hangs them off the bottom of the text. Middle centres
+// them against the x-height, which is where the eye reads a run of faces as sitting
+// IN the line rather than under it.
 .avatars {
   display: inline-flex;
   margin: 0 6px;
   vertical-align: middle;
 }
 
+// The white ring is what separates each face from the one it overlaps — without it
+// three illustrations on the same pale ground merge into one shape. The grey fill is
+// the same one Testimonials gives these, so a transparent corner in the artwork does
+// not show the page through.
 .avatar {
+  background: #f3f4f6;
   border: 2px solid #fff;
   border-radius: 999px;
-  display: block;
   flex-shrink: 0;
   height: 44px;
-  overflow: hidden;
-  position: relative;
+  object-fit: cover;
   width: 44px;
 
   & + & {
     margin-left: -20px;
   }
-}
-
-// Position and size come from the node's own per-avatar crop (set inline).
-.avatarImage {
-  max-width: none;
-  position: absolute;
 }
 
 /* ------------------------------------------------------------ lede + CTA */
@@ -154,6 +155,8 @@
     letter-spacing: -0.76px;
   }
 
+  // Scaled with the headline: a 44px cluster on a 38px line is taller than the type
+  // it sits in and forces the line box open.
   .avatar {
     height: 34px;
     width: 34px;

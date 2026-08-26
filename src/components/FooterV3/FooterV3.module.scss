@@ -1,0 +1,357 @@
+// A grey the page cannot be mistaken for. #f7f7f7 — the card grey used elsewhere on
+// these pages — reads as white once it is the full width of the viewport with nothing
+// beside it to compare against, so the footer stopped looking like a footer. #eceef1
+// is dark enough to terminate the page and still light enough for the white cards and
+// third-party marks sitting on it.
+.footer {
+  align-items: center;
+  background: #eceef1;
+  display: flex;
+  flex-direction: column;
+  padding: 88px 80px 28px;
+  width: 100%;
+}
+
+// The 1280px measure every other section on these pages uses.
+.inner {
+  display: flex;
+  flex-direction: column;
+  max-width: 1280px;
+  width: 100%;
+}
+
+/* ------------------------------------------------------- brand + navigation */
+
+// Fixed brand column against flexible link columns, so the four column heads sit on a
+// predictable grid instead of letting the longest link decide where they start.
+.top {
+  display: flex;
+  gap: 80px;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  width: 300px;
+}
+
+.logo {
+  height: auto;
+  width: 86px;
+}
+
+.pitch {
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22px;
+  margin: 18px 0 0;
+}
+
+/* --------------------------------------------------------------- trust line */
+
+// One line, not the old footer's stacked Trustpilot block. The block was three
+// elements — logo, five green squares, score and count — for a single claim, and it
+// took the top of the column away from the wordmark.
+.trust {
+  align-items: center;
+  color: #4b5563;
+  display: inline-flex;
+  font-size: 13px;
+  gap: 6px;
+  line-height: 18px;
+  margin-top: 20px;
+  text-decoration: none;
+  transition: color 0.18s ease;
+  width: fit-content;
+
+  &:hover {
+    color: #111928;
+  }
+}
+
+// Trustpilot's own green, so the mark is recognisable without reproducing their
+// lockup — which we would have to license and keep in step.
+.trustStar {
+  color: #00b67a;
+  font-size: 15px;
+  line-height: 1;
+}
+
+/* ------------------------------------------------------------ store buttons */
+
+.stores {
+  display: flex;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+// Named buttons rather than two bare glyphs in a bordered panel. The old footer put
+// the store icons and the payment marks in one box under a "Get the app" label, which
+// made two unrelated things look like one control.
+.store {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #e0e3e8;
+  border-radius: 10px;
+  color: #111928;
+  display: inline-flex;
+  font-size: 12.5px;
+  font-weight: 500;
+  gap: 7px;
+  line-height: 16px;
+  padding: 8px 12px;
+  text-decoration: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+
+  &:hover {
+    border-color: #c9cfd8;
+    box-shadow: 0 2px 8px rgba(17, 25, 40, 0.06);
+    transform: translateY(-1px);
+  }
+}
+
+.storeIcon {
+  height: 18px;
+  width: 18px;
+}
+
+/* ------------------------------------------------------------------ columns */
+
+// Four equal tracks. `1fr` each rather than auto, so the heads sit on a rhythm and a
+// long link in one column cannot shove the other three sideways.
+.columns {
+  display: grid;
+  flex: 1;
+  gap: 40px;
+  grid-template-columns: repeat(4, 1fr);
+  min-width: 0;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+// A micro-label, not a heading that competes with the links under it. The replica set
+// these at the same size and weight as its links in near-black, so each column read
+// as nine links of which the first happened to be bold.
+//
+// Still an <h2>, because each column is a labelled <nav> and this names it — the
+// outline is correct even though it does not look like a heading.
+.columnHeading {
+  color: #98a1ae;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  line-height: 14px;
+  margin: 0 0 18px;
+  text-transform: uppercase;
+}
+
+.columnList {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.link {
+  align-items: center;
+  color: #374151;
+  display: inline-flex;
+  font-size: 14px;
+  gap: 6px;
+  line-height: 20px;
+  text-decoration: none;
+  transition: color 0.18s ease;
+
+  &:hover {
+    color: #1c64f2;
+  }
+}
+
+// The "New"/"Hiring" flags the content table carries on a few links. Blue, not the
+// replica's pink — pink is the only place that colour appears on these pages, and a
+// footer badge is not the thing to introduce a second accent for.
+.tag {
+  background: rgba(28, 100, 242, 0.1);
+  border-radius: 4px;
+  color: #1c64f2;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  line-height: 12px;
+  padding: 2px 5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------ contact strip */
+
+// Lifted OUT of the column grid and given the full width. As a fifth column these
+// three read as another list of links; as a row of cards they read as the one thing
+// in the footer you are meant to act on.
+.contact {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 64px;
+  width: 100%;
+}
+
+.contactCard {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #e0e3e8;
+  border-radius: 12px;
+  display: flex;
+  gap: 12px;
+  padding: 14px 16px;
+  text-decoration: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+
+  &:hover {
+    border-color: rgba(28, 100, 242, 0.4);
+    box-shadow: 0 4px 14px rgba(17, 25, 40, 0.06);
+    transform: translateY(-1px);
+  }
+}
+
+.contactIcon {
+  align-items: center;
+  background: rgba(28, 100, 242, 0.09);
+  border-radius: 50%;
+  display: flex;
+  flex-shrink: 0;
+  height: 34px;
+  justify-content: center;
+  width: 34px;
+
+  svg {
+    height: 16px;
+    width: 16px;
+  }
+}
+
+.contactValue {
+  color: #111928;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------- bottom bar */
+
+.bottom {
+  align-items: center;
+  border-top: 1px solid #dfe3e8;
+  display: flex;
+  gap: 24px;
+  justify-content: space-between;
+  margin-top: 40px;
+  padding-top: 22px;
+  width: 100%;
+}
+
+.copyright {
+  color: #98a1ae;
+  font-size: 13px;
+  line-height: 18px;
+  margin: 0;
+}
+
+.bottomRight {
+  align-items: center;
+  display: flex;
+  gap: 18px;
+}
+
+// Slightly held back: these are third-party marks doing a reassurance job, not
+// something to lead with.
+.payments {
+  height: 22px;
+  opacity: 0.65;
+  width: auto;
+}
+
+.divider {
+  background: #d3d8df;
+  height: 20px;
+  width: 1px;
+}
+
+.social {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+}
+
+// A hit target rather than a bare 18px image, and a white disc so the full-colour
+// brand marks sit on their own ground instead of directly on the grey.
+.socialLink {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #e0e3e8;
+  border-radius: 50%;
+  display: flex;
+  height: 32px;
+  justify-content: center;
+  transition: border-color 0.18s ease, transform 0.18s ease;
+  width: 32px;
+
+  &:hover {
+    border-color: #c9cfd8;
+    transform: translateY(-1px);
+  }
+}
+
+.socialIcon {
+  height: 18px;
+  width: 18px;
+}
+
+@media (max-width: 1100px) {
+  .top {
+    flex-direction: column;
+    gap: 48px;
+  }
+
+  .brand {
+    width: 100%;
+  }
+
+  .columns {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .contact {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .footer {
+    padding: 64px 24px 24px;
+  }
+
+  .bottom {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .bottomRight {
+    flex-wrap: wrap;
+  }
+}

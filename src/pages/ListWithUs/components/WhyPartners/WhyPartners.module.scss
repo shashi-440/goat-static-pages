@@ -1,722 +1,328 @@
-// "Your place is made for amber" — heading, then one bordered panel holding a
-// stepped rail on the left and the travelling globe on the right.
+// The internal cell divider.
+//
+// ⚠️  MUCH DARKER THAN THE PERIMETER, AND MEASURED. A 1px `dotted` border renders one pixel on, one
+// off — measured at exactly 40 of 80px inked — so only half the line carries ink. Matched to the
+// perimeter's #e5e7eb it averaged 235 against the cell's 252 ground, 17 levels of contrast, and was
+// effectively invisible. This puts the dots near 184 and the line's average near 218, about 34
+// levels.
+//
+// The rule of thumb: a dotted line needs roughly TWICE the contrast of a solid one to read at the
+// same strength, because it only covers half the distance.
+$divider: 1px dotted #aeb7c4;
+
 .section {
+  align-items: center;
   background: #fff;
   display: flex;
-  justify-content: center;
-  padding: 96px 120px;
+  flex-direction: column;
+  // ⚠️  THE 96px BOTTOM SITS INSIDE NOTHING NOW — this band lost its rules when it became a panel —
+  // but `Features` below still brings a matching 96px top, and that pairing is the page's rhythm.
+  padding: 96px 80px;
   width: 100%;
 }
 
 .inner {
-  max-width: 1260px;
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+  max-width: 1280px;
   width: 100%;
 }
 
+// ⚠️  THE HEADING IS BACK ON ITS OWN. It shared a flex row with a variant switch (`.head`, `.toggle`,
+// `.toggleBtn`, `.toggleOn`) so the two could sit at opposite ends; the switch is gone and so is the
+// row. Not part of the Figma node either way — that starts at the grid — but every other band on this
+// page carries a heading.
 .heading {
   color: #111928;
-  font-size: 44px;
+  font-size: 40px;
   font-weight: 600;
-  letter-spacing: -0.88px;
-  line-height: 1.14;
+  letter-spacing: -1px;
+  line-height: 48px;
   margin: 0;
 }
 
-/* -------------------------------------------------------- pinned track */
+/* ---------------------------------------------------------------------- mat */
 
-// The track is taller than the panel by `STEPS * STEP_SCROLL_PX`, contributed by a
-// spacer child (see the note in the TSX — padding does NOT work here, because a sticky
-// element is constrained to its containing block's content box and padding is outside
-// it). The panel pins inside the track, so that extra height IS the scroll budget the
-// stepper spends — no scroll hijacking, no wheel interception, just a sticky element and
-// a progress calculation.
-.track {
-  margin-top: 48px;
-  position: relative;
-}
-
-.sticky {
-  // Must match STICKY_TOP in WhyPartners.tsx; the progress maths uses it as the origin.
-  position: sticky;
-  top: 96px;
-}
-
-// Pure scroll budget. Height is set inline from the step count.
-.spacer {
-  pointer-events: none;
-}
-
-/* -------------------------------------------------------------- panel */
-
-// One hairline box around both halves, as in the reference. The divider between them
-// is the rail's own right border rather than a separate element, so it cannot drift out
-// of alignment with the panel edge.
-.panel {
-  align-items: stretch;
+// An 8px hatched band around the panel, with its own rule outside it.
+//
+// The 8px padding IS the band, and the 21px radius is the panel's 12 plus that 8 plus this element's
+// own 1px border — concentric by arithmetic rather than by eye.
+//
+// The hatch is a 45deg repeating gradient at a 5px period: a 1px line of ink at 9% over a flat
+// #f4f5f7. Fine enough that an 8px band reads as texture rather than as stripes.
+//
+// ⚠️  NEUTRAL GREY, NOT THE PAGE BLUE. This was a blue-hatched #eff4ff; grey keeps the frame as
+// FRAMING and leaves the blue to mean something — the accent on this panel is already carried by the
+// ten coloured marks, and a blue mat around them made the whole thing read as one blue object.
+//
+// ⚠️  THE MAT MUST STAY DARKER THAN THE PANEL'S #fcfcfc FILL. That is what makes the panel read as
+// sitting ON the mat rather than as a hole cut in it — the mat is the lower surface. Measured: 245
+// against the panel's 252, a 7-level separation.
+.frame {
+  // ⚠️  FLAT, AND THAT IS A DEPARTURE FROM THE NODE. The design lays a 1619x971 PNG over this mat at
+  // 20% opacity. Measured, it resolves to a four-level variation — #F2F4F8 at the left edge to
+  // #F6F6F8 at the right — so it was implemented as two low-alpha radials rather than a 1.3MB
+  // download, and then asked away entirely. Both the bitmap and the gradients are gone.
+  //
+  // If the wash is ever wanted back, the gradients are the way to do it, not the asset:
+  //   radial-gradient(60% 80% at 8% 88%, rgba(96, 141, 232, 0.16), transparent 70%),
+  //   radial-gradient(55% 70% at 45% 60%, rgba(150, 120, 214, 0.1), transparent 70%)
+  //
+  // A 45deg hatch also lived here for a while — a separate request from before this node arrived,
+  // likewise removed.
+  background: #f4f5f7;
   border: 1px solid #e5e7eb;
-  border-radius: 16px;
+  border-radius: 21px;
+  padding: 8px;
+}
+
+/* -------------------------------------------------------------------- panel */
+
+// ONE BOX. The ten cells were ten separate bordered cards with 18/14 gaps between them; the border,
+// the radius and the background live here and the gaps are zero, so the cells share one outline and
+// are separated by internal hairlines instead.
+//
+// ⚠️  `overflow: hidden` IS WHAT MAKES THE RADIUS REAL. The corner cells are square; without the clip
+// their dividers paint over the rounded corners and the panel renders as a rectangle.
+//
+// ⚠️  THE COLUMN COUNT MUST DIVIDE TEN. A short last row leaves the row above it drawing bottom
+// dividers across empty grid area as dangling rules — which is why the breakpoints below step 5 -> 2
+// -> 1 and never through 3 or 4.
+.grid {
+  background: #fcfcfc;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  column-gap: 0;
   display: grid;
-  // Weighted toward the visual half rather than evenly: the right side has to hold the
-  // sphere AND the card that opens beside it, and at 0.62fr the freed space was ~50px
-  // short of the card's width. The rail is comfortable at ~430px — its longest step body
-  // still sets in three lines.
-  grid-template-columns: minmax(280px, 0.52fr) minmax(0, 1fr);
+  grid-template-columns: repeat(5, 1fr);
+  margin: 0;
   overflow: hidden;
+  row-gap: 0;
 }
 
-/* --------------------------------------------------------------- rail */
-
-.rail {
-  border-right: 1px solid #e5e7eb;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  // The steps share the height evenly, so the rail's rhythm does not jump as the open
-  // step changes — only the copy inside fades.
-  justify-content: stretch;
-  padding: 8px 0;
-}
-
-// The rail's progress bar: one continuous accent growing downward as the section is
-// scrolled. Scaled rather than animated in height so it stays on the compositor —
-// `transform-origin: top` is what makes a scaleY read as "filling down".
-.railProgress {
-  background: #1c64f2;
-  border-radius: 0 2px 2px 0;
-  bottom: 8px;
-  left: 0;
-  position: absolute;
-  top: 8px;
-  transform-origin: top;
-  width: 3px;
-  // No transition: it is driven per frame from scroll position, and a transition would
-  // fight that by lagging behind every frame.
-}
-
-.step {
-  appearance: none;
-  background: none;
-  border: 0;
-  cursor: pointer;
-  display: flex;
-  flex: 1;
-  gap: 0;
-  padding: 0;
-  text-align: left;
-  width: 100%;
-
-  &:focus-visible {
-    outline: 2px solid #1c64f2;
-    outline-offset: -3px;
-  }
-}
-
-// Spacer where the per-step bar used to be. The rail now carries ONE continuous
-// progress bar (`.railProgress`) instead of a bar per step, matching the reference —
-// this keeps the steps' text aligned to the same left edge as before.
-.stepBar {
-  flex-shrink: 0;
-  width: 3px;
-}
-
-.stepMain {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  // Tightened from 22px with the panel: the steps share the panel's height evenly, and at
-  // the shorter height the old padding was pushing the open step's stat against the next
-  // step's title.
-  padding: 18px 28px 18px 25px;
-}
-
-// 19px, up from 15. These four titles are the section's only navigation and they sit in a 400px
-// column with nothing else in it — at 15 they read as captions rather than as the four things
-// the section is about, which is what they are. The body under the open one stays at 14, so the
-// gap between title and body widens and the pair reads as heading-then-detail.
-.stepTitle {
-  color: #9ca3af;
-  font-size: 19px;
-  font-weight: 600;
-  letter-spacing: -0.24px;
-  line-height: 1.35;
-  transition: color 0.32s ease;
-}
-
-.stepOn .stepTitle {
-  color: #111928;
-}
-
-// The body collapses with `grid-template-rows` rather than `height`, which is the one
-// way to animate to and from a content-driven height without measuring it in JS. The
-// node stays in the DOM throughout so the copy is always available to a crawler and a
-// screen reader regardless of which step is open.
-.stepBodyWrap {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.36s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
-  opacity: 0;
-}
-
-.stepOn .stepBodyWrap {
-  grid-template-rows: 1fr;
-  opacity: 1;
-}
-
-.stepBody {
-  color: #6b7280;
-  font-size: 14px;
-  line-height: 22px;
-  // Required: a grid row animating from 0fr only clips if the child itself can be
-  // clipped, and without this the text spills out during the transition.
-  min-height: 0;
-  overflow: hidden;
-}
-
-/* ------------------------------------------------------------- visual */
-
-.visual {
-  align-items: center;
-  display: flex;
-  justify-content: center;
-  // Breathing room so the sphere never touches the panel's border.
-  padding: 32px;
-  // The backdrop and the step card are both positioned against this box.
-  position: relative;
-}
-
-/* ---------------------------------------------------------- visual backdrop */
-
-// Fills the visual half; clipped by the panel's own `overflow: hidden`, so it takes the
-// panel's rounded corner without needing a radius of its own.
-//
-// Left at the bottom of the local stacking order on purpose. Everything in this half
-// paints over it: the card (later in the DOM, so it wins without a z-index) and the globe
-// (a fixed layer at z-index 1, above all of it).
-//
-// Shown at full strength. There was a white wash element over it, removed by request —
-// see the note where the image is rendered for what it was doing and what carries the
-// sphere instead.
-.visualBg {
-  height: 100%;
-  inset: 0;
-  object-fit: cover;
-  position: absolute;
-  width: 100%;
-}
-
-// Reserves the globe's space in this section; the globe itself is the fixed layer in
-// GlobeTravel, which parks over this box.
-//
-// HEIGHT-DRIVEN, and deliberately NOT a square — this is what sets the panel's height.
-// It was `aspect-ratio: 1/1` at the hero's own 656px cap, which made the panel 714px tall
-// and left the rail's four steps floating in ~140px of empty space each. The visual half
-// is far wider than it needs to be tall, so a square slot was spending that width on
-// nothing and buying height with it.
-//
-// This slot is therefore SMALLER than the hero's, which is allowed because GlobeTravel
-// positions the layer by slot CENTRES rather than corners; the pose scales the sphere down
-// to suit. It does NOT have to match Hero.module.scss any more — but the per-step `pose`
-// scales in WhyPartners.tsx are derived from the ratio between the two, so changing this
-// value means revisiting those.
-//
-// ⚠️ Still load-bearing in a way that is easy to miss: without a size here the slot is a
-// 0x0 div and the globe parks over a zero-size box, which puts the sphere outside the
-// panel entirely.
-.globeSlot {
-  height: clamp(240px, 32vw, 480px);
-  width: 100%;
-}
-
-/* ------------------------------------------------------------- step card */
-
-// The dashboard-style card that opens beside the sphere on every step but the first.
-//
-// ── Why it can sit under the sphere's box ───────────────────────────────────
-// The globe is a fixed layer at `z-index: 1` and this is in normal flow, so the sphere
-// paints OVER it. That is deliberate and it is what buys the layout its room: the canvas
-// is a square with a circle inscribed and Mapbox's space colour is fully transparent, so
-// the ~20px of each corner outside the sphere shows whatever is behind it. The card may
-// therefore overlap the globe's BOX by a couple of dozen pixels without a single
-// character being hidden — only the sphere itself covers anything.
-//
-// The steps' `pose` offsets are sized against that: the sphere shrinks and slides away
-// from the arriving side, and the card lands in the space that frees up.
+// ⚠️  GENEROUS ON PURPOSE, and the vertical is the half that matters. The cells were 16/14, which put
+// the dividers close enough to the type that the box read as a dense table. Cell height follows from
+// the copy: 26px title + 3px + 21px label = 50px, so 28px top and bottom makes a ~105px row.
 .card {
-  // Dark GLASS, straight on the photo: a translucent black plate, a hairline of white for
-  // an edge, and a blur so the picture reads through it without competing with the type.
+  align-items: flex-start;
+  // ⚠️  DIVIDERS, NOT BORDERS. Each cell draws only the lines INSIDE it; the panel draws the outline.
+  // Right and bottom on every cell, then the outer edges cancelled below.
   //
-  // This replaced a white card inside a grey frame. The frame was doing the job the blur
-  // does here — lifting the panel off its background — and doing it by hiding the photo
-  // instead of using it. Nothing about the old treatment survived, so no fallbacks from it
-  // are left behind either.
-  //
-  // ── Why the plate is this DARK and this COOL ────────────────────────────────
-  // At 0.42 alpha the blur pulled the photograph's warm dust straight through the panel and
-  // it read as a smudge on the picture rather than a pane over it: a brown-grey rectangle,
-  // no edge, white type sitting on a mid-tone. Three things fix that and all three are
-  // load-bearing:
-  //
-  //   · a DEEPER overlay (0.58 → 0.72 down the panel), so the type has a real ground;
-  //   · a COOL, near-neutral base — the backdrop here is a warm landscape and a warm plate
-  //     over a warm photo has nothing to separate it;
-  //   · `brightness(0.86)` inside the filter, which darkens what is blurred BEFORE the
-  //     overlay lands on it, rather than trying to hide a bright blur under more alpha.
-  //
-  // The gradient is not decoration either: the label lives at the top and the figure at the
-  // bottom, so the panel is lightest where the small type is and deepest under the number.
-  background: linear-gradient(
-    180deg,
-    rgba(12, 17, 27, 0.58) 0%,
-    rgba(6, 10, 17, 0.72) 100%
-  );
-  backdrop-filter: blur(20px) saturate(1.12) brightness(0.86);
-  // ── The edge ───────────────────────────────────────────────────────────────
-  // A hairline border alone was invisible over the photo's mid-tones — the panel had no
-  // edge at all along two of its sides, which is most of what made it look unfinished. It
-  // takes all three of these to read as a pane:
-  //
-  //   · the border, for the sides and the bottom;
-  //   · an inset top highlight, the one light line that says "glass" and nothing else does;
-  //   · a soft drop, which is what seats it ON the photo instead of floating over it.
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow:
-    0 24px 48px -22px rgba(3, 7, 14, 0.65),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  // Near-square, as in the reference. Everything else on this page is 13–20px, so this is
-  // a deliberate exception rather than an oversight.
-  border-radius: 6px;
-  opacity: 0;
-  // Decorative and duplicated in the copy — never a hover or click target, and it must
-  // not steal the sphere's drag.
-  pointer-events: none;
-  position: absolute;
-  top: 50%;
-  transition:
-    opacity 0.4s ease,
-    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
-  // 256, down from 280 when this held three rows.
-  //
-  // 260, up from 256 when this held one figure. Two columns of numbers need the width: at 256
-  // the longest pairs ("$1Bn+ / delivered in 2025") wrapped their labels to two lines in one
-  // column and not the other, which pulls the grid out of alignment with itself.
-  //
-  // It is not free — every 16px here comes off the sphere's band and has to be paid for in the
-  // four `dx` values in the TSX, which are derived from this number. Change one, change both.
-  width: 260px;
-  // Never more than half the visual column: at 1024–1280px the column narrows faster
-  // than the sphere does, and a fixed width would run under the sphere far enough to eat
-  // the figure.
-  max-width: 42%;
+  // Dotted, and only the internal ones — the panel's outline and the mat's rule stay SOLID. The
+  // contrast between a solid perimeter and a dotted interior is what makes this read as one object
+  // subdivided rather than as a grid of dotted boxes.
+  border-bottom: $divider;
+  border-right: $divider;
+  display: flex;
+  gap: 16px;
+  padding: 28px 24px;
 }
 
-// Arrives FROM its own edge rather than fading in on the spot. The `translateY(-50%)` has
-// to be repeated in every state — it is centring, not animation, and a transform is one
-// property, so omitting it from a state drops the centring with it.
-// 34px, not 14. Absolute offsets resolve against the containing block's PADDING BOX, so
-// `.visual`'s own 32px of padding does nothing for these — at 14 the card sat almost against
-// the panel's border while everything else in the panel respected that 32. 34 lines the card
-// up with the padding the rest of the layout keeps.
+// Cancels the dividers that would land ON the panel's own outline and double it.
 //
-// ⚠️ Moving these INWARD moves the card toward the sphere, so the four `pose` offsets in the
-// TSX were opened up to compensate. Change one and re-check the other: the symptom is a card
-// whose figure disappears under the globe.
-// 280 for the coverage card only: three columns of flag, city and count need the width, and the
-// step's `dx` is opened to 0.232 to pay for it. Every other card is 260.
-.cardWide {
-  width: 280px;
+// ⚠️  `nth-child(5n)` IS THE RIGHT-HAND COLUMN and `nth-child(n + 6)` IS THE LAST ROW, and both are
+// only true because there are exactly ten cells in five columns. Every breakpoint that changes the
+// count restates them.
+.card:nth-child(5n) {
+  border-right: 0;
 }
 
-.cardLeft {
-  left: 34px;
-  transform: translate(-24px, -50%);
+.card:nth-child(n + 6) {
+  border-bottom: 0;
 }
 
-.cardRight {
-  right: 34px;
-  transform: translate(24px, -50%);
+/* --------------------------------------------------------------------- cell */
+
+// ⚠️  KEEP THIS SQUARE. `InlineLottie` forces the injected <svg> to 100% width AND height of its host,
+// so a non-square box does not letterbox the artwork — it STRETCHES it.
+//
+// ⚠️  `margin-top` IS DERIVED, NOT NUDGED: `(title line-height - box) / 2`. The title is 18px/26, so a
+// 26px line and a 30px box give -2px. Recompute it whenever either value moves.
+.mark {
+  display: inline-flex;
+  flex-shrink: 0;
+  height: 30px;
+  margin-top: -2px;
+  width: 30px;
 }
 
-.cardOn {
-  opacity: 1;
-  transform: translate(0, -50%);
-}
-
-// Label at the top, then the card's content. No `min-height` and no `space-between` any more:
-// those existed to hold a deliberate empty band above a single large figure, and a card carrying
-// a grid or a list has nothing to hold apart. Height follows content, which is why the four
-// cards are different heights — they are never on screen together.
-.cardInner {
+// `min-width: 0` so a long label wraps inside the cell instead of forcing it wider than its column.
+//
+// ⚠️  THE -2px IS ON THE BLOCK, NOT ON THE TITLE. Lifting the figure and its name TOGETHER is the
+// point — a negative margin on `.cardTitle` alone would look identical in a flex column (the label
+// follows it up) while actually meaning "shrink the space above the title", which is a different
+// thing to reason about next time.
+.cardCopy {
   display: flex;
   flex-direction: column;
-  padding: 20px 22px;
+  gap: 3px;
+  margin-top: -2px;
+  min-width: 0;
 }
 
-/* ------------------------------------------------------------------ label */
-
-// Small caps, tracked, and quiet. This is a HEADER for a list now, not the line a single figure
-// answers to — it was 15px sentence-case white when the card held one number and it competed
-// with six of them. Uppercase at 11px reads as a category and gets out of the way.
-.cardLabel {
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.09em;
-  line-height: 1;
-  text-transform: uppercase;
-}
-
-/* ---------------------------------------------------------------- figures */
-
-/* ------------------------------------------------------------- card bodies */
-
-// One wrapper for all four bodies, carrying the arrival. Everything below it is per-kind: the
-// four cards are different objects on a shared plate, not four fills of one template — see the
-// note on `StepCard` for why that was necessary.
-.body {
-  display: flex;
-  flex-direction: column;
-  margin-top: 15px;
-  opacity: 0;
-  transition:
-    opacity 0.36s ease,
-    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-  transform: translateY(6px);
-}
-
-.cardOn .body {
-  opacity: 1;
-  transform: none;
-}
-
-/* ------------------------------------------------- demand: analytics panel */
-
-// Figure, unit and trend on one baseline. `align-items: baseline` and not `center`: the three are
-// 26px, 12px and 11px, and centring them puts the small two adrift in the middle of the numeral.
-.headline {
-  align-items: baseline;
-  display: flex;
-  gap: 7px;
-
-  b {
-    color: #fff;
-    font-size: 26px;
-    font-weight: 500;
-    letter-spacing: -0.8px;
-    line-height: 1;
-    font-variant-numeric: tabular-nums;
-  }
-
-  em {
-    color: rgba(255, 255, 255, 0.45);
-    font-size: 12px;
-    font-style: normal;
-  }
-}
-
-// Green, and the only colour on any of the four cards that is not amber's blue. A rise is the one
-// thing here that carries a value judgement, and green is the convention for it — a blue pill
-// would read as another label.
-.trend {
-  background: rgba(52, 199, 123, 0.16);
-  border-radius: 5px;
-  color: #6ee7a8;
-  font-size: 10.5px;
-  font-style: normal;
+// The figure. 600 weight because on a card there is no hairline or sentence to carry the hierarchy.
+// The leading rises with the size (18/26, not 18/24): holding 24 would cut the ratio to 1.44, which
+// starts clipping ascenders on a 600 weight.
+.cardTitle {
+  color: #111928;
+  font-size: 18px;
   font-weight: 600;
-  letter-spacing: 0.01em;
-  margin-left: auto;
-  padding: 4px 6px;
+  line-height: 26px;
+  margin: 0;
 }
 
-// `preserveAspectRatio: none` on the SVG plus a fixed height here: the bars are authored in a
-// 0-100 space and stretched to whatever width the card is, which is what keeps twelve of them
-// evenly spaced without a percentage per bar.
-.chart {
-  display: block;
-  fill: #7ea8ff;
-  height: 34px;
-  margin-top: 13px;
-  width: 100%;
+// The figure's name, at 14px to match the body copy in `Features` so the two bands agree.
+.cardLabel {
+  color: #828282;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 21px;
+  margin: 0;
 }
 
-/* -------------------------------------------------------- shared: rows/foot */
+/* ------------------------------------------------------------- testimonial */
 
-// The footer figures under the demand and coverage cards.
-//
-// STACKED, not inline. They were "600k+ bookings a year" on one line at 11px, and at that size a
-// figure stops being a figure — it reads as small print at the bottom of the card, which is the
-// opposite of what a number is doing there. Stacking is what buys the size: inline, the pair needs
-// ~150px and each column only has ~100, so the figure could not grow without the label wrapping.
-//
-// The label is an anonymous flex item — a bare text node after the `<b>` — which is why there is
-// no class for it. `flex-direction: column` puts it on its own line without an extra element.
-.foot {
-  border-top: 1px solid rgba(255, 255, 255, 0.11);
-  display: grid;
-  gap: 4px 16px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin-top: 14px;
-  padding-top: 13px;
-
-  > span {
-    color: rgba(255, 255, 255, 0.45);
-    display: flex;
-    flex-direction: column;
-    font-size: 11.5px;
-    gap: 4px;
-    line-height: 1.2;
-  }
-
-  b {
-    color: #fff;
-    font-size: 19px;
-    font-weight: 500;
-    letter-spacing: -0.5px;
-    line-height: 1;
-    font-variant-numeric: tabular-nums;
-  }
-}
-
-.rows {
+// The design puts a testimonial inside the mat, under the panel. Positions there are absolute — the
+// quote at top 258 and the avatar at 361 — which is Figma's way of saying "39px under the panel, then
+// 19px under the quote"; those are the two gaps this reproduces in flow.
+.voice {
+  align-items: center;
   display: flex;
   flex-direction: column;
+  padding: 40px 24px 30px;
 }
 
-/* ------------------------------------------------------- coverage: city table */
+// 639px in the design. `max-width` rather than `width` so it reflows instead of overflowing the mat
+// on a narrow viewport.
+.quote {
+  color: #000;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 28px;
+  margin: 0;
+  max-width: 639px;
+  text-align: center;
+}
 
-// Ruled rows, as a table would be. The rule is on the row rather than between rows so the last
-// one can drop it without a `:not()` chain.
-.row {
+// ⚠️  A PLACEHOLDER PHOTO, NOT A PICTURE OF THE PERSON NAMED — see the note in the component. 44px
+// and round, which is the design's own geometry.
+.avatarWrap {
   align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  display: flex;
-  gap: 10px;
-  padding: 9px 0;
-
-  &:first-child {
-    padding-top: 0;
-  }
-
-  &:last-child {
-    border-bottom: 0;
-  }
-}
-
-// Circular, matching the flags on the sphere's pins and in its hover cards. The white ground is
-// not decoration: Nepal's flag is the one non-rectangular national flag and its PNG has a
-// transparent corner — see the flags note in `DemandMap/network.ts`.
-.rowFlag {
-  background: #fff;
-  border-radius: 999px;
-  flex-shrink: 0;
-  height: 17px;
-  object-fit: cover;
-  width: 17px;
-}
-
-.rowName {
-  color: rgba(255, 255, 255, 0.86);
-  font-size: 13px;
-  letter-spacing: -0.1px;
-  // Truncates rather than pushing the value out of the card.
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.rowValue {
-  color: #fff;
-  font-size: 13px;
-  font-weight: 500;
-  margin-left: auto;
-  font-variant-numeric: tabular-nums;
-}
-
-// Says the three rows are a sample. Without it a reader takes the table for the whole coverage,
-// which undersells 260 cities by about 257 of them.
-.more {
-  color: rgba(255, 255, 255, 0.4);
-  font-size: 11px;
-  margin-top: 10px;
-}
-
-/* ----------------------------------------------------------- costs: statement */
-
-.feeRow {
-  align-items: baseline;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  display: flex;
-  padding: 9px 0;
-
-  &:first-child {
-    padding-top: 0;
-  }
-}
-
-// The zeros are the argument, so they are the only thing on this card at figure weight.
-.zero {
-  color: #fff;
-  font-size: 17px;
-  font-weight: 500;
-  letter-spacing: -0.3px;
-  margin-left: auto;
-  font-variant-numeric: tabular-nums;
-}
-
-// The total line of a statement: heavier rule above it, and the one row whose value is words.
-.total {
-  align-items: baseline;
-  border-top: 1px solid rgba(255, 255, 255, 0.22);
-  display: flex;
-  gap: 12px;
-  margin-top: 11px;
-  padding-top: 12px;
-}
-
-.totalValue {
-  color: #7ea8ff;
-  font-size: 13px;
-  font-weight: 500;
-  margin-left: auto;
-}
-
-/* ------------------------------------------------ performance: property meters */
-
-.meterRow {
   display: flex;
   flex-direction: column;
-  gap: 7px;
-  padding: 9px 0 10px;
-
-  &:first-child {
-    padding-top: 0;
-  }
+  gap: 8px;
+  margin-top: 20px;
 }
 
-.meterHead {
-  align-items: baseline;
-  display: flex;
-  gap: 10px;
-}
-
-.meter {
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 999px;
-  height: 4px;
-  overflow: hidden;
-  width: 100%;
-}
-
-.meterFill {
-  background: #7ea8ff;
-  border-radius: 999px;
-  display: block;
-  height: 100%;
-}
-
-// The support line. The faces are amber's people, so this row is the one place on the four cards
-// where the answer to the claim is a person rather than a number.
-.support {
-  align-items: center;
-  border-top: 1px solid rgba(255, 255, 255, 0.11);
-  color: rgba(255, 255, 255, 0.72);
-  display: flex;
-  font-size: 12px;
-  gap: 9px;
-  margin-top: 8px;
-  padding-top: 12px;
-}
-
-.faces {
-  display: flex;
+// ⚠️  `box-sizing: border-box` IS SET HERE RATHER THAN INHERITED. On a content-box img the 1px ring
+// would make this 46px, and the column's `align-items: center` would then shift the name a pixel —
+// the same trap the SupportChat avatars hit.
+//
+// A hairline ring rather than none: this photo has a light studio background that sits only a little
+// off the mat's own value, so without an edge the circular crop does not read as circular.
+.avatar {
+  border: 1px solid rgba(17, 25, 40, 0.08);
+  border-radius: 100px;
+  box-sizing: border-box;
   flex-shrink: 0;
-}
-
-// Overlapped, with a ring in the card's own colour rather than white — on glass, a white ring
-// reads as a highlight around the face instead of a gap between faces.
-.face {
-  border: 1.5px solid #131a26;
-  border-radius: 999px;
-  display: block;
-  height: 21px;
+  height: 44px;
   object-fit: cover;
-  width: 21px;
-
-  & + & {
-    margin-left: -7px;
-  }
+  width: 44px;
 }
 
-/* --------------------------------------------------------- responsive */
-
-// Reduced motion: no pinning and no tall track, so nothing moves on scroll and the rail
-// is simply a click-through list. Mirrors the JS, which stops deriving the step from
-// scroll under the same query.
-@media (prefers-reduced-motion: reduce) {
-  // The card still appears, it just appears at once — the stagger and the slide are the
-  // motion, the information is not.
-  .card,
-  .body {
-    transition: opacity 0.01s linear;
-  }
-
-  .cardLeft,
-  .cardRight {
-    transform: translate(0, -50%);
-  }
-
-  .body {
-    transform: none;
-  }
-
-  .spacer {
-    display: none;
-  }
-
-  .sticky {
-    position: static;
-  }
-
-  .railProgress {
-    display: none;
-  }
+.who {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-@media (max-width: 1024px) {
+.whoName {
+  color: #000;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 17px;
+  margin: 0;
+}
+
+.whoRole {
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 17px;
+  margin: 0;
+  text-align: center;
+}
+
+/* -------------------------------------------------------------- responsive */
+
+// Two columns — five rows of two, which divides ten. The five-column cancellations above still match
+// here and mean nothing, so they are undone before the two-column ones are applied.
+@media (max-width: 820px) {
   .section {
     padding: 72px 24px;
   }
 
+  .inner {
+    gap: 36px;
+  }
+
   .heading {
-    font-size: 34px;
-    letter-spacing: -0.68px;
+    font-size: 30px;
+    letter-spacing: -0.6px;
+    line-height: 38px;
   }
 
-  // Stacked: the visual goes above the rail, matching the hero's stacked order where
-  // the globe also sits under its copy.
-  .panel {
-    grid-template-columns: minmax(0, 1fr);
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 
-  .track {
-    margin-top: 32px;
-  }
-
-  .rail {
-    border-right: 0;
-    border-top: 1px solid #e5e7eb;
-    order: 2;
-  }
-
-  .visual {
-    order: 1;
-    padding: 24px;
-  }
-
-  // Stacked, the visual is the full panel width and the sphere fills it, so there is no
-  // freed space for a card to open into. GlobeTravel ignores poses under the same
-  // threshold (POSE_MIN_WIDTH) — change one and change the other.
+  // 28/24 in a half-width column spends too much of it on padding.
   .card {
-    display: none;
+    gap: 14px;
+    padding: 22px 18px;
+  }
+
+  .voice {
+    padding: 30px 16px 24px;
+  }
+
+  .quote {
+    font-size: 15px;
+    line-height: 26px;
+  }
+
+  .card:nth-child(5n) {
+    border-right: $divider;
+  }
+
+  .card:nth-child(n + 6) {
+    border-bottom: $divider;
+  }
+
+  .card:nth-child(2n) {
+    border-right: 0;
+  }
+
+  .card:nth-child(n + 9) {
+    border-bottom: 0;
+  }
+}
+
+// One column. Every cell is both first and last in its row, so none carries a right divider and only
+// the final one drops its bottom.
+@media (max-width: 520px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    border-bottom: $divider;
+    border-right: 0;
+  }
+
+  .card:last-child {
+    border-bottom: 0;
   }
 }
