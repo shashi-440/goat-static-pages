@@ -4,19 +4,26 @@ import wrapperHOC from "@Utils/wrapperHOC";
 import Reveal from "../../../AboutUsV2/components/Reveal/Reveal";
 import RolesButton from "../RolesButton/RolesButton";
 import styles from "./CrewCTA.module.scss";
-// The outer four are real teammates — two from India, two from elsewhere — so the
-// cluster reads as this team rather than as stock photography. Two of each, and
-// alternating across the fan (IN, non-IN, ?, non-IN, IN) so neither side is all
-// one office.
+// Five real teammates, no stock photography, and no face twice.
 //
-// The centre keeps crew-3.jpg: it is the largest circle at 123px and the only one
-// shot square-on at that size, and the real headshots are 160px crops that would
-// soften noticeably scaled up to it.
+// Spread across offices and alternating so neither side of the fan is one region:
+// Harshal (India), Mirna (Egypt), Bhanu (India, centre), Dan (China), Solomon
+// (Nigeria).
+//
+// All five are real teammates. crew-3.jpg used to hold the centre, but it turned
+// out to be a photo of Dan Teo — the same face as the circle to its right, which
+// read as a duplicate even though the two files differ. Bhanu takes the centre
+// instead.
+//
+// His crop is a separate 320px file rather than the shared 160px one: the centre
+// circle renders at 123px, so a 160px crop is only 1.3x and visibly soft on a
+// retina screen. 320 gives it 2.6x, matching what the smaller circles get from
+// their own 160px crops.
 import harshalImg from "../../assets/people/harshal-maniyar.jpg";
 import mirnaImg from "../../assets/people/mirna-abdo.jpg";
-import crew3 from "../../assets/crew-3.jpg";
+import bhanuImg from "../../assets/people/bhanu-mahajan-lg.jpg";
 import danImg from "../../assets/people/dan-teo.jpg";
-import prachiImg from "../../assets/people/prachi-kamble.jpg";
+import solomonImg from "../../assets/people/ajibode-solomon.jpg";
 
 /**
  * Closing black CTA band (Figma 2665:13697), reusing AboutUsV2's CrewCTA
@@ -62,13 +69,13 @@ const CrewCTA = () => {
           <Image src={mirnaImg} alt="" className={styles.avatarImage} width={90} height={90} />
         </span>
         <span className={`${styles.avatarCenter} ${styles.center}`}>
-          <Image src={crew3} alt="" className={styles.avatarImage} width={123} height={123} />
+          <Image src={bhanuImg} alt="" className={styles.avatarImage} width={123} height={123} />
         </span>
         <span className={`${styles.avatar} ${styles.avatarMedium} ${styles.side} ${styles.right1}`}>
           <Image src={danImg} alt="" className={styles.avatarImage} width={90} height={90} />
         </span>
         <span className={`${styles.avatar} ${styles.avatarSmall} ${styles.side} ${styles.right2}`}>
-          <Image src={prachiImg} alt="" className={styles.avatarImage} width={84} height={84} />
+          <Image src={solomonImg} alt="" className={styles.avatarImage} width={84} height={84} />
         </span>
       </div>
 
