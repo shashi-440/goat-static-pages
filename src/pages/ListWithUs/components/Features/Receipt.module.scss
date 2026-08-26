@@ -1,0 +1,333 @@
+// The receipt. Sits in the card's media window, fills it, and bleeds off the bottom like the other
+// art panels on this card row.
+//
+// ── THE BLUE ───────────────────────────────────────────────────────────────
+// Everything here was mono grey on white first, and it read as a wireframe of a receipt rather than
+// a receipt. The accent is #1c64f2, this page's own, and it is spent in exactly four places so it
+// still reads as an accent: the brand word, the total band, the stamp, and the paper's shadow. Every
+// rule, dot and dash is a BLUE-TINTED grey rather than a neutral one — that is what stops the
+// accents looking pasted onto a grey sheet.
+//
+// `--perf` is the scallop radius, used by both the notch strip and the top padding that clears it.
+// THE LIFT. Carries the shadow, the tilt and the room around the paper — everything that has to
+// happen OUTSIDE the torn silhouette.
+//
+// ⚠️  THE SHADOW CANNOT LIVE ON THE SHEET ITSELF. CSS applies `clip-path` after `filter`, so an
+// element that clips its own silhouette also clips its own drop-shadow away. Measured with both on
+// one element: two levels of darkening and zero reach. Filtering the parent of a clipped child is
+// the way round it — see the note in Receipt.tsx.
+//
+// ⚠️  THE BLUR RADII ARE CAPPED BY THE MARGIN, not chosen for taste. `.media` has `overflow:
+// hidden`, so the shadow shows only as far as this margin reaches; a 30px blur inside a 10px margin
+// darkened the card by eight levels and read as nothing. 18px of side room, radii brought inside
+// it. If the margin changes, these change with it.
+//
+// ⚠️  NEUTRAL GREY, NOT BLUE-TINTED. The wide layer was `rgba(28, 100, 242, 0.2)` to match the
+// panel's accent; a blue at 20% is too light in VALUE to read as a shadow on a #f7f7f7 ground. The
+// accent stays where it belongs: the type.
+//
+// Alphas are lower than a box-shadow equivalent would need, because chained `drop-shadow()` filters
+// COMPOUND — each one shadows the result of the last.
+.lift {
+  display: flex;
+  // ⚠️  THE X OFFSETS ARE NOT STYLE, THEY ARE CLEARANCE. Leftward reach of a drop-shadow is
+  // `blur - offsetX`, and the left edge is the one that gets clipped (see the margin note). Pushing
+  // each layer right by a few px buys back that much room without shrinking the shadow anyone sees,
+  // and a light source slightly up-and-left is what the rest of this page assumes anyway.
+  filter:
+    drop-shadow(1px 1px 2px rgba(17, 25, 40, 0.12))
+    drop-shadow(2px 4px 8px rgba(17, 25, 40, 0.14))
+    drop-shadow(4px 10px 16px rgba(17, 25, 40, 0.16));
+  // The tilt. Anchored at BOTTOM CENTRE so it lifts the head of the receipt and leaves the foot
+  // where it was; rotating about the centre would swing the visible top edge down into the copy.
+  //
+  // On the wrapper rather than the sheet so the shadow rotates with the paper — a filter on a
+  // rotated child would cast its shadow straight down while the sheet leaned.
+  transform: rotate(-1.8deg);
+  transform-origin: 50% 100%;
+  transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1), filter 0.34s ease;
+
+  // ⚠️  THE MARGINS ARE DERIVED FROM THE TILT AND THE BLUR, not picked. `.media` clips with
+  // `overflow: hidden`, so anything past these edges is cut with a hard straight line — which is
+  // exactly what a clipped shadow looks like, and why the top and left of this panel read as
+  // unblended at 10/18.
+  //
+  // The arithmetic, for a 359px-tall sheet rotated about its bottom centre:
+  //   · at -1.8deg the top corners swing sideways by 359 * sin(1.8) ~= 11px and the leading one
+  //     rises by about 5px;
+  //   · the widest shadow reaches `blur - offset` outward: 16 - 4 = 12px left, 16 - 10 = 6px up.
+  // So the left needs ~23px and the top ~11px. 26 and 14 leave a margin of error.
+  //
+  // ⚠️  THE TILT CAME DOWN FROM -2.2 TO -1.8 FOR THE SAME REASON. Every extra degree costs ~6px of
+  // side room, and this panel only has 328px to give. If the tilt increases again, these margins
+  // have to grow with it or the shadow clips.
+  //
+  // Bottom stays 0: the paper is meant to bleed off the foot of the card, where a shadow would be
+  // clipped whatever the margin.
+  margin: 14px 26px 0;
+  min-height: calc(100% + 30px);
+  width: calc(100% - 52px);
+}
+
+// THE SHEET. Background, torn edge, and everything printed on it.
+.receipt {
+  // A hair of warmth top to bottom. Flat white next to the card's #f7f7f7 ground looked like a
+  // hole; this reads as paper.
+  background: linear-gradient(180deg, #fff 0%, #fcfdff 100%);
+
+  // ⚠️  A REAL TORN EDGE, cut out of the paper. The first version painted 5px semicircles in the
+  // card's #f7f7f7 over a white sheet — about 3% of value difference, which at that size read as a
+  // faint fuzz rather than a perforation. This removes the paper instead of drawing over it, so the
+  // teeth are as legible as whatever ground sits behind them.
+  //
+  // 26 teeth, 8px deep. GENERATED, not hand-typed: 53 points alternating between y=8px and y=0
+  // across the top, then square down the sides and along the bottom. To change the count or depth,
+  // regenerate rather than editing points — one stray value shows as a chipped tooth.
+  //
+  // ⚠️  NO `border` AND NO `box-shadow` HERE. Both follow the element's BORDER BOX, so under a
+  // clip-path they draw a rectangle the paper no longer occupies: a straight edge across the teeth,
+  // and a border sliced off mid-tooth. Definition comes from `.lift`'s shadow instead.
+  clip-path: polygon(0% 8px, 1.923% 0, 3.846% 8px, 5.769% 0, 7.692% 8px, 9.615% 0, 11.54% 8px, 13.46% 0, 15.38% 8px, 17.31% 0, 19.23% 8px, 21.15% 0, 23.08% 8px, 25% 0, 26.92% 8px, 28.85% 0, 30.77% 8px, 32.69% 0, 34.62% 8px, 36.54% 0, 38.46% 8px, 40.38% 0, 42.31% 8px, 44.23% 0, 46.15% 8px, 48.08% 0, 50% 8px, 51.92% 0, 53.85% 8px, 55.77% 0, 57.69% 8px, 59.62% 0, 61.54% 8px, 63.46% 0, 65.38% 8px, 67.31% 0, 69.23% 8px, 71.15% 0, 73.08% 8px, 75% 0, 76.92% 8px, 78.85% 0, 80.77% 8px, 82.69% 0, 84.62% 8px, 86.54% 0, 88.46% 8px, 90.38% 0, 92.31% 8px, 94.23% 0, 96.15% 8px, 98.08% 0, 100% 8px, 100% 100%, 0 100%);
+
+  display: flex;
+  flex-direction: column;
+  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  // The top padding clears the teeth; the bottom is the blank tail below the footer.
+  padding: 20px 14px 16px;
+  position: relative;
+  width: 100%;
+}
+
+/* --------------------------------------------------------------------- head */
+
+.head {
+  align-items: baseline;
+  display: flex;
+  font-size: 9px;
+  font-weight: 500;
+  justify-content: space-between;
+  letter-spacing: 0.6px;
+  line-height: 13px;
+  white-space: nowrap;
+}
+
+.headL {
+  color: #6b7280;
+}
+
+// One word in the accent. A receipt's masthead is the natural place for a brand colour, and it is
+// the cheapest possible way to stop the head row being another line of grey mono.
+.brand {
+  color: #1c64f2;
+  font-weight: 600;
+}
+
+.headR {
+  color: #9aa4b8;
+}
+
+// Blue-tinted, not neutral grey — see the note at the top of the file.
+.ruleDashed {
+  border-top: 1px dashed #dfe6f2;
+  height: 0;
+  margin: 10px 0;
+  width: 100%;
+}
+
+/* -------------------------------------------------------------------- lines */
+
+.lines {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+// ⚠️  `align-items: baseline` IS WHAT MAKES THE LEADER WORK. The dotted span has no content, so on
+// any other alignment it centres itself in the row and the dots float above the baseline the label
+// and amount sit on.
+.line {
+  align-items: baseline;
+  display: flex;
+  gap: 6px;
+}
+
+.lineLabel {
+  color: #4b5563;
+  font-size: 11px;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+// The dotted leader. `flex: 1` so it absorbs whatever the label and amount leave, which is what
+// pins every amount to the same right edge.
+//
+// The 3px lift is optical: a dotted border on the baseline sits ON the text's baseline, and a
+// leader should run just below the x-height's centre.
+.leader {
+  border-bottom: 1px dotted #ccd7ea;
+  flex: 1;
+  min-width: 8px;
+  position: relative;
+  top: -3px;
+}
+
+// Tabular by virtue of being mono — the four zeroes line up without needing `tnum`.
+.lineValue {
+  color: #111928;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 16px;
+}
+
+/* -------------------------------------------------------------------- total */
+
+// A TINTED BAND, bled to the paper's edges. The negative margins cancel `.receipt`'s 14px inset and
+// the padding puts it back, so the tint reaches the paper's edge while the type stays on the same
+// left edge as every other line.
+//
+// The double rule above it is the till-roll convention and has to be a real border: `3px double`
+// collapses to two 1px lines with a 1px gap, which one hairline cannot draw.
+.total {
+  align-items: baseline;
+  background: rgba(28, 100, 242, 0.05);
+  border-top: 3px double #c3d0e8;
+  display: flex;
+  justify-content: space-between;
+  margin: 10px -14px 0;
+  padding: 10px 14px 11px;
+}
+
+.totalLabel {
+  color: #1e3a8a;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  line-height: 14px;
+}
+
+// The one figure with any size on it, and the only amount in the accent. Everything else is 9-11px
+// grey mono, so 16px of blue is enough to make this the line the eye lands on without turning the
+// panel into a headline.
+.totalValue {
+  color: #1c64f2;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  line-height: 19px;
+}
+
+/* --------------------------------------------------------------------- note */
+
+// Commission, below the total rather than among the zeroes — see the note in Receipt.tsx.
+.note {
+  align-items: baseline;
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.noteLabel {
+  color: #4b5563;
+  font-size: 11px;
+  line-height: 16px;
+}
+
+.noteValue {
+  color: #6b7280;
+  font-size: 10px;
+  line-height: 16px;
+  text-align: right;
+}
+
+/* -------------------------------------------------------------------- stamp */
+
+// Takes up the slack so the foot sits at the bottom of the card whatever height the media window
+// ends up at — and now HOLDS the stamp, so the slack is not empty paper.
+// ⚠️  FIXED, NOT `flex: 1`. Growing it pinned the foot to the bottom of the paper, which sounds
+// right and is not: the paper is deliberately taller than its window, so the slack all collected
+// HERE and opened a band of empty paper between the commission line and the barcode. A receipt with
+// a hole in the middle of it. Fixed at 18px, the content flows on and the leftover paper ends up
+// BELOW the footer as a blank tail — which is what a torn receipt actually looks like.
+.spacer {
+  flex: none;
+  height: 18px;
+}
+
+/* ------------------------------------------------------------ foot of the roll */
+
+.foot {
+  display: flex;
+  flex-direction: column;
+}
+
+// ⚠️  `space-between`, NOT a left-aligned row. The bars keep their own widths and the GAPS stretch
+// to fill the paper exactly. Left-aligned they stopped about 60% across, which read as a truncated
+// image rather than a code — and uneven gaps are what a real code looks like anyway.
+//
+// `align-items: flex-end` so the bars hang from one baseline; equal heights read as a chart.
+.barcode {
+  align-items: flex-end;
+  display: flex;
+  height: 26px;
+  justify-content: space-between;
+  overflow: hidden;
+  width: 100%;
+}
+
+// Height comes from the wrapper; only the WIDTH varies per bar, set inline from the pattern array.
+// Navy rather than pure black — pure black is the one value that would sit outside this panel's
+// palette entirely.
+.bar {
+  background: #111928;
+  flex-shrink: 0;
+  height: 100%;
+}
+
+.footer {
+  color: #1c64f2;
+  font-size: 8.5px;
+  font-weight: 500;
+  letter-spacing: 0.9px;
+  line-height: 12px;
+  opacity: 0.65;
+  padding: 5px 0 5px;
+  text-align: center;
+}
+/* --------------------------------------------------------------------- hover */
+
+// ⚠️  GATED ON A REAL POINTER. Without `(hover: hover) and (pointer: fine)` a touch device applies the
+// hover state on tap and then LEAVES IT APPLIED until something else is tapped — a card stuck in its
+// lifted state with no way to dismiss it.
+//
+// ⚠️  THE SHADOW DEEPENS BY ALPHA, NOT BY BLUR, and that is a hard constraint rather than a
+// preference. `.media` clips with `overflow: hidden`, so these radii were sized to fit inside the
+// panel's own margin — growing them on hover would push the shadow past the clip and the lift would
+// arrive with a straight cut edge on two sides. Alpha costs no geometry.
+//
+// ⚠️  `prefers-reduced-motion` DROPS THE TRANSITION AND THE MOVE, keeping only the shadow. The point
+// of the gesture is "this is a surface"; that survives without the 2px, and a translate is exactly
+// what a reader who asked for no motion asked not to get.
+
+// The paper lifts a little and straightens a little — a sheet being picked up rather than a card
+// being highlighted. The tilt only goes -1.8 -> -1.4deg, which also keeps the corner sweep INSIDE
+// the clearance the margins were derived for (a bigger straighten would be safe; a bigger tilt would
+// not).
+@media (hover: hover) and (pointer: fine) {
+  .lift:hover {
+    filter:
+      drop-shadow(1px 1px 2px rgba(17, 25, 40, 0.16))
+      drop-shadow(2px 4px 8px rgba(17, 25, 40, 0.18))
+      drop-shadow(4px 10px 16px rgba(17, 25, 40, 0.2));
+    transform: rotate(-1.4deg) translateY(-2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lift {
+    transition: none;
+  }
+
+  .lift:hover {
+    transform: rotate(-1.8deg);
+  }
+}

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 682.667 682.667" fill="none">
+  <defs><clipPath id="duoSafetyClip" clipPathUnits="userSpaceOnUse"><path d="M0 512h512V0H0Z"/></clipPath></defs>
+  <g clip-path="url(#duoSafetyClip)" transform="matrix(1.33333 0 0 -1.33333 0 682.667)">
+    <path d="M0 0c-32.326 0-58.813 25.015-61.174 56.75h-159.498C-223.033 25.015-249.52 0-281.846 0a61.255 61.255 0 0 0-18.795 2.935v-236.938c0-46.707 28.424-88.708 71.772-106.054l87.946-35.193 87.946 35.193c43.348 17.346 71.772 59.347 71.772 106.054V2.935A61.25 61.25 0 0 0 0 0Z" transform="translate(396.923 415.25)" fill="none" stroke="#DC52B7" stroke-width="19.319" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="m0 0-82.71 57.779 29.148 40.625 38.437-26.011 46.103 72.205 42.976-25.555zm43.151 237.707h-95.058c-13.899-26.492-38.739-46.339-68.189-53.667V-9.046c0-28.885 17.318-54.478 44.118-65.203l71.6-28.651 71.6 28.651c26.8 10.725 44.118 36.318 44.118 65.203V184.04c-29.45 7.328-54.29 27.175-68.189 53.667" transform="translate(260.378 190.293)" fill="#F0C1E3"/>
+    <path d="M0 0h-14.622" transform="translate(502 256)" fill="none" stroke="#DC52B7" stroke-width="19.319" stroke-linecap="round"/>
+    <path d="m0 0-10.339-10.339" transform="translate(470.531 331.972)" fill="none" stroke="#DC52B7" stroke-width="19.319" stroke-linecap="round"/>
+    <path d="m0 0-10.339 10.339" transform="translate(470.531 180.028)" fill="none" stroke="#DC52B7" stroke-width="19.319" stroke-linecap="round"/>
+    <path d="M0 0h14.622" transform="translate(10 256)" fill="none" stroke="#DC52B7" stroke-width="19.319" stroke-linecap="round"/>
+    <path d="m0 0 10.339-10.339" transform="translate(41.469 331.972)" fill="none" stroke="#DC52B7" stroke-width="19.319" stroke-linecap="round"/>
+    <path d="m0 0 10.339 10.339" transform="translate(41.469 180.028)" fill="none" stroke="#DC52B7" stroke-width="19.319" stroke-linecap="round"/>
+  </g>
+</svg>

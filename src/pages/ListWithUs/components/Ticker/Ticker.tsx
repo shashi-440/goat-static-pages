@@ -18,20 +18,39 @@ import wrapperHOC from "@Utils/wrapperHOC";
  * Rendered by Hero — in this version of the design the wall sits inside the hero
  * section, not in a band of its own.
  */
-const ROWS = [
-  [
-    { src: fresh, alt: "Fresh", width: 69, height: 32 },
-    { src: iqStudent, alt: "iQ Student Accommodation", width: 110, height: 36 },
-    { src: homesForStudents, alt: "Homes for Students", width: 83, height: 36 },
-    { src: uniteStudents, alt: "Unite Students", width: 75, height: 32 },
-  ],
-  [
-    { src: crmStudents, alt: "CRM Students", width: 99, height: 36 },
-    { src: scape, alt: "Scape", width: 86, height: 36 },
-    { src: studentRoost, alt: "Student Roost", width: 104, height: 36 },
-    { src: varsity, alt: "Varsity", width: 67, height: 32 },
-  ],
+export type OperatorLogo = {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+};
+
+/**
+ * The operator marks, LARGEST NAME FIRST.
+ *
+ * Exported because this wall is not the only place they are drawn any more: "Who we work
+ * with" (`Audience`) ends on a strip of them, the way Partner With Us's equivalent section
+ * does. This stays the single source of truth — the two-row wall below is one arrangement
+ * of the same list, not a second copy of it.
+ *
+ * ⚠️  THE ORDER IS MEANT. It runs biggest and best-known operator downward rather than
+ * following the node's layout, because the strip's job is to be recognised: whoever is
+ * reading has to hit a name they know in the first two marks or the wall is just texture.
+ * The old row order opened on Fresh and buried Unite at the end of row one.
+ */
+export const OPERATOR_LOGOS: OperatorLogo[] = [
+  { src: uniteStudents, alt: "Unite Students", width: 75, height: 32 },
+  { src: iqStudent, alt: "iQ Student Accommodation", width: 110, height: 36 },
+  { src: homesForStudents, alt: "Homes for Students", width: 83, height: 36 },
+  { src: studentRoost, alt: "Student Roost", width: 104, height: 36 },
+  { src: fresh, alt: "Fresh", width: 69, height: 32 },
+  { src: scape, alt: "Scape", width: 86, height: 36 },
+  { src: crmStudents, alt: "CRM Students", width: 99, height: 36 },
+  { src: varsity, alt: "Varsity", width: 67, height: 32 },
 ];
+
+/** The wall's two rows of four, taken off the one ordered list above. */
+const ROWS = [OPERATOR_LOGOS.slice(0, 4), OPERATOR_LOGOS.slice(4)];
 
 const Ticker = () => (
   <div className={styles.wall}>

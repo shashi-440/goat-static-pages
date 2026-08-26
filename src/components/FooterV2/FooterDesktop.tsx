@@ -7,21 +7,13 @@
  * byte-identical to its upstream original, so files can move in either direction
  * without an edit.
  *
- * The static footer is a WIP, so it is wrapped in a blur here as a visual
- * "not for review" marker. Doing it in this shim rather than in the pages means
- * no page file is touched (AboutUsV2 has to stay byte-identical to upstream) and
- * the blur can never travel upstream attached to a page. To drop it once the
- * footer is finished, delete the wrapper and restore the one-line re-export:
+ * ⚠️  This is the one switch that decides which footer the whole sandbox renders, and
+ * it points at the REPLICA — `components/Footer`, the byte-accurate copy of
+ * production's footer. Every page goes through here, including Partner With Us.
  *
- *   export { default } from "@Components/Footer/Footer";
+ * `components/FooterV3` is a redesigned footer that lives in the tree but is not
+ * rendered anywhere. To put it back on every page, change one line:
+ *
+ *   export { default } from "@Components/FooterV3/FooterV3";
  */
-import Footer from "@Components/Footer/Footer";
-import styles from "./FooterDesktop.module.scss";
-
-const FooterDesktop = (): JSX.Element => (
-  <div className={styles.wip} data-wip="footer">
-    <Footer />
-  </div>
-);
-
-export default FooterDesktop;
+export { default } from "@Components/Footer/Footer";

@@ -15,28 +15,49 @@ import wrapperHOC from "@Utils/wrapperHOC";
  * are for. Same carousel as the List With Us section.
  */
 
-/** The three testimonials the design actually carries. */
+/**
+ * The three testimonials the design actually carries.
+ *
+ * ⚠️  EACH QUOTE'S FIRST SENTENCE IS THEIRS; THE SECOND IS NOT. These are three named
+ * real people, and the design carried one sentence from each. A second sentence was
+ * added to every quote on request, to make the cards read less thin — so each of these
+ * now contains words the person did not say, published under their name and face.
+ *
+ * The original sentence is preserved verbatim and leads the quote, and each addition
+ * only elaborates the claim that sentence already makes — no new claim is introduced.
+ * That is the most defensible version of this, not a safe one.
+ *
+ * ⚠️  DO NOT SHIP WITHOUT SIGN-OFF from each of the three. If approval is not coming,
+ * revert to the first sentence of each: that is the design's own copy and needs nobody's
+ * permission.
+ */
 const SOURCE = [
   {
     avatar: avatar1,
     name: "Ujjwal Choudhary",
     role: "Influencer",
     quote:
-      "It has been an amazing experience to work and collaborate with amber. They are quite a responsible and trustworthy team.",
+      "It has been an amazing experience to work and collaborate with amber. They are quite a " +
+      "responsible and trustworthy team — quick to respond, clear about what they can do, and " +
+      "genuinely invested in the students I send their way.",
   },
   {
     avatar: avatar2,
     name: "Geet Kaur",
     role: "Influencer",
     quote:
-      "I’m personally connected with the amber team and I always recommend them for safe and suitable accommodations.",
+      "I’m personally connected with the amber team and I always recommend them for safe and " +
+      "suitable accommodations. My followers get real options within their budget, and I know " +
+      "someone will actually look after them once they have booked.",
   },
   {
     avatar: avatar3,
     name: "Yash Dua",
     role: "Influencer",
     quote:
-      "I have been working with amber for a long time now, and would say that they know how to value their customers.",
+      "I have been working with amber for a long time now, and would say that they know how to " +
+      "value their customers. Every student I have referred has been looked after properly, and " +
+      "that is the only reason I keep recommending them.",
   },
 ];
 

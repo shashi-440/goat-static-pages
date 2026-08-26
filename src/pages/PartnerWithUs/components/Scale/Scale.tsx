@@ -18,7 +18,7 @@ import student5 from "../../assets/student-avatar-5.png";
 import wrapperHOC from "@Utils/wrapperHOC";
 
 /**
- * "Student housing, solved at global scale." bento — Figma node 2141:3681.
+ * "Housing, solved at global scale." bento — Figma node 2141:3681.
  *
  * A 2-column grid, mirrored from the List With Us bento: the 2x2 of stat cards
  * comes first and the tall card holding the full amber-connect mock over a photo
@@ -109,19 +109,19 @@ const Scale = () => {
     <section ref={sectionRef} className={`${styles.section} ${alive ? styles.alive : ""}`}>
       <div className={styles.inner}>
         <Reveal as="h2" className={styles.heading}>
-          Student housing, solved at global scale.
+          Housing, solved at global scale.
         </Reveal>
 
         <div className={styles.bento}>
           {/* 2x2 of stat cards — the left column in this design. */}
           <div className={styles.grid}>
             <div className={styles.gridRow}>
-              {/* ------------------------------------------------- 25+ */}
+              {/* ------------------------------------------------ 240+ */}
               <div className={styles.card}>
                 <div className={`${mock.panel} ${styles.cardPanel}`}>
                   <div className={mock.crumb}>
                     <span className={mock.crumbL}>COVERAGE</span>
-                    <span className={mock.crumbR}>25 REGIONS</span>
+                    <span className={mock.crumbR}>240 CITIES</span>
                   </div>
                   <span className={mock.rule} />
                   <div className={styles.rows}>
@@ -141,10 +141,10 @@ const Scale = () => {
                 <div className={styles.cardHead}>
                   <CountUp
                     className={`${styles.cardNumber} ${styles.cardNumberBlue}`}
-                    target={25}
+                    target={240}
                     suffix="+"
                   />
-                  <span className={styles.cardLabel}>Countries and Region</span>
+                  <span className={styles.cardLabel}>Cities</span>
                 </div>
 
                 <span className={styles.cardFade} aria-hidden="true" />
@@ -235,11 +235,11 @@ const Scale = () => {
                 <span className={styles.cardFade} aria-hidden="true" />
               </div>
 
-              {/* ------------------------------------------------ 300K */}
+              {/* ------------------------------------------------ 160+ */}
               <div className={styles.card}>
                 <div className={`${mock.panel} ${styles.cardPanel}`}>
                   <div className={mock.crumb}>
-                    <span className={mock.crumbL}>STUDENTS HELPED</span>
+                    <span className={mock.crumbL}>SOURCE COUNTRIES</span>
                     <span className={mock.crumbR}>THIS YEAR</span>
                   </div>
                   <span className={mock.rule} />
@@ -259,7 +259,7 @@ const Scale = () => {
                           />
                         ))}
                       </span>
-                      <span className={`${mock.value} ${mock.valueInk}`}>+300K</span>
+                      <span className={`${mock.value} ${mock.valueInk}`}>160+</span>
                     </span>
                     <span className={`${mock.badge} ${mock.badgeGreen}`}>+12% YOY</span>
                   </div>
@@ -285,8 +285,8 @@ const Scale = () => {
                 </div>
 
                 <div className={styles.cardHead}>
-                  <CountUp className={styles.cardNumber} target={300} suffix="K" />
-                  <span className={styles.cardLabel}>Students helped each year</span>
+                  <CountUp className={styles.cardNumber} target={160} suffix="+" />
+                  <span className={styles.cardLabel}>Student source countries</span>
                 </div>
 
                 <span className={`${styles.cardFade} ${styles.cardFadeLow}`} aria-hidden="true" />

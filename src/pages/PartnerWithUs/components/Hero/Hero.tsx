@@ -1,37 +1,31 @@
 import { useEffect, useRef } from "react";
 import Image from "@Components/Image";
 import CustomLink from "@Components/CustomLink";
-import { UniversityPartners } from "../LogoStrip/LogoStrip";
 // Shared with About Us / Scholarship rather than copied, so every v2 page uses
 // one scroll-reveal.
 import Reveal from "../../../AboutUsV2/components/Reveal/Reveal";
 import styles from "./Hero.module.scss";
 import heroPhoto from "../../assets/hero-bg.jpg";
-import avatar1 from "../../assets/avatar-1.jpg";
-import avatar2 from "../../assets/avatar-2.jpg";
-import avatar3 from "../../assets/avatar-3.jpg";
+import avatar1 from "../../assets/testimonial-avatar-1.png";
+import avatar2 from "../../assets/testimonial-avatar-2.png";
+import avatar3 from "../../assets/testimonial-avatar-3.png";
 import wrapperHOC from "@Utils/wrapperHOC";
 
 /**
  * Hero — Figma node 2141:4336.
  *
- * Centred headline with an overlapping avatar cluster sitting inline on the
- * second line, the lede + blue pill under it, then the 1200px photo and the
- * university logo strip. The strip lives inside the hero in this design rather
- * than in a section of its own.
+ * Centred two-line headline, the lede + blue pill under it, then the 1200px photo.
  *
- * The design positions the avatar cluster absolutely into a run of spaces in the
- * headline; here it is a real inline element between "get" and "global", so the
- * gap stays correct when the headline rewraps.
+ * The node also put a "University Partners" logo strip inside the hero (2141:4368).
+ * It is gone — removed by request — which is why the hero now ends on the photo.
+ *
+ * The headline carries an overlapping three-avatar cluster between "Your" and
+ * "audience" — sitting in front of the noun the faces illustrate. They are the SAME three illustrations the
+ * Testimonials section uses, imported from `assets/testimonial-avatar-*.png` rather
+ * than a second set: a page showing one trio of faces in the hero and a different
+ * trio further down reads as stock art in both places.
  */
-const AVATARS = [
-  // Each avatar carries its own crop from the node — the source photos are not
-  // framed identically, so one shared object-position would misalign the faces.
-  { src: avatar1, alt: "", left: "-7.5%", top: "-7.5%", size: "115%" },
-  { src: avatar2, alt: "", left: "-17%", top: "-19.74%", size: "134%" },
-  { src: avatar3, alt: "", left: "0.18%", top: "2.56%", size: "100%" },
-];
-
+const AVATARS = [avatar1, avatar2, avatar3];
 // Distance (px) over which the hero image eases from full-bleed to contained.
 // Same value as the About Us hero, so the two pages scroll identically.
 const SHRINK_DISTANCE = 420;
@@ -76,28 +70,27 @@ const Hero = () => {
     <section className={styles.hero} data-pwu-hero>
       <div className={styles.heroRow}>
         <Reveal as="h1" className={styles.title}>
-          Partner with amber student
-          <br />
-          get{" "}
+          Your{" "}
+          {/* Before the noun, not after the sentence. aria-hidden, and the headline
+              reads correctly without it: the faces illustrate "audience", they do not
+              add a word to the sentence. */}
           <span className={styles.avatars} aria-hidden="true">
-            {AVATARS.map((avatar, i) => (
-              // eslint-disable-next-line react/no-array-index-key
-              <span className={styles.avatar} key={i}>
-                <img
-                  src={avatar.src}
-                  alt=""
-                  className={styles.avatarImage}
-                  style={{
-                    left: avatar.left,
-                    top: avatar.top,
-                    width: avatar.size,
-                    height: avatar.size,
-                  }}
-                />
-              </span>
+            {AVATARS.map((src, i) => (
+              <Image
+                src={src}
+                alt=""
+                // eslint-disable-next-line react/no-array-index-key
+                key={i}
+                className={styles.avatar}
+                width={44}
+                height={44}
+                isNotLazy
+              />
             ))}
           </span>{" "}
-          global access
+          audience.
+          <br />
+          Our global housing network.
         </Reveal>
 
         <Reveal className={styles.lede} delay={120}>
@@ -116,15 +109,13 @@ const Hero = () => {
       <div ref={mediaRef} className={styles.photo}>
         <Image
           src={heroPhoto}
-          alt="Students sharing a meal around the table of a sunlit student apartment"
+          alt="A student working at a desk in their room, with a laptop, notes and a shelf of books behind them"
           className={styles.photoImage}
           width="100%"
           height="100%"
           isEagerLoad
         />
       </div>
-
-      <UniversityPartners />
     </section>
   );
 };

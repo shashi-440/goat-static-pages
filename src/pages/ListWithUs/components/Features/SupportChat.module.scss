@@ -1,0 +1,201 @@
+// The cropping frame itself — no header, no inner wrapper. The thread is pinned to
+// its bottom edge, which is what lets a new bubble grow the column upward.
+.panel {
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+/* ------------------------------------------------------------------- thread */
+
+// Bottom-anchored: appending a bubble grows the column upward on its own, so there
+// is no scroll position to drive. The `transform` is written by the component's
+// layout effect to turn that growth into a glide — see the note in SupportChat.tsx.
+// Padding, not a shorter frame. The card gives its media window no bottom or right
+// inset — the screenshot cards WANT to bleed off both — so the breathing room for a
+// thread of bubbles has to come from inside it.
+//
+// It is on `.thread` rather than on `.panel` on purpose: the glide measures this
+// element's `offsetHeight`, and padding is inside that box, so the two agree. Move
+// it to the panel and the measured height stops matching what is on screen.
+.thread {
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  left: 0;
+  padding-bottom: 16px;
+  // The right-aligned question bubbles would otherwise sit flush against the card's
+  // edge, which the media window does not inset either.
+  padding-right: 14px;
+  position: absolute;
+  right: 0;
+  will-change: transform;
+}
+
+// One row per message, so the avatar sits beside the bubble instead of inside it.
+// `flex-end` on the cross axis pins the avatar to the bubble's LAST line, which is
+// where a face belongs on a bubble that wrapped to two.
+.line {
+  align-items: flex-end;
+  display: flex;
+  gap: 6px;
+  // Keyed off mount, so it plays once per message and never replays on re-render.
+  // On the row rather than the bubble, so the avatar arrives with its bubble.
+  animation: pop 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.lineAsk {
+  justify-content: flex-end;
+}
+
+.lineReply {
+  justify-content: flex-start;
+}
+
+// 12px / 17px, up from 9.5 / 14. The original size came from scaling a full-size chat
+// down to fit a card's media window, and at 9.5px it had crossed from "small UI" into
+// "unreadable" — this card is the only place on the page carrying type under 11px.
+//
+// ⚠️  THE PADDING WENT UP WITH IT, and had to. A bubble's inset is proportional to its
+// type; holding 6px/9px under 12px text leaves the words touching the corner radius and
+// the bubble stops reading as a bubble.
+//
+// ⚠️  TALLER BUBBLES MEAN THE COLUMN OVERFLOWS ITS WINDOW FURTHER. That is safe rather
+// than broken — `.thread` is absolutely positioned at `bottom: 0` and the card clips it,
+// so extra height runs off the TOP under `.fade`, which is the effect the component wants
+// anyway. It does mean `WINDOW` in SupportChat.tsx now seeds more messages than can be
+// seen; see the note there.
+.bubble {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 17px;
+  // Never the full width: a bubble spanning the frame stops reading as a bubble. The
+  // ask side leaves room for the avatar and its gap on top of that.
+  max-width: 76%;
+  padding: 7px 11px;
+  width: fit-content;
+}
+
+.lineAsk .bubble {
+  max-width: calc(76% - 27px);
+}
+
+// One tight corner on the speaker's side, which is what makes these read as speech
+// rather than as tags. Cheaper and cleaner than a drawn tail at this size.
+.ask {
+  background: #1c64f2;
+  border-radius: 12px 12px 4px 12px;
+  color: #fff;
+}
+
+.reply {
+  background: #fff;
+  border: 1px solid #eceef1;
+  border-radius: 12px 12px 12px 4px;
+  box-shadow: 0 1px 2px rgba(17, 25, 40, 0.03);
+  color: #1f2937;
+}
+
+// A ring in the card's own colour, so overlapping bubbles cannot make the face look
+// pasted onto one of them.
+// ⚠️  THE CLIP WAS ALWAYS THERE — `border-radius: 50%` on the `<img>` itself, verified computed at
+// 50% on all five avatars at both pixel ratios. What was missing is an EDGE. The ring below is
+// `#f7f7f7`, the card panel's exact colour, so it separates overlapping bubbles without drawing
+// anything; and this photo's background is #B0BABF, which sits at 1.85:1 against that panel. So the
+// only thing with real contrast was the head-and-shoulders inside — a roughly square silhouette —
+// and the round crop had nothing to announce it. The result read as a square photo.
+//
+// The hairline is what fixes that: a 1px edge at 8% ink follows the radius and states the circle.
+//
+// ⚠️  `box-sizing: border-box` IS LOAD-BEARING and set here rather than inherited. With a
+// content-box img, a 1px border makes this 22px, and the row's `align-items: flex-end` then lifts
+// the avatar a pixel off the bubble's last line — visible because there are five of them down one
+// edge.
+//
+// A border rather than an inset box-shadow: inset shadows on replaced elements are painted
+// inconsistently across engines, and this has to be reliable on a 20px circle.
+.avatar {
+  border: 1px solid rgba(17, 25, 40, 0.08);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1.5px #f7f7f7;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  height: 20px;
+  object-fit: cover;
+  width: 20px;
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: translateY(5px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* --------------------------------------------------------- typing indicator */
+
+.typing {
+  align-items: center;
+  display: flex;
+  gap: 3px;
+  padding: 8px 9px;
+
+  span {
+    animation: blink 1.1s ease-in-out infinite;
+    background: #c2c8d0;
+    border-radius: 50%;
+    height: 4px;
+    width: 4px;
+
+    // Staggered, so the three read as a wave and not as one switch.
+    &:nth-child(2) {
+      animation-delay: 0.18s;
+    }
+
+    &:nth-child(3) {
+      animation-delay: 0.36s;
+    }
+  }
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 0.28;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-1px);
+  }
+}
+
+/* -------------------------------------------------------------- the top fade */
+
+// Card-coloured, not white: this sits on the #f7f7f7 card, and a white gradient
+// would show as a pale band across the top of the thread.
+.fade {
+  background: linear-gradient(#f7f7f7 10%, rgba(247, 247, 247, 0));
+  height: 46px;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .line {
+    animation: none;
+  }
+
+  .typing span {
+    animation: none;
+  }
+}

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "@Components/Image";
 import CustomLink from "@Components/CustomLink";
 import config from "@Config/index";
@@ -22,29 +22,29 @@ const NAV_LINKS = [
 ];
 
 /**
- * Announcement rail + navbar — Figma node 2141:3647.
+ * Navbar — Figma node 2141:3647.
  *
- * Rail and navbar travel together as one fixed stack (42px + 64px = 106px, the
- * page's top padding), so the rail never slides under the fixed bar.
+ * ⚠️  THE ANNOUNCEMENT RAIL IS GONE, and with it the slide-up. There used to be a
+ * 42px rail above the bar ("Download amber's UK PBSA Demand & Pricing Update…"), and
+ * the two travelled as one fixed stack that translated up by exactly the rail's
+ * measured height on first scroll, so the rail left the viewport and the bar took the
+ * top edge. Removed by request.
  *
- * The Figma frame draws only the 64px bar, because it draws the page at the top
- * where the rail is the thing above it and the bar's CTA has not opened out yet.
- * The rail and the scroll-in CTA are carried over from List With Us so the two
- * partner-facing pages share one shell.
+ * That machinery went with it — the ref, the measured height, the resize listener and
+ * the transform existed only to move the rail. `scrolled` stays, because it also
+ * drives the bar's glass effect. The page's own top padding may now be 42px too tall;
+ * this component no longer has an opinion about it.
+ *
+ * The Figma frame draws only the 64px bar, so this is now closer to the node than it
+ * was. The scroll-in CTA is still carried over from List With Us.
  */
 const Header = () => {
   // `true` once the user has scrolled past the very top — the glass effect
   // (blur, tint, shadow) only appears after this; at the top the bar is plain.
-  // It also drives the rail: the whole stack slides up by exactly the rail's
-  // height, so the rail leaves the viewport and the navbar takes the top edge.
   const [scrolled, setScrolled] = useState(false);
   // `true` once the hero is half past the top of the viewport — that is when the
   // CTA opens out in the bar, by which point the hero's own CTA has gone.
   const [ctaShown, setCtaShown] = useState(false);
-  const railRef = useRef<HTMLDivElement>(null);
-  // Measured rather than hard-coded at 42px — below ~1180px the rail's sentence
-  // wraps to two lines and gets taller, and the slide has to clear all of it.
-  const [railHeight, setRailHeight] = useState(0);
 
   useEffect(() => {
     // Read live rather than cached: the hero's own scroll effect changes its
@@ -72,38 +72,8 @@ const Header = () => {
     };
   }, []);
 
-  useEffect(() => {
-    const measure = () => setRailHeight(railRef.current?.offsetHeight || 0);
-    measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-  }, []);
-
   return (
-    <header
-      className={styles.stack}
-      style={scrolled && railHeight ? { transform: `translateY(-${railHeight}px)` } : undefined}
-    >
-      <div
-        className={styles.rail}
-        ref={railRef}
-        // Off-screen once it has slid away, so it is not a tab stop either.
-        aria-hidden={scrolled || undefined}
-      >
-        <p className={styles.railText}>
-          Download <strong className={styles.railStrong}>amber&apos;s UK PBSA Demand &amp; Pricing Update</strong>{" "}
-          (Jan&apos;26 vs Mar&apos;26) for demand signals, amber&apos;s pricing recommendations, and more.
-        </p>
-        <CustomLink
-          href="/"
-          className={styles.railCta}
-          dataTestId="partner-with-us-rail-cta"
-          tabIndex={scrolled ? -1 : undefined}
-        >
-          Get now
-        </CustomLink>
-      </div>
-
+    <header className={styles.stack}>
       <nav
         className={`${navStyles.navbar} ${styles.navbar} ${scrolled ? navStyles.scrolled : ""}`}
       >

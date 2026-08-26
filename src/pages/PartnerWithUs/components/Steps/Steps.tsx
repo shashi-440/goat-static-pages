@@ -272,11 +272,11 @@ const Steps = () => {
 
               <div className={styles.copy}>
                 {/* Figma labels this step "Affiliate Link", which belongs to the
-                    benefits section — the mock-up and the body copy are both
-                    about the contact form. Named for what it shows. */}
-                <h3 className={styles.stepTitle}>Fill the form</h3>
+                    benefits section — the mock-up is the signup form and the
+                    body copy is what it asks for. */}
+                <h3 className={styles.stepTitle}>Signup with us</h3>
                 <p className={styles.stepBody}>
-                  Fill out a simple contact form and get started instantly.
+                  Share a few details about your business and the customers you serve.
                 </p>
               </div>
             </div>
@@ -327,9 +327,10 @@ const Steps = () => {
               </div>
 
               <div className={styles.copy}>
-                <h3 className={styles.stepTitle}>Get Contacted</h3>
+                <h3 className={styles.stepTitle}>We get you set up</h3>
                 <p className={styles.stepBody}>
-                  Finalise your onboarding and become an official partner of amber.
+                  Our partnerships team aligns on the model, commercials and integration
+                  that works best for you.
                 </p>
               </div>
             </div>
@@ -392,9 +393,10 @@ const Steps = () => {
               </div>
 
               <div className={styles.copy}>
-                <h3 className={styles.stepTitle}>Enhance your student offerings</h3>
+                <h3 className={styles.stepTitle}>Start helping students book</h3>
                 <p className={styles.stepBody}>
-                  Add accommodation to your portfolio and help students find homes easily.
+                  Give your students access to our global housing network and earn from
+                  completed bookings.
                 </p>
               </div>
             </div>

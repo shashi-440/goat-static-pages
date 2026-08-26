@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 682.667 682.667" fill="none">
+  <defs><clipPath id="duoDataClip" clipPathUnits="userSpaceOnUse"><path d="M0 512h512V0H0Z"/></clipPath></defs>
+  <path d="M133 66H41v260h92zM297 66h-82v240h82zM471 66h-92v230h92z" transform="matrix(1.33333 0 0 -1.33333 0 682.667)" fill="#C3DDFD"/>
+  <g clip-path="url(#duoDataClip)" transform="matrix(1.33333 0 0 -1.33333 0 682.667)">
+    <path d="M0 0h492" transform="translate(10 66)" fill="none" stroke="#000" stroke-width="19.319" stroke-linecap="round"/>
+  </g>
+  <g fill="none" stroke="#000" stroke-width="19.319" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M215 66h-82v180h82z" transform="matrix(1.33333 0 0 -1.33333 0 682.667)"/>
+    <path d="M379 66h-82v300h82z" transform="matrix(1.33333 0 0 -1.33333 0 682.667)"/>
+    <path d="m0 0 89.5-45 157 100 105.514-34.22" transform="matrix(1.33333 0 0 -1.33333 112.667 161.333)"/>
+    <path d="m0 0 15.78-25.514-25.514-15.781" transform="matrix(1.33333 0 0 -1.33333 560.98 99.607)"/>
+  </g>
+</svg>

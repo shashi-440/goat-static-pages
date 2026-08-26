@@ -13,6 +13,9 @@
   // section slots, so it has to say so — without them the stage came out 650x458 inside
   // a 650x650 box and the sphere was visibly cut off at the bottom.
   --globe-max-width: 100%;
+  // Matches MAP_ASPECT in GlobeTravel.tsx. The two are the same shape stated twice — the
+  // JS sizes the layer box, this sizes the stage inside it — and a mismatch shows as the
+  // map being letterboxed within its own canvas.
   --globe-aspect: 1 / 1;
   --globe-aspect-mobile: 1 / 1;
 
