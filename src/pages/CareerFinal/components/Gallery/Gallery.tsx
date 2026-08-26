@@ -139,9 +139,22 @@ const CARD_GAP = 0;
 const radiusFor = (step: number) =>
   Math.round((CARD_W + CARD_GAP) / (2 * Math.tan((Math.PI * step) / 360)));
 
-// Cards this far (in slots) from the front are edge-on slivers; they fade out
-// rather than being drawn as 1px lines.
-const FADE_SLOTS = 4.2;
+// How far from the front of the arc a card stays visible, in DEGREES.
+//
+// Degrees, not slots. This was `4.2` slots, which was fine at sixteen cards (a
+// slot is 22.5deg, so ~95deg) but is scale-dependent in the worst way: a slot is
+// 360/count, so at six cards a row the same 4.2 became 252deg — wider than the
+// visible hemisphere. Nothing ever faded, the far side of the cylinder stayed
+// fully opaque, and a card at rotateY(120deg) rendered 375px tall against a 190px
+// row (perspective magnifies whatever swings toward the viewer). That is what made
+// the rows overlap and spill out of the section.
+//
+// 78deg: a card is worth showing while it still faces the viewer. Past ~80deg it
+// is edge-on, and past 90 it is behind the cylinder's waist where the projection
+// blows it up.
+const FADE_DEG = 78;
+// Width of the fade ramp, also in degrees.
+const FADE_RAMP = 26;
 
 /**
  * Per-card opacity at `deg` degrees from the front of the arc.
@@ -155,12 +168,13 @@ const FADE_SLOTS = 4.2;
  * Only opacity varies, so cards edge-on to the viewer leave rather than
  * collapsing into a hard 1px line at the end of the arc.
  */
-const opacityAt = (deg: number, step: number) => {
+const opacityAt = (deg: number) => {
+  // Angular distance from the front of the arc: 0deg faces the viewer, 180deg is
+  // directly behind. The expression already yields that distance — do not negate
+  // it against 180, which inverts the fade and hides the front of the strip.
   const d = Math.abs((((deg % 360) + 540) % 360) - 180);
-  const slots = d / step;
-  // Fade over the last 1.3 slots before FADE_SLOTS, smoothstepped so neither
-  // end of the fade has a corner in it.
-  const t = Math.min(1, Math.max(0, (slots - (FADE_SLOTS - 1.3)) / 1.3));
+  // Smoothstepped over FADE_RAMP so neither end of the fade has a corner in it.
+  const t = Math.min(1, Math.max(0, (d - (FADE_DEG - FADE_RAMP)) / FADE_RAMP));
   const k = t * t * (3 - 2 * t);
   return Number((1 - k).toFixed(3));
 };
@@ -249,7 +263,7 @@ const Gallery = () => {
       // card 60x a second for a value only the compositor consumes.
       cardRefs.current[r].forEach((el, i) => {
         if (!el) return;
-        el.style.opacity = String(opacityAt(i * step + angle, step));
+        el.style.opacity = String(opacityAt(i * step + angle));
       });
     });
   }, []);

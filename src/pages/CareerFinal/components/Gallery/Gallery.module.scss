@@ -24,6 +24,11 @@ $img-gap: 10px;
 // each curves independently, so a wide vertical gutter makes the block feel
 // like three unrelated carousels rather than one gallery.
 $row-gap: 14px;
+// The row's own height. See `.row`: perspective magnifies the off-centre cards,
+// so the row has to be the PROJECTED height, not the card height, or they paint
+// outside it. 240 covers the ~227px worst case at six cards a row with a little
+// slack.
+$row-h: 240px;
 
 // Flat white, full height.
 //
@@ -136,8 +141,18 @@ $row-gap: 14px;
 
 // One row of the stack. Each is its own 3D context holding one ring, and each
 // clips its own overflow so a card swinging wide cannot overlap the row above.
+// Taller than a card on purpose.
+//
+// A card is $card-h flat on, but the ones away from the front of the arc are
+// nearer the viewer and perspective magnifies them — at six cards a row the
+// steepest visible card projects ~227px against a 190px card. Sizing the row to
+// the CARD left those cards painting outside it, so neighbouring rows overlapped
+// and the strip spilled past the section. `$row-h` is the projected worst case,
+// and `overflow: hidden` clips anything beyond it so a row can never bleed into
+// the one below.
 .row {
-  height: $card-h;
+  height: $row-h;
+  overflow: hidden;
   position: relative;
   transform-style: preserve-3d;
   width: 100%;
@@ -154,10 +169,10 @@ $row-gap: 14px;
   height: $card-h;
   left: 50%;
   position: absolute;
-  // Was `30px`, the hand-tuned clearance for a single ring on a taller stage.
-  // Each row is now exactly $card-h and owns its own box, so the ring sits flush
-  // at its top and the row gap does the spacing instead.
-  top: 0;
+  // Centred in the taller row rather than pinned to its top, so the arc's
+  // magnified cards have equal room above and below.
+  top: 50%;
+  margin-top: -$card-h * 0.5;
   transform-style: preserve-3d;
   width: $card-w;
   // Centre the ring's own box in its row before any rotation.
