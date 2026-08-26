@@ -23,25 +23,7 @@ $img-gap: 10px;
 // $img-gap's horizontal rhythm: the rows already read as separate bands because
 // each curves independently, so a wide vertical gutter makes the block feel
 // like three unrelated carousels rather than one gallery.
-// The gap between the CARDS, not between the row boxes. The boxes are 420px tall
-// around 190px cards — the surplus is headroom for the arc's magnified edge cards
-// (see $row-h) and is not meant to be seen. `.row` pulls the difference back out
-// with a negative margin.
 $row-gap: 14px;
-// The row's own height. See `.row`: perspective magnifies the off-centre cards, so
-// the row has to be the PROJECTED height, not the card height, or they paint
-// outside it and rows collide.
-//
-// 420px covers the ~403px worst case for an eighteen-card ring faded at 78deg.
-//
-// Paired with FADE_DEG in Gallery.tsx. A wider fade and a bigger radius both raise
-// the projected height, so changing either without raising this reintroduces the
-// row overlap. Sizing the row generously is the right side of the trade: the fade
-// is what produces the curve, so it should not be shortened to fit a box.
-$row-h: 420px;
-// How much taller each row box is than its cards. Applied as a negative margin on
-// `.row` so the boxes overlap while the cards land $row-gap apart.
-$row-bleed: $row-h - $card-h;
 
 // Flat white, full height.
 //
@@ -139,6 +121,7 @@ $row-bleed: $row-h - $card-h;
   // of ~265px, and at 1200px the top and bottom rows sit far enough off the
   // camera's axis that their arcs visibly tilt away from the middle row's. 1700px
   // flattens that differential so the three read as parallel bands.
+  gap: $row-gap;
   perspective: 1700px;
   // 50% 50% would put the camera at the middle ROW's centre, so the top and
   // bottom rows would be viewed from off-axis and their arcs would skew in
@@ -154,49 +137,29 @@ $row-bleed: $row-h - $card-h;
 
 // One row of the stack. Each is its own 3D context holding one ring, and each
 // clips its own overflow so a card swinging wide cannot overlap the row above.
-// Taller than a card on purpose.
+// One row of the stack. Each is its own 3D context holding one ring.
 //
-// A card is $card-h flat on, but the ones away from the front of the arc are
-// nearer the viewer and perspective magnifies them — on this ring the steepest
-// visible card projects ~403px against a 190px card. Sizing the row to the CARD
-// left those cards painting outside it, so neighbouring rows overlapped and the
-// strip spilled past the section. `$row-h` is the projected worst case, and
-// `overflow: hidden` clips anything beyond it so a row can never bleed into the
-// one below whatever the geometry does.
+// NO `overflow` here, and that is load-bearing rather than an oversight: CSS makes
+// `transform-style: preserve-3d` behave as flat when overflow is anything but
+// visible, so `overflow: hidden` on this element silently flattens the ring inside
+// it and every card renders as a plain 2D rectangle — the cylinder disappears. It
+// was added once to stop rows overlapping and cost exactly that.
+//
+// The row is $card-h and the cards paint outside it; the stack's gap is what keeps
+// the rows apart, and the section's own `overflow: hidden` (which is NOT in a 3D
+// context) does the horizontal clipping.
 .row {
-  height: $row-h;
-  // Overlap the neighbouring boxes by their surplus height, so the CARDS sit
-  // $row-gap apart rather than the boxes doing. A negative `gap` on the stage
-  // would be the obvious way to express this and does not work — CSS rejects
-  // negative gap values outright (it compiles, then is ignored), which is why
-  // this is a margin.
-  margin-bottom: -$row-bleed + $row-gap;
-  overflow: hidden;
+  height: $card-h;
   position: relative;
   transform-style: preserve-3d;
   width: 100%;
-
-  // Nothing follows the last row, so its pull-up would only shorten the section.
-  &:last-child {
-    margin-bottom: -$row-bleed * 0.5;
-  }
 }
 
-.isDragging {
-  cursor: grabbing;
-}
-
-// The rotating ring. `translateZ` pushes the whole cylinder back so the near
-// wall lands at the screen plane rather than in front of it; the JS writes this
-// transform every frame, and the value here is only the pre-hydration state.
 .ring {
   height: $card-h;
   left: 50%;
   position: absolute;
-  // Centred in the taller row rather than pinned to its top, so the arc's
-  // magnified cards have equal room above and below.
-  top: 50%;
-  margin-top: -$card-h * 0.5;
+  top: 0;
   transform-style: preserve-3d;
   width: $card-w;
   // Centre the ring's own box in its row before any rotation.
@@ -219,12 +182,16 @@ $row-bleed: $row-h - $card-h;
   top: 0;
   width: $card-w;
 
-  // No padding. The gap between photos is CARD_GAP in Gallery.tsx now, seated on
-  // the ring itself. As padding here it foreshortened with its own card — 10px
-  // between the centre pair, 6px at the edges — which is what made the spacing
-  // look uneven. On the ring it is a fixed angular distance, so it projects to the
-  // same proportion everywhere.
+  // The gap between images lives INSIDE the card, as padding — not as a gap in the
+  // ring. Widening CARD_GAP instead opens a real hole between neighbours and the
+  // white page shows through the arc. Padding keeps the cards butted so the ring
+  // stays continuous while the photos are separated.
+  //
+  // border-box is essential: with content-box the padding would make the card
+  // 410px wide while the radius is derived from 400, so every pair would overlap
+  // 10px more than intended and the arc would tighten.
   box-sizing: border-box;
+  padding-right: $img-gap;
 }
 
 // Fills the frame without distorting.
