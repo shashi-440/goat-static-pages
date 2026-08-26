@@ -148,8 +148,16 @@ const MemberCard = ({ member, delay = 0 }: MemberCardProps) => {
     const py = (e.clientY - r.top) / r.height - 0.5; // -0.5 (top) … 0.5 (bottom)
     el.style.setProperty("--tilt-x", `${-py * MAX_TILT * 2}deg`);
   };
+  // Hovering the card flips it; leaving flips it back. The tilt is reset at the
+  // same time so the card is square-on before the flip runs — otherwise the
+  // leftover rotateX fights the flip's own rotation and the card lands crooked.
+  const handleEnter = () => {
+    cardRef.current?.style.setProperty("--tilt-x", "0deg");
+    setFlipped(true);
+  };
   const handleLeave = () => {
     cardRef.current?.style.setProperty("--tilt-x", "0deg");
+    setFlipped(false);
   };
 
   return (
@@ -158,6 +166,7 @@ const MemberCard = ({ member, delay = 0 }: MemberCardProps) => {
       className={`${styles.flipCard} ${shown ? styles.cardShown : ""}`}
       style={{ transitionDelay: `${delay}ms` }}
       onMouseMove={handleMove}
+      onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
     >
       <div className={styles.tilt}>
@@ -186,12 +195,16 @@ const MemberCard = ({ member, delay = 0 }: MemberCardProps) => {
                   <p className={styles.role}>{member.role}</p>
                 </div>
               </div>
+              {/* The card flips on hover, so this is really the keyboard path —
+                  hover is not available to keyboard users. Focus flips it too, so
+                  tabbing to the card reveals the story the same way. */}
               <button
                 type="button"
                 className={styles.toggle}
                 aria-label={`Read ${member.name}'s story`}
                 aria-expanded={flipped}
                 onClick={() => setFlipped(true)}
+                onFocus={() => setFlipped(true)}
               >
                 <span className={styles.plus} aria-hidden="true" />
               </button>

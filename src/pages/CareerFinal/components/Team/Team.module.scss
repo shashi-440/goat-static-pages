@@ -1,0 +1,297 @@
+// Flat white. This used to be a white-to-near-black gradient handing off to
+// CrewCTA, but the Gallery carousel now sits between the two, so the handoff had
+// nothing to hand off to — the darkening just ended mid-page.
+.section {
+  align-items: center;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+  padding: 80px var(--page-gutter);
+  position: relative;
+  width: 100%;
+}
+
+.header {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+.title {
+  color: $neutral9;
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -0.72px;
+  line-height: 40px;
+  margin: 0;
+  text-align: center;
+}
+
+.subtitle {
+  color: $neutral6;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.5;
+  margin: 0;
+  text-align: center;
+}
+
+/* ------------------------------------------------------- drifting columns */
+
+// The viewport. Its height is what the columns scroll *within*, and the mask
+// below is anchored to it.
+//
+// The fade is a `mask-image` rather than a pair of gradient overlays. The
+// section background is itself a white → near-black gradient, so a solid-colour
+// scrim would have to match a moving target and would band visibly against it.
+// Masking fades the cards to genuine transparency, so the effect is correct over
+// any backdrop. The stops are deliberately soft and asymmetric-free — a long
+// 18% ramp at each end with a `transparent → black` blend, which is what gives
+// the diffused dissolve rather than a hard cut.
+.columns {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(3, 1fr);
+  height: 620px;
+  margin: 0 auto;
+  max-width: 1280px;
+  overflow: hidden;
+  width: 100%;
+
+  // Two properties, not one: Safari and older Chrome need the -webkit- form, and
+  // autoprefixer does not add mask-image's prefix for this browserslist.
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.65) 9%,
+    #000 18%,
+    #000 82%,
+    rgba(0, 0, 0, 0.65) 91%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.65) 9%,
+    #000 18%,
+    #000 82%,
+    rgba(0, 0, 0, 0.65) 91%,
+    transparent 100%
+  );
+}
+
+.column {
+  min-height: 0;
+  // Each column runs its own loop; only the direction and duration differ.
+  overflow: hidden;
+}
+
+.track {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  // The animation translates by exactly -50%/+50% of the track, and the track
+  // holds two identical halves — so the wrap is seamless. `gap` is included in
+  // that 50% because it applies evenly between all children, including across
+  // the seam.
+  will-change: transform;
+}
+
+// Outer columns travel up, the middle one down. Both start offset by the full
+// distance of their first copy so the loop is already mid-flow on load rather
+// than snapping from a hard edge.
+.columnUp .track {
+  animation: driftUp var(--duration) linear infinite;
+}
+
+.columnDown .track {
+  animation: driftDown var(--duration) linear infinite;
+}
+
+@keyframes driftUp {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes driftDown {
+  from {
+    transform: translateY(-50%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+// Motion here is decorative and continuous, which is exactly the kind that
+// triggers vestibular discomfort — so it stops entirely rather than slowing.
+@media (prefers-reduced-motion: reduce) {
+  .columnUp .track,
+  .columnDown .track {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------- the card */
+
+.card {
+  background: #fff;
+  border: 1px solid rgba(17, 25, 40, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(17, 25, 40, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  margin: 0;
+  padding: 28px;
+}
+
+.quote {
+  color: $neutral8;
+  font-size: 17px;
+  font-weight: 400;
+  letter-spacing: -0.2px;
+  line-height: 28px;
+  margin: 0;
+}
+
+.author {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+}
+
+.avatar {
+  border-radius: 50%;
+  flex: 0 0 40px;
+  height: 40px;
+  object-fit: cover;
+  width: 40px;
+}
+
+// The avatar and its flag badge. `position: relative` so the flag can sit on the
+// avatar's corner; the flex sizing keeps it from being squeezed by the text.
+.avatarWrap {
+  display: block;
+  flex: 0 0 40px;
+  height: 40px;
+  position: relative;
+  width: 40px;
+}
+
+// Circular flag on the avatar's lower-right. Circular rather than the rectangle
+// the source PNGs are: a small rectangle beside a round avatar reads as a sticker
+// stuck on, where a disc reads as part of the same object.
+//
+// The white ring is what separates it from the photo behind — several of these
+// flags have white in them (GB, IN, EG, NG), so without the ring the badge's edge
+// disappears into whatever it overlaps.
+.avatarFlag {
+  background: #fff;
+  border-radius: 50%;
+  bottom: -2px;
+  box-shadow: 0 0 0 1.5px #fff, 0 1px 3px rgba(17, 25, 40, 0.28);
+  display: block;
+  height: 15px;
+  // `cover` on purpose: the flags are 72x72 squares and this is a circle, so the
+  // sides are trimmed rather than the flag being squashed into the disc.
+  object-fit: cover;
+  position: absolute;
+  right: -3px;
+  width: 15px;
+}
+
+.authorText {
+  min-width: 0;
+}
+
+.name {
+  color: $neutral8;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 20px;
+  margin: 0;
+}
+
+// The light-hearted aside, one step quieter than the department it follows so the
+// real information still leads.
+.fun {
+  color: $neutral4;
+}
+
+.role {
+  color: $neutral5;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 18px;
+  margin: 0;
+}
+
+/* ------------------------------------------------------------- responsive */
+
+@media (max-width: 900px) {
+  .section {
+    gap: 40px;
+    padding: 64px var(--page-gutter);
+  }
+
+  .title {
+    font-size: 32px;
+    letter-spacing: -0.58px;
+    line-height: 36px;
+  }
+
+  // Two columns at tablet: three tracks at this width leave the quotes too
+  // narrow to read comfortably.
+  .columns {
+    grid-template-columns: repeat(2, 1fr);
+    height: 540px;
+  }
+
+  // The third column is dropped rather than reflowed, so the remaining two keep
+  // their opposing directions and the effect is preserved.
+  .column:nth-child(3) {
+    display: none;
+  }
+
+  .card {
+    gap: 20px;
+    padding: 22px;
+  }
+
+  .quote {
+    font-size: 16px;
+    line-height: 26px;
+  }
+}
+
+@media (max-width: 600px) {
+  .title {
+    font-size: 27px;
+    letter-spacing: -0.5px;
+    line-height: 32px;
+  }
+
+  .subtitle {
+    font-size: 16px;
+  }
+
+  .columns {
+    grid-template-columns: 1fr;
+    height: 460px;
+  }
+
+  // Single column on phones. Keep the *middle* one (the down-drifting track) and
+  // drop the outer two — dropping column 2 instead would leave only an up-track,
+  // and the opposing-direction effect would be lost entirely.
+  .column:nth-child(1),
+  .column:nth-child(3) {
+    display: none;
+  }
+}

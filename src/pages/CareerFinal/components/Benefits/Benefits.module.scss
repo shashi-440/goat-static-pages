@@ -1,0 +1,179 @@
+// "Benefits" — a 3 x 2 card grid on the v2 section grey.
+//
+// Was a dark band (#151515 with #1d1d1d cards). It is #f7f7f7 now, the same grey
+// AboutUsV2's WhyAmberExists and the ListWithUs Faq/Testimonials sections use, so
+// the page shares one light palette instead of carrying a single dark island
+// between two white sections (Globe above, Values below).
+//
+// Card treatment inverts with it: a white fill on the grey band, lifted by a
+// hairline rather than a shadow. White-on-grey is only 8 levels apart, the same
+// separation problem the dark treatment had, so the border is doing the work.
+.section {
+  background: #f7f7f7;
+  display: flex;
+  justify-content: center;
+  padding: 96px var(--page-gutter);
+  width: 100%;
+}
+
+.inner {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  max-width: 1280px;
+  width: 100%;
+}
+
+// Centre-aligned header.
+.top {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 640px;
+  text-align: center;
+}
+
+// 40px/-0.72px, the scale every other section title on this page uses.
+// #202020, the colour AboutUsV2's grey section uses for the same 40px heading.
+.heading {
+  color: #202020;
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -0.72px;
+  line-height: 1.2;
+  margin: 0;
+}
+
+// $neutral6, the body grey the other light v2 sections use for a section lede.
+.lede {
+  color: $neutral6;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 28px;
+  margin: 0;
+}
+
+// Three columns, all cards the same height.
+//
+// `align-items` is left at its `stretch` default deliberately: every card in a
+// row then takes the height of the tallest, and `grid-auto-rows: 1fr` extends
+// that across both rows, so all six match rather than each row matching only
+// itself. The bodies are very unevenly sized ("Health & Wellbeing" is ~4x
+// "Time Away"), so the short cards carry trailing space — that is the trade for
+// a uniform grid, and the alternative is the ragged edges this replaces.
+.grid {
+  display: grid;
+  grid-auto-rows: 1fr;
+  gap: 24px;
+  grid-template-columns: repeat(3, 1fr);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+// The grid cell. This is the `Reveal`, so its transform belongs to the entrance
+// animation — the tilt lives two levels down instead.
+// The grid cell, and the PERSPECTIVE HOST. Perspective has to sit on the parent
+// of the rotating element — declared on the rotating element itself it flattens
+// the effect to a 2D skew.
+//
+// This is also the `Reveal`, so its own transform belongs to the entrance
+// animation and the tilt must not be applied here.
+.cardOuter {
+  display: flex;
+  min-width: 0;
+  perspective: 900px;
+}
+
+// Mouse target and tilt reference. Carries no paint of its own — it exists so the
+// pointer maths has a stable, unrotated box to measure against. Rotating the same
+// element you are measuring makes the cursor's position within it shift as it
+// tips, which feeds back into the next frame and makes the tilt jitter.
+.card {
+  --tilt-x: 0deg; // written by JS from the cursor's height within the card
+
+  display: flex;
+  width: 100%;
+}
+
+// The card surface AND the rotating layer. The background, border and radius live
+// here rather than on `.card` so the whole card tips — previously they sat on the
+// unrotated parent and only the contents moved inside a static frame.
+.tilt {
+  background: #fff;
+  border: 1px solid rgba(17, 25, 40, 0.08);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 232px;
+  padding: 26px;
+  transform: rotateX(var(--tilt-x));
+  transform-style: preserve-3d;
+  transition: transform 0.12s ease-out;
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tilt {
+    transform: none;
+    transition: none;
+  }
+}
+
+// Leads the card, above the title. `margin-bottom` rather than relying on the
+// column gap so the icon-to-title distance is tuned independently of the
+// title-to-body one.
+.cardIcon {
+  display: block;
+  height: 30px;
+  margin-bottom: 6px;
+  width: 30px;
+}
+
+.cardTitle {
+  color: $neutral9;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24px;
+  margin: 0;
+}
+
+// $neutral8 on white holds comfortably above 7:1, so the copy reads as body text
+// rather than receding into the card.
+.cardBody {
+  color: $neutral8;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 26px;
+  margin: 0;
+}
+
+@media (max-width: 1100px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .section {
+    padding: 64px var(--page-gutter);
+  }
+
+  .heading {
+    font-size: 32px;
+    letter-spacing: -0.5px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .card {
+    padding: 24px;
+  }
+}

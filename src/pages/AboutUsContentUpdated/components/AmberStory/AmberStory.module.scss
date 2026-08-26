@@ -1,0 +1,152 @@
+.section {
+  align-items: center;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 80px;
+  width: 100%;
+}
+
+.heading {
+  color: #202020;
+  font-size: 40px;
+  font-weight: 550;
+  letter-spacing: -0.72px;
+  line-height: 40px;
+  margin-bottom: 48px;
+  text-align: center;
+}
+
+// Carousel viewport clips the track; the track slides ONE card per click.
+.viewport {
+  max-width: 1280px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.track {
+  --per-view: 4;
+  --gap: 24px;
+  display: flex;
+  gap: var(--gap);
+  // Track box == viewport width, so `100%` in the inline translateX resolves to
+  // one viewport; cards overflow and are clipped, and the step of
+  // `(100% + gap) / per-view` advances exactly one card.
+  width: 100%;
+  transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1);
+  will-change: transform;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 24px;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  // Exactly `per-view` cards fill the viewport (accounting for the gaps).
+  flex: 0 0 calc((100% - (var(--per-view) - 1) * var(--gap)) / var(--per-view));
+  min-width: 0;
+  overflow: hidden;
+  padding-bottom: 16px;
+}
+
+// Fixed cover height, identical in every card. `aspect-ratio` alone derived the
+// height from the card's width, and because `.track` stretches all cards to the
+// tallest one, the covers in shorter-copy cards ended up a different height from
+// their neighbours. A flat height plus `flex-shrink: 0` pins them so all four
+// images line up regardless of how much text sits below.
+.cover {
+  flex: 0 0 auto;
+  height: 260px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.coverImage {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 24px;
+}
+
+// Month + year line. Identical to the original About Us `.date` rule so the two
+// pages read the same; the milestone heading now opens the description instead of
+// occupying its own line.
+.date {
+  color: #111928;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 24px;
+}
+
+.description {
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18px;
+}
+
+.controls {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.dots {
+  align-items: center;
+  background: #f7f7f7;
+  border-radius: 999px;
+  display: flex;
+  gap: 8px;
+  height: 40px;
+  padding: 0 28px;
+}
+
+.dot {
+  background: #8e8e8e;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  height: 8px;
+  padding: 0;
+  transition: width 0.2s ease, background 0.2s ease;
+  width: 8px;
+}
+
+.dotActive {
+  background: #202020;
+  width: 24px;
+}
+
+.navButton {
+  align-items: center;
+  background: #f0f0f0;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  display: flex;
+  height: 40px;
+  justify-content: center;
+  padding: 0;
+  transition: opacity 0.2s ease;
+  width: 40px;
+
+  img {
+    height: 16px;
+    width: 16px;
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.4;
+  }
+}

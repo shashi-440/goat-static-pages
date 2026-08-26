@@ -1,0 +1,22 @@
+// Sized inline (px) by the component so it matches whatever static icon it
+// replaces; this just pins the injected <svg> to the box.
+.icon {
+  display: block;
+  flex-shrink: 0;
+  // Magnifies the ARTWORK without changing the layout box, so a mark can be made
+  // to carry the same visual weight as a wider neighbour while the line it sits
+  // on keeps its height. Defaults to 1, so every existing caller is unaffected.
+  //
+  // `transform-origin` at the LEFT edge, not the default centre: scaling about the
+  // centre grows the art outward in both directions, which pushes it left of the
+  // column it belongs to and leaves the figure below looking un-aligned with it.
+  // Anchoring the left edge keeps the art flush with the number and label.
+  transform: scale(var(--icon-scale, 1));
+  transform-origin: left center;
+
+  svg {
+    display: block;
+    height: 100% !important;
+    width: 100% !important;
+  }
+}

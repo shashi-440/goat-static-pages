@@ -1,0 +1,84 @@
+.hero {
+  align-items: center;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  // Matches AboutUsV2: heading block sits 56px below the top of the hero
+  // section (itself starting under the 64px navbar); image 40px below the CTA.
+  // Horizontal gutter comes from the page so it tracks the Navbar's own.
+  padding: 56px var(--page-gutter) 0;
+  width: 100%;
+}
+
+.header {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 40px;
+  max-width: 900px;
+  text-align: center;
+}
+
+.title {
+  color: $neutral9;
+  font-size: 52px;
+  font-weight: 550;
+  letter-spacing: -1.04px;
+  line-height: 56px;
+  margin: 0;
+  text-align: center;
+}
+
+// Figma 2665:13553 puts 20px between the headline and the CTA.
+.cta {
+  margin-top: 20px;
+}
+
+// Hero media — identical treatment to AboutUsV2's hero.
+.media {
+  // --shrink goes 0 (full-bleed, edge-to-edge) → 1 (contained, rounded).
+  // Set by JS on scroll; defaults to 0 so the first paint is edge-to-edge.
+  --shrink: 0;
+  // Contained target width — the 1280px column (or the available width if less).
+  --contained: min(1280px, 100vw - 160px);
+
+  aspect-ratio: 1280 / 720;
+  overflow: hidden;
+
+  // The media is centred in the hero's padded content column, which is itself
+  // centred in the viewport, so a 100vw box spans edge to edge with no offset.
+  // Ease the width from the full viewport down to the contained column width.
+  width: calc(100vw - (100vw - var(--contained)) * var(--shrink));
+
+  // Corners round in as it contracts.
+  border-radius: calc(24px * var(--shrink));
+
+  // Load-time entrance: hidden until the title + CTA have appeared, then fades
+  // and rises in. Opacity/transform only, so it doesn't fight the width and
+  // border-radius scroll effect above.
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.mediaShown {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .media {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+.image {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}

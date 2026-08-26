@@ -29,7 +29,7 @@ const AboutUsV2 = () => (
     <Navbar
       links={[
         { label: "How it works", href: "/how-it-works-v2" },
-        { label: "Career", href: "/career-v2" },
+        { label: "Career", href: "/career" },
       ]}
     />
     <Hero />

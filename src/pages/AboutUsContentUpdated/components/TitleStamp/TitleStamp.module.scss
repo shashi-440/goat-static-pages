@@ -1,0 +1,98 @@
+// Inline stamp in the hero headline. Sized to the text line so it doesn't
+// stretch the line (matches the previous stamp behaviour).
+.stamp {
+  cursor: pointer;
+  display: inline-flex;
+  height: 1em;
+  margin: 0 4px;
+  position: relative;
+  vertical-align: middle;
+  width: 62px;
+}
+
+// The stamp box, kept out of the line box via absolute centring so it can grow
+// on hover without shifting the text. Holds the resting rotation, the hover
+// scale, and the 3D perspective for the flip. Aspect matches the SVG (277×272).
+.inner {
+  aspect-ratio: 277 / 272;
+  // Smaller at rest; enlarges on hover.
+  height: 59px;
+  inset: 0;
+  margin: auto;
+  perspective: 600px;
+  position: absolute;
+  transform: rotate(-4deg);
+  transform-origin: center;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  width: 60px;
+}
+
+// The whole stamp card (frame + photo). Keyed in the JSX so it re-mounts and
+// replays the page-flip each time the city changes.
+.card {
+  backface-visibility: hidden;
+  display: block;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  width: 100%;
+  animation: cardPageFlip 0.6s cubic-bezier(0.4, 0.1, 0.2, 1) both;
+}
+
+// City-photo window: the SVG's inner opening is inset ~10.6% on every side
+// (rect 29.5,28.7 → 247.1,243.3 within the 277×272 viewBox).
+.window {
+  inset: 10.6% 10.7% 10.6% 10.6%;
+  overflow: hidden;
+  position: absolute;
+}
+
+.photo {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+// The perforated frame sits BEHIND the photo (its scalloped white edge shows
+// around it). Fills the whole card.
+.frame {
+  height: 100%;
+  inset: 0;
+  object-fit: contain;
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+}
+
+// Preloaded copies — kept in the DOM (loaded) but invisible and out of layout.
+.preload {
+  height: 0;
+  left: -9999px;
+  overflow: hidden;
+  position: absolute;
+  width: 0;
+}
+
+// Hover: enlarge the whole stamp and straighten it slightly.
+.isHovered .inner {
+  transform: rotate(-2deg) scale(2.6);
+  z-index: 5;
+}
+
+// Page-flip: the whole card turns in on its vertical axis, like flipping a card.
+@keyframes cardPageFlip {
+  0% {
+    opacity: 0.35;
+    transform: rotateY(-90deg);
+  }
+
+  55% {
+    opacity: 1;
+    transform: rotateY(12deg);
+  }
+
+  100% {
+    transform: rotateY(0deg);
+  }
+}

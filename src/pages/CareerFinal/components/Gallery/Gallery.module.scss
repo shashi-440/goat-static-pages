@@ -1,0 +1,258 @@
+// Photo gallery — a 3D cylinder carousel, sitting above the closing CTA.
+//
+// The cards sit on the INNER wall of a cylinder with the viewer at its centre.
+// That is what produces the concave arc: the strip curves away at both edges and
+// bows toward the viewer in the middle. A flat row with a curve filter cannot do
+// this, because each card has to be genuinely angled in space.
+//
+// Card width here MUST match CARD_W in Gallery.tsx — the radius is derived from
+// it, so a mismatch leaves gaps or overlaps between cards on the ring.
+// Must match CARD_W / CARD_H in Gallery.tsx — the radius is derived from the
+// width, so a mismatch re-opens the gaps between cards. Landscape: office photos
+// are wide scenes and a tall crop cuts the subject off.
+$card-w: 400px;
+// Shorter than the single-row 265px. Three rows at that height stacked to ~820px
+// — most of a laptop viewport for one decorative band. At 190px the block is
+// ~600px, and because the radius is derived from the WIDTH the arc is unchanged;
+// only the vertical extent shrinks.
+$card-h: 190px;
+// Space between adjacent photos. Applied as padding inside each card, so the
+// cards themselves still meet and the ring stays continuous.
+$img-gap: 10px;
+// Vertical space between the three stacked rows. Deliberately tighter than
+// $img-gap's horizontal rhythm: the rows already read as separate bands because
+// each curves independently, so a wide vertical gutter makes the block feel
+// like three unrelated carousels rather than one gallery.
+$row-gap: 14px;
+
+// Flat white, full height.
+//
+// This carried a white -> #0a0a0a ramp in its last 16%, added to avoid a hard
+// edge against CrewCTA below. The ramp itself was the problem: over ~130px it
+// read as a long grey smear under the bottom row of photos rather than as a
+// transition, and it dulled the images it sat beneath.
+//
+// The section ends white now and CrewCTA opens on its own flat #0a0a0a, so the
+// boundary is a crisp line. That matches how every other seam on this page
+// works — Globe white -> Benefits grey -> Values white are all hard edges — so
+// the join reads as two deliberate panels rather than an unfinished fade.
+.section {
+  background: #fff;
+  // The ring is far wider than the viewport; this clips it rather than letting
+  // the page scroll sideways.
+  overflow: hidden;
+  // 240px at the bottom, up from 96px.
+  //
+  // The bottom row's cards paint well BELOW their row box — the arc's near cards
+  // are magnified by perspective and overhang by ~115px — so a 96px pad left the
+  // last row almost touching the dark CTA beneath it. This is the clean white band
+  // between the end of the strip and the section changing colour.
+  //
+  // Measuring this from the DOM misleads: the lowest card's box still runs ~57px
+  // past the section box, but that card is faded to near-zero opacity at its angle
+  // and `overflow: hidden` clips it anyway, so what the box says and what the eye
+  // sees are different. Judge it from a screenshot.
+  padding: 8px 0 240px;
+  position: relative;
+  width: 100%;
+}
+
+// Invisible marker for the region where the header must go white. The shared
+// Navbar looks for [data-nav-theme="dark"] and switches to its light logo and
+// links while such an element is behind the 64px header line.
+//
+// The cap has to sit OUTSIDE the gutter padding, not inside it. Previously this
+// was `max-width: 720px` with `padding: 0 var(--page-gutter)` on the same box —
+// and since the gutter is at least 80px a side, that left only ~560px of usable
+// width for a subtitle needing ~630px, so it always wrapped to two lines.
+//
+// The padding now lives on an outer box and the cap on the inner one, so 860px
+// means 860px of text width.
+.header {
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--page-gutter);
+  width: 100%;
+}
+
+.headerInner {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 0 48px;
+  // Wide enough to hold the subtitle on one line at 18px, with room to spare.
+  max-width: 860px;
+  text-align: center;
+}
+
+// 40px/-0.72px, the scale every other section title on this page uses.
+.title {
+  color: $neutral9;
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -0.72px;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.subtitle {
+  color: $neutral6;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 28px;
+  margin: 0;
+  // Balanced rather than nowrap: if a narrow viewport does force a break, two
+  // even lines read better than one long line and one orphaned word. nowrap
+  // would push the text past the gutter instead.
+  text-wrap: balance;
+}
+
+// ---- Stage ---------------------------------------------------------------
+// Owns the perspective and the gestures. The perspective origin sits at the
+// horizontal centre, so the nearest card is the middle one.
+//
+// Height is the card height plus room for the arc: cards at the edges are
+// rotated away and their corners swing below the centre card's baseline.
+// Now holds three stacked rows rather than one ring. The perspective lives here
+// and is INHERITED by all three, which is deliberate: one shared camera means
+// the rows share a vanishing point and read as one gallery seen from a single
+// viewpoint. Giving each row its own `perspective` would aim three cameras at
+// three separate centres and the stack would look like unrelated strips.
+.stage {
+  cursor: grab;
+  display: flex;
+  flex-direction: column;
+  gap: $row-gap;
+  // Deeper than the single-row 1200px. The stack spans ~600px vertically instead
+  // of ~265px, and at 1200px the top and bottom rows sit far enough off the
+  // camera's axis that their arcs visibly tilt away from the middle row's. 1700px
+  // flattens that differential so the three read as parallel bands.
+  gap: $row-gap;
+  perspective: 1700px;
+  // 50% 50% would put the camera at the middle ROW's centre, so the top and
+  // bottom rows would be viewed from off-axis and their arcs would skew in
+  // opposite directions. Anchoring the origin to the stack's own centre line
+  // keeps all three symmetric about the same axis.
+  perspective-origin: 50% 50%;
+  position: relative;
+  // Let a vertical swipe scroll the page while a horizontal one turns the rings.
+  touch-action: pan-y;
+  user-select: none;
+  width: 100%;
+}
+
+// One row of the stack. Each is its own 3D context holding one ring, and each
+// clips its own overflow so a card swinging wide cannot overlap the row above.
+// One row of the stack. Each is its own 3D context holding one ring.
+//
+// NO `overflow` here, and that is load-bearing rather than an oversight: CSS makes
+// `transform-style: preserve-3d` behave as flat when overflow is anything but
+// visible, so `overflow: hidden` on this element silently flattens the ring inside
+// it and every card renders as a plain 2D rectangle — the cylinder disappears. It
+// was added once to stop rows overlapping and cost exactly that.
+//
+// The row is $card-h and the cards paint outside it; the stack's gap is what keeps
+// the rows apart, and the section's own `overflow: hidden` (which is NOT in a 3D
+// context) does the horizontal clipping.
+.row {
+  height: $card-h;
+  position: relative;
+  transform-style: preserve-3d;
+  width: 100%;
+}
+
+.ring {
+  height: $card-h;
+  left: 50%;
+  position: absolute;
+  top: 0;
+  transform-style: preserve-3d;
+  width: $card-w;
+  // Centre the ring's own box in its row before any rotation.
+  margin-left: -$card-w * 0.5;
+}
+
+// ---- Cards ---------------------------------------------------------------
+// Each is rotated to its own angle and pushed out to the cylinder wall by an
+// inline transform from the component.
+// No border-radius. A rounded corner on each card cuts a notch out of the
+// strip's top and bottom edge at every join, which is exactly the "not smooth"
+// stepping this fixes — the arc has to read as one continuous band.
+.card {
+  backface-visibility: hidden;
+  height: $card-h;
+  left: 0;
+  // No overflow clip: the radius lives on the photo (below), and clipping here
+  // would square its corners back off against the card's own box.
+  position: absolute;
+  top: 0;
+  width: $card-w;
+
+  // The gap between images lives INSIDE the card, as padding — not as a gap in the
+  // ring. Widening CARD_GAP instead opens a real hole between neighbours and the
+  // white page shows through the arc. Padding keeps the cards butted so the ring
+  // stays continuous while the photos are separated.
+  //
+  // border-box is essential: with content-box the padding would make the card
+  // 410px wide while the radius is derived from 400, so every pair would overlap
+  // 10px more than intended and the arc would tighten.
+  box-sizing: border-box;
+  padding-right: $img-gap;
+}
+
+// Fills the frame without distorting.
+// The radius goes on the PHOTO, not the card. The card is the ring slot and its
+// right 10px is the inter-image gap, so rounding the card would put the corners
+// in the gap rather than on the picture.
+//
+// This is safe now in a way it was not before: when the cards were butted edge
+// to edge a radius cut a notch out of the strip's continuous top and bottom
+// edge. With the internal gap each photo is a discrete frame, so rounding reads
+// as intended.
+.photo {
+  border-radius: 8px;
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+@media (max-width: 1100px) {
+  .stage {
+    // A nearer camera on a narrower viewport, so the arc keeps its curve
+    // instead of flattening out across less width.
+    perspective: 950px;
+  }
+}
+
+@media (max-width: 900px) {
+  .section {
+    padding-bottom: 72px;
+  }
+
+  .title {
+    font-size: 32px;
+    letter-spacing: -0.5px;
+  }
+
+  // The cards keep their ring geometry (the radius is derived in JS), so the
+  // whole stack is scaled down instead — that preserves each arc exactly while
+  // fitting a phone. The negative margins reclaim the space the untransformed
+  // box would still occupy.
+  //
+  // Three rows at 0.6 would be ~600px of phone screen, which is most of a
+  // viewport for a decorative strip — so the bottom row is dropped and the
+  // remaining two scale a little smaller. Rows 1 and 2 are kept rather than 1
+  // and 3 because they spin in opposite directions; keeping two same-direction
+  // rows would lose the counter-drift that makes the stack read as depth.
+  .stage {
+    margin: -40px 0;
+    transform: scale(0.56);
+    transform-origin: center;
+  }
+
+  .row:nth-child(3) {
+    display: none;
+  }
+}

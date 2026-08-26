@@ -31,9 +31,27 @@ app.get("*", (req, res) => {
   void ssr(req, res);
 });
 
-app.listen(config.PORT, config.HOST, () => {
-  console.info(chalk.green(`==> ✅  Server started on ${config.HOST}:${config.PORT}`));
-  console.info(chalk.cyan(`==> 🚀  http://${config.HOST}:${config.PORT}/about-us-v2`));
+// Always bind. This process is only ever run directly — by `yarn dev`, and by
+// scripts/prerender.mjs, which spawns it and crawls it to write the static HTML.
+//
+// This used to be wrapped in `if (!process.env.VERCEL)`, for a deployment that
+// imported the app into a serverless function and did its own listening. That
+// function is gone: the site is prerendered at build time and served as static
+// files. The guard then became actively harmful, because Vercel sets VERCEL=1
+// during BUILDS as well — so the prerender's server would start, skip listen(),
+// and exit 0 without serving, failing the build with "Server exited with code 0
+// before serving anything."
+//
+// Host/port come from the platform when it provides them: PORT is the standard
+// env var, and binding must be 0.0.0.0 rather than localhost or a container
+// accepts no external traffic. Local dev is unchanged — LOCAL_PORT and localhost
+// still apply when nothing else is set.
+const port = Number(process.env.PORT) || config.PORT;
+const host = process.env.HOST || (process.env.PORT ? "0.0.0.0" : config.HOST);
+
+app.listen(port, host, () => {
+  console.info(chalk.green(`==> ✅  Server started on ${host}:${port}`));
+  console.info(chalk.cyan(`==> 🚀  http://${host}:${port}/about-us-v2`));
 });
 
 export default app;
