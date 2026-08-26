@@ -4,15 +4,23 @@ import wrapperHOC from "@Utils/wrapperHOC";
 import Reveal from "../../../AboutUsV2/components/Reveal/Reveal";
 import RolesButton from "../RolesButton/RolesButton";
 import styles from "./CrewCTA.module.scss";
-import crew1 from "../../assets/crew-1.jpg";
-import crew2 from "../../assets/crew-2.jpg";
+// The outer four are real teammates — two from India, two from elsewhere — so the
+// cluster reads as this team rather than as stock photography. Two of each, and
+// alternating across the fan (IN, non-IN, ?, non-IN, IN) so neither side is all
+// one office.
+//
+// The centre keeps crew-3.jpg: it is the largest circle at 123px and the only one
+// shot square-on at that size, and the real headshots are 160px crops that would
+// soften noticeably scaled up to it.
+import harshalImg from "../../assets/people/harshal-maniyar.jpg";
+import mirnaImg from "../../assets/people/mirna-abdo.jpg";
 import crew3 from "../../assets/crew-3.jpg";
-import crew4 from "../../assets/crew-4.jpg";
-import crew5 from "../../assets/crew-5.jpg";
+import danImg from "../../assets/people/dan-teo.jpg";
+import prachiImg from "../../assets/people/prachi-kamble.jpg";
 
 /**
  * Closing black CTA band (Figma 2665:13697), reusing AboutUsV2's CrewCTA
- * treatment: the same five crew photos, the same centre-outward fan reveal, and
+ * treatment: five faces, the same centre-outward fan reveal, and
  * the same plain (unringed) centre avatar, so the two pages read as one site.
  */
 const CrewCTA = () => {
@@ -48,19 +56,19 @@ const CrewCTA = () => {
     <section className={styles.section} id="open-roles" data-nav-theme="dark">
       <div ref={avatarsRef} className={`${styles.avatars} ${shown ? styles.avatarsShown : ""}`}>
         <span className={`${styles.avatar} ${styles.avatarSmall} ${styles.side} ${styles.left2}`}>
-          <Image src={crew1} alt="" className={styles.avatarImage} width={84} height={84} />
+          <Image src={harshalImg} alt="" className={styles.avatarImage} width={84} height={84} />
         </span>
         <span className={`${styles.avatar} ${styles.avatarMedium} ${styles.side} ${styles.left1}`}>
-          <Image src={crew2} alt="" className={styles.avatarImage} width={90} height={90} />
+          <Image src={mirnaImg} alt="" className={styles.avatarImage} width={90} height={90} />
         </span>
         <span className={`${styles.avatarCenter} ${styles.center}`}>
           <Image src={crew3} alt="" className={styles.avatarImage} width={123} height={123} />
         </span>
         <span className={`${styles.avatar} ${styles.avatarMedium} ${styles.side} ${styles.right1}`}>
-          <Image src={crew4} alt="" className={styles.avatarImage} width={90} height={90} />
+          <Image src={danImg} alt="" className={styles.avatarImage} width={90} height={90} />
         </span>
         <span className={`${styles.avatar} ${styles.avatarSmall} ${styles.side} ${styles.right2}`}>
-          <Image src={crew5} alt="" className={styles.avatarImage} width={84} height={84} />
+          <Image src={prachiImg} alt="" className={styles.avatarImage} width={84} height={84} />
         </span>
       </div>
 

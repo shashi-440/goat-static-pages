@@ -41,11 +41,18 @@ $row-gap: 14px;
   // The ring is far wider than the viewport; this clips it rather than letting
   // the page scroll sideways.
   overflow: hidden;
-  // Back to 96px. The 168px was headroom for the removed ramp — it had to start
-  // below the third row of cards so the photos were not dimmed by it. With a flat
-  // background the cards need no such clearance, and the extra 72px just left a
-  // band of empty white above the CTA.
-  padding: 8px 0 96px;
+  // 240px at the bottom, up from 96px.
+  //
+  // The bottom row's cards paint well BELOW their row box — the arc's near cards
+  // are magnified by perspective and overhang by ~115px — so a 96px pad left the
+  // last row almost touching the dark CTA beneath it. This is the clean white band
+  // between the end of the strip and the section changing colour.
+  //
+  // Measuring this from the DOM misleads: the lowest card's box still runs ~57px
+  // past the section box, but that card is faded to near-zero opacity at its angle
+  // and `overflow: hidden` clips it anyway, so what the box says and what the eye
+  // sees are different. Judge it from a screenshot.
+  padding: 8px 0 240px;
   position: relative;
   width: 100%;
 }
