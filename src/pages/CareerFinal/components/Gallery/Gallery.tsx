@@ -124,11 +124,14 @@ const CARD_W = 400;
 // kept in sync so the two files do not disagree about the card's shape.
 const CARD_H = 190;
 
-// ZERO. A positive gap opens a real hole in the ring and the white page shows
-// through it — that was the visible seam. At 0 the tangent seating already
-// leaves neighbours overlapping by ~12px on screen, so the strip is continuous;
-// the hairline between frames comes from each card's own inner edge instead.
-const CARD_GAP = 0;
+// The inter-photo gap, seated on the RING rather than as padding inside each card.
+//
+// It used to be `padding-right: $img-gap` on the card, which foreshortens with the
+// card it belongs to: measured 10px between the two centre photos but only 6px out
+// at the edges, which is the uneven spacing. A gap built into the ring's own
+// spacing is a fixed angular distance, so it projects to the same proportion of
+// every card and the rhythm reads as even all the way across.
+const CARD_GAP = 12;
 
 // r = (w + gap) / (2 * tan(step / 2)).
 //

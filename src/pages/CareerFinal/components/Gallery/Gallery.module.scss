@@ -219,17 +219,12 @@ $row-bleed: $row-h - $card-h;
   top: 0;
   width: $card-w;
 
-  // The gap between images lives INSIDE the card, as padding — not as a gap in
-  // the ring. Widening CARD_GAP instead opens a real hole between neighbours and
-  // the white page shows through the arc (verified: at 16px the seam turns
-  // positive). Padding keeps the cards butted so the ring stays continuous while
-  // the photos are separated.
-  //
-  // border-box is essential: with the default content-box the padding would make
-  // the card 410px wide, and the radius is derived from 400 — every pair would
-  // overlap by 10px more than intended and the arc would tighten.
+  // No padding. The gap between photos is CARD_GAP in Gallery.tsx now, seated on
+  // the ring itself. As padding here it foreshortened with its own card — 10px
+  // between the centre pair, 6px at the edges — which is what made the spacing
+  // look uneven. On the ring it is a fixed angular distance, so it projects to the
+  // same proportion everywhere.
   box-sizing: border-box;
-  padding-right: $img-gap;
 }
 
 // Fills the frame without distorting.
