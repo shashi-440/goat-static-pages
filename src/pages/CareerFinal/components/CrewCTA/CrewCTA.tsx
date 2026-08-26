@@ -7,14 +7,15 @@ import styles from "./CrewCTA.module.scss";
 // Five real teammates, no stock photography and no face twice.
 //
 // Dan holds the centre. The four around them are two from India (Harshal, Prachi)
-// and two from elsewhere (Mirna, Michael), one man and one woman in each pair, and
-// they alternate across the fan so neither side is a single region.
+// and two from elsewhere (Mirna, Summer), alternating so neither side of the fan
+// is a single region.
 //
-// The last slot was Solomon, whose photo has a near-black backdrop: measured at
-// the crop's outer ring it reads 16/255 against this section's #0a0a0a (10), so
-// the circle had no visible edge and the face appeared to float. Michael's ring
-// measures 243, the brightest of any non-India man in the set, and he is also
-// Nigeria — so the regional mix is unchanged.
+// The last slot has been through two others. Solomon first, whose backdrop is
+// near-black — measured 16/255 at the crop's outer ring against this section's
+// #0a0a0a (10), so the circle lost its edge and the face appeared to float. Then
+// Michael, whose ring measures 243. Summer now, by request; hers measures 43,
+// which is dimmer than Michael's but clearly above Solomon's, so the circle still
+// reads against the band.
 //
 // Dan's crop is a separate 320px file rather than the shared 160px one: the centre
 // circle renders at 123px, so a 160px crop is only 1.3x and visibly soft on a
@@ -23,7 +24,7 @@ import harshalImg from "../../assets/people/harshal-maniyar.jpg";
 import mirnaImg from "../../assets/people/mirna-abdo.jpg";
 import danImg from "../../assets/people/dan-teo-lg.jpg";
 import prachiImg from "../../assets/people/prachi-kamble.jpg";
-import michaelImg from "../../assets/people/adeniran-michael.jpg";
+import summerImg from "../../assets/people/summer-xia.jpg";
 
 /**
  * Closing black CTA band (Figma 2665:13697), reusing AboutUsV2's CrewCTA
@@ -75,7 +76,7 @@ const CrewCTA = () => {
           <Image src={prachiImg} alt="" className={styles.avatarImage} width={90} height={90} />
         </span>
         <span className={`${styles.avatar} ${styles.avatarSmall} ${styles.side} ${styles.right2}`}>
-          <Image src={michaelImg} alt="" className={styles.avatarImage} width={84} height={84} />
+          <Image src={summerImg} alt="" className={styles.avatarImage} width={84} height={84} />
         </span>
       </div>
 
