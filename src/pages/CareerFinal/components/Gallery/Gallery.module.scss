@@ -23,12 +23,25 @@ $img-gap: 10px;
 // $img-gap's horizontal rhythm: the rows already read as separate bands because
 // each curves independently, so a wide vertical gutter makes the block feel
 // like three unrelated carousels rather than one gallery.
+// The gap between the CARDS, not between the row boxes. The boxes are 420px tall
+// around 190px cards — the surplus is headroom for the arc's magnified edge cards
+// (see $row-h) and is not meant to be seen. `.row` pulls the difference back out
+// with a negative margin.
 $row-gap: 14px;
-// The row's own height. See `.row`: perspective magnifies the off-centre cards,
-// so the row has to be the PROJECTED height, not the card height, or they paint
-// outside it. 240 covers the ~227px worst case at six cards a row with a little
-// slack.
-$row-h: 240px;
+// The row's own height. See `.row`: perspective magnifies the off-centre cards, so
+// the row has to be the PROJECTED height, not the card height, or they paint
+// outside it and rows collide.
+//
+// 420px covers the ~403px worst case for an eighteen-card ring faded at 78deg.
+//
+// Paired with FADE_DEG in Gallery.tsx. A wider fade and a bigger radius both raise
+// the projected height, so changing either without raising this reintroduces the
+// row overlap. Sizing the row generously is the right side of the trade: the fade
+// is what produces the curve, so it should not be shortened to fit a box.
+$row-h: 420px;
+// How much taller each row box is than its cards. Applied as a negative margin on
+// `.row` so the boxes overlap while the cards land $row-gap apart.
+$row-bleed: $row-h - $card-h;
 
 // Flat white, full height.
 //
@@ -144,18 +157,29 @@ $row-h: 240px;
 // Taller than a card on purpose.
 //
 // A card is $card-h flat on, but the ones away from the front of the arc are
-// nearer the viewer and perspective magnifies them — at six cards a row the
-// steepest visible card projects ~227px against a 190px card. Sizing the row to
-// the CARD left those cards painting outside it, so neighbouring rows overlapped
-// and the strip spilled past the section. `$row-h` is the projected worst case,
-// and `overflow: hidden` clips anything beyond it so a row can never bleed into
-// the one below.
+// nearer the viewer and perspective magnifies them — on this ring the steepest
+// visible card projects ~403px against a 190px card. Sizing the row to the CARD
+// left those cards painting outside it, so neighbouring rows overlapped and the
+// strip spilled past the section. `$row-h` is the projected worst case, and
+// `overflow: hidden` clips anything beyond it so a row can never bleed into the
+// one below whatever the geometry does.
 .row {
   height: $row-h;
+  // Overlap the neighbouring boxes by their surplus height, so the CARDS sit
+  // $row-gap apart rather than the boxes doing. A negative `gap` on the stage
+  // would be the obvious way to express this and does not work — CSS rejects
+  // negative gap values outright (it compiles, then is ignored), which is why
+  // this is a margin.
+  margin-bottom: -$row-bleed + $row-gap;
   overflow: hidden;
   position: relative;
   transform-style: preserve-3d;
   width: 100%;
+
+  // Nothing follows the last row, so its pull-up would only shorten the section.
+  &:last-child {
+    margin-bottom: -$row-bleed * 0.5;
+  }
 }
 
 .isDragging {

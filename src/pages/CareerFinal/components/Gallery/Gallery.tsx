@@ -76,29 +76,30 @@ const CARDS: Shot[] = [
   { label: "Office stairwell", src: life18 },
 ];
 
-// Three rows, each with its OWN six photos — no overlap between them.
+// Three rows, each carrying the FULL deck at a different offset.
 //
-// This replaces "every row carries the full deck at a different offset", which
-// could not avoid duplicates. Each row shows about nine of its cards at once, and
-// with all three drawing from one eighteen-card deck a photo was visible in two
-// rows simultaneously 100% of the time (measured over an hour of simulated drift,
-// worst case nine duplicates at once). Offsetting the decks does not help: the
-// rows spin at different speeds, so any offset drifts into alignment eventually.
+// This restores the wide shallow arc. A row needs about twelve cards for its
+// visible span to fill the strip — measured: six cards span ~1000px of a 1440px
+// viewport and leave obvious gaps, twelve span ~1693px and fill it — and with
+// eighteen photos three DISJOINT rows would only get six each. The full deck it
+// is, until there are enough photos for twelve a row.
 //
-// Partitioning is the only construction that makes a repeat impossible rather than
-// unlikely — a photo cannot appear twice on screen if it exists in only one row.
+// The cost is duplicates: every row draws from the same deck, so a photo can be
+// visible in two rows at once. Offsets space them as far apart as the deck allows,
+// which is the most that can be done without more photos — the rows spin at
+// different speeds, so no offset keeps them apart forever.
 //
-// The cost is the arc. A six-card ring has a 346px radius against 1134px at
-// eighteen, so each row curves harder and its visible strip is narrower. Twelve
-// cards a row (36 photos) would keep both; with eighteen photos this is the trade.
+// WHEN 18 MORE PHOTOS ARRIVE: switch to disjoint slices of twelve —
+//   const PER_ROW = Math.floor(CARDS.length / ROW_COUNT);
+//   CARDS.slice(r * PER_ROW, (r + 1) * PER_ROW)
+// — which makes a repeat impossible AND keeps the arc, since each row still holds
+// twelve cards.
 const ROW_COUNT = 3;
-const PER_ROW = Math.floor(CARDS.length / ROW_COUNT);
-const ROWS: Shot[][] = Array.from({ length: ROW_COUNT }, (_, r) =>
-  // Contiguous slices, not round-robin: the deck is ordered India-then-China, so
-  // striding would scatter both offices through every row. Slicing keeps each row
-  // tonally coherent.
-  CARDS.slice(r * PER_ROW, (r + 1) * PER_ROW),
-);
+const ROW_OFFSET = [0, 6, 12];
+const ROWS: Shot[][] = Array.from({ length: ROW_COUNT }, (_, r) => {
+  const k = ROW_OFFSET[r] % CARDS.length;
+  return [...CARDS.slice(k), ...CARDS.slice(0, k)];
+});
 
 // ---- Cylinder geometry ---------------------------------------------------
 // Cards sit on the INSIDE wall of a cylinder with the viewer at its centre,
@@ -149,9 +150,15 @@ const radiusFor = (step: number) =>
 // row (perspective magnifies whatever swings toward the viewer). That is what made
 // the rows overlap and spill out of the section.
 //
-// 78deg: a card is worth showing while it still faces the viewer. Past ~80deg it
-// is edge-on, and past 90 it is behind the cylinder's waist where the projection
-// blows it up.
+// 78deg. The CURVE is the whole point of this component, and it comes from cards
+// being visibly angled — cut the fade short and the strip flattens into a plain
+// row of pictures. 60deg was tried and does exactly that.
+//
+// The catch is that perspective magnifies a card as it swings toward the viewer,
+// and on this eighteen-card ring (r = 1134px) a card at 78deg projects 403px tall
+// against a 190px card. That is not a reason to shorten the fade — it is a
+// requirement on the ROW, which is sized to 420px to hold it. The two are a pair:
+// widening this without raising $row-h puts the rows back on top of each other.
 const FADE_DEG = 78;
 // Width of the fade ramp, also in degrees.
 const FADE_RAMP = 26;
