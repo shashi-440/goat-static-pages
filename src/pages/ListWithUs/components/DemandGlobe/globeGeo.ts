@@ -58,7 +58,89 @@ export const greatCircle = (from: LngLat, to: LngLat, samples = 48): LngLat[] =>
       const s1 = Math.sin(t * omega) / sinO;
       v = [a[0] * s0 + b[0] * s1, a[1] * s0 + b[1] * s1, a[2] * s0 + b[2] * s1];
     }
-    out.push([Math.atan2(v[1], v[0]) * DEG, Math.asin(Math.min(1, Math.max(-1, v[2]))) * DEG]);
+    let lon = Math.atan2(v[1], v[0]) * DEG;
+    // ── UNWRAPPED, which matters on a flat map ─────────────────────────────
+    // `atan2` returns -180..180, so a path crossing the antimeridian steps from +179 to
+    // -179 between two samples. On a globe that is invisible — the two points are
+    // neighbours in 3D. On a FLAT projection it is a line drawn the long way back across
+    // the entire map, and one such streak crosses everything else on screen.
+    //
+    // Adding a turn each time the step exceeds half a revolution keeps the sequence
+    // continuous, so the path simply carries on past 180 into the next copy of the world.
+    // Mapbox accepts longitudes outside -180..180 and renders them in the wrapped copy,
+    // so this is correct in both projections rather than a flat-map special case.
+    const prev = out[out.length - 1];
+    if (prev) {
+      while (lon - prev[0] > 180) lon -= 360;
+      while (lon - prev[0] < -180) lon += 360;
+    }
+    out.push([lon, Math.asin(Math.min(1, Math.max(-1, v[2]))) * DEG]);
+  }
+  return out;
+};
+
+/**
+ * A bowed path between two coordinates, sampled as `samples + 1` points.
+ *
+ * ── Why not the great circle ────────────────────────────────────────────────
+ * `greatCircle` above draws the true shortest route, and on a GLOBE that is also the
+ * prettiest: it wraps over the sphere and the curvature is the sphere's own. Projected
+ * flat it is nearly a straight line for most pairs — the only bend is whatever mercator
+ * imposes, which for two places at similar latitudes is almost none. A dozen arcs
+ * converging on one building came out as a bundle of straight ties.
+ *
+ * So on the flat map the arc is DRAWN rather than derived: a quadratic bezier whose
+ * control point sits off the midpoint, perpendicular to the chord. That is the flight-map
+ * convention, and the shape is honest about being a convention rather than pretending to
+ * be a route.
+ *
+ * `bow` is the control point's offset as a fraction of the chord's length, so a long
+ * journey bends more than a short one in absolute terms and the same amount in relative
+ * ones — which is what stops short hops looking like near-circles.
+ *
+ * The bow is always NORTHWARD. Alternating it by geometry would send some arcs over the
+ * top and some under the bottom of the same pair of endpoints, and the map would read as
+ * two unrelated systems.
+ */
+export const arcPath = (
+  from: LngLat,
+  to: LngLat,
+  samples = 96,
+  bow = 0.3,
+): LngLat[] => {
+  const [x0, y0] = from;
+  // The destination, moved to whichever copy of the world is nearest the origin. Without
+  // this a Manila -> London arc is drawn the long way round the entire map — the same
+  // antimeridian trap `greatCircle` documents, arriving here by a different route.
+  let x1 = to[0];
+  const y1 = to[1];
+  while (x1 - x0 > 180) x1 -= 360;
+  while (x1 - x0 < -180) x1 += 360;
+
+  const dx = x1 - x0;
+  const dy = y1 - y0;
+  const len = Math.hypot(dx, dy) || 1e-9;
+  // Unit perpendicular, flipped so it always points north. `py` is the latitude component;
+  // if it is negative the perpendicular is pointing at the south pole and both components
+  // have to turn round together, or the bow leans the wrong way as well as down.
+  let px = -dy / len;
+  let py = dx / len;
+  if (py < 0) {
+    px = -px;
+    py = -py;
+  }
+
+  const cx = (x0 + x1) / 2 + px * len * bow;
+  const cy = (y0 + y1) / 2 + py * len * bow;
+
+  const out: LngLat[] = [];
+  for (let i = 0; i <= samples; i += 1) {
+    const t = i / samples;
+    const u = 1 - t;
+    out.push([
+      u * u * x0 + 2 * u * t * cx + t * t * x1,
+      u * u * y0 + 2 * u * t * cy + t * t * y1,
+    ]);
   }
   return out;
 };

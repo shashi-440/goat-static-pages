@@ -6,31 +6,96 @@ import wrapperHOC from "@Utils/wrapperHOC";
 /**
  * FAQ accordion — Figma node 2141:4120. The first item renders open, as in the
  * design; one item open at a time.
+ */
+
+/**
+ * The partnerships team's approved FAQ — ten items, replacing the four that were
+ * here.
  *
- * NOTE: only the first answer exists in the Figma file. The remaining three are
- * written from the copy elsewhere on this page (25+ countries, 16,000+
- * properties, 1M+ beds, the dedicated dashboard) and should be replaced with the
- * partnerships team's approved wording before this goes live.
+ * Only the first of those four existed in the Figma file; the other three were
+ * written from copy elsewhere on the page as placeholders, and every one of them is
+ * now gone. Nothing on this list is inferred: it is the supplied wording verbatim,
+ * including its British spellings ("centralised", "counselling") and its curly
+ * apostrophes, so it matches whatever else the team publishes it in.
  */
 const ITEMS = [
   {
-    question: "How long after filling the form will someone from the team contact me?",
-    answer: "After filling the contact form, you will be contacted within 24 hours.",
+    question: "Who can partner with amber?",
+    answer:
+      "amber partners with education consultants, study-abroad agencies, universities, " +
+      "student communities and other organisations that support students travelling " +
+      "overseas. Whether you are a large education group or an independent consultant, you " +
+      "can partner with amber to help your students find trusted student accommodation.",
   },
   {
-    question: "How extensive is ambers reach?",
+    question: "How do I become an official amber partner?",
     answer:
-      "amber covers 25+ countries and 240 cities, with 16,000+ properties and over a million beds to choose from. Around 300,000 students book through us every year.",
+      "Simply submit your details through the Partner with us form. Our partnerships team " +
+      "will get in touch with you to understand your business, complete the onboarding " +
+      "process and provide you with access to amber’s partner tools and resources.",
   },
   {
-    question: "What is a dashboard?",
+    question: "Is there any cost to becoming an amber partner?",
     answer:
-      "Your dashboard is the partner portal we set up for you. It holds every lead you have sent us, the listings in your portfolio, live availability, and the status of each booking and payout.",
+      "No. There is no cost to becoming an amber partner. Once onboarded, you can refer " +
+      "students to amber and earn commissions on eligible bookings made through your " +
+      "partner account.",
   },
   {
-    question: "How to track your leads?",
+    question: "How does the amber partner commission structure work?",
     answer:
-      "Every student who comes through your affiliate link appears in your dashboard with their status, destination city and the team member handling them, so you can follow a lead from enquiry to confirmed booking.",
+      "Partners can earn commission on eligible student accommodation bookings referred " +
+      "through their account. Your commission is tracked against your referred bookings, " +
+      "giving you clear visibility of your performance and earnings. The exact commission " +
+      "structure may vary based on your partnership agreement and booking volumes.",
+  },
+  {
+    question: "How can I refer students to amber?",
+    answer:
+      "Once you are onboarded, you can refer students through your dedicated partner tools, " +
+      "including your unique referral link and other available lead-sharing options. Simply " +
+      "share the accommodation options with your students and refer them to amber, and our " +
+      "team will support them through the booking journey.",
+  },
+  {
+    question: "How does amber track and attribute my student referrals?",
+    answer:
+      "amber uses dedicated partner tracking and attribution mechanisms to ensure that " +
+      "eligible students referred by you are linked to your partner account. You can also " +
+      "track your leads and bookings through the Partner Dashboard, giving you greater " +
+      "transparency throughout the student journey.",
+  },
+  {
+    question: "What is the amber Partner Dashboard and what can I do with it?",
+    answer:
+      "The amber Partner Dashboard gives you a centralised view of your partnership " +
+      "activity. Depending on your partnership setup, you can use it to track referred " +
+      "students, leads, bookings and other key information, helping you manage your student " +
+      "accommodation referrals more efficiently.",
+  },
+  {
+    question: "Which countries, cities and universities can I offer accommodation for?",
+    answer:
+      "amber offers student accommodation across major study-abroad destinations and cities " +
+      "worldwide. You can search for accommodation based on the student’s university, city " +
+      "or preferred location and help them find options that match their requirements. " +
+      "Availability varies by destination, university and intake.",
+  },
+  {
+    question: "What support does amber provide to partners and their students?",
+    answer:
+      "Partners receive dedicated support from amber throughout the referral and booking " +
+      "journey. Our team can assist with accommodation recommendations, availability, " +
+      "booking queries and student support, helping you provide a smoother experience to " +
+      "your students while you focus on your core counselling and admissions activities.",
+  },
+  {
+    question: "Does amber offer white-label or API integration for partners?",
+    answer:
+      "Yes. amber can support technology-led partnerships through solutions such as APIs, " +
+      "integrations and white-label accommodation experiences, depending on the partner’s " +
+      "requirements. These solutions allow partners to offer accommodation to their " +
+      "students directly through their own platforms or digital journey.",
   },
 ];
 

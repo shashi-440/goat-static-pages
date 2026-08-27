@@ -9,8 +9,9 @@
   // takes position:sticky away from the Tools rail inside it. clip suppresses
   // the same horizontal bleed without creating one.
   overflow-x: clip;
-  // Clear the fixed header stack: 42px announcement rail + 64px navbar.
-  padding-top: 106px;
+  // Clear the fixed navbar. 64px, down from 106: the 42px announcement rail above it is
+  // gone, and this padding was the only other place its height was written down.
+  padding-top: 64px;
   width: 100%;
 
   // The app reset gives most elements `font: inherit`, so the family cascades on
@@ -28,4 +29,15 @@
   textarea {
     font-family: inherit;
   }
+}
+
+// Everything after the hero, lifted above the globe layer. See the note in ListWithUs.tsx.
+//
+// ⚠️  `z-index: 2` PAIRS WITH `z-index: 1` ON THE GLOBE LAYER (GlobeTravel.module.scss) and with the
+// hero copy's own `z-index: 2`. A positioned element with z-index 0 would NOT be enough: static
+// block backgrounds paint below every positioned box, so the globe would still cover this.
+.belowHero {
+  background: #fff;
+  position: relative;
+  z-index: 2;
 }

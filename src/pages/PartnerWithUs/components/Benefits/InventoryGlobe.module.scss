@@ -1,0 +1,63 @@
+// The globe fills the card's media window and is CROPPED by it, the way the
+// screenshots on the sibling cards are. Nothing here is inset: a globe with a
+// margin round it reads as a small picture of the earth, and the reference's whole
+// idea is that the planet is bigger than the frame.
+// Fills whatever window it is given and is cropped by it. The full-bleed decision
+// is NOT made here — it belongs to the card, which drops its media inset for this one
+// card via `.mediaBleed`. Trying to escape the inset from inside with a negative
+// margin does not work: `.media` clips it with its own `overflow: hidden`.
+.wrap {
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+// TALLER THAN ITS WINDOW, deliberately. The window is roughly 264px and a globe
+// drawn to fit that is a small disc with air above and below it; at 420px the limb
+// crosses the top of the frame and the south falls away past the card's bottom
+// edge, which is the reference's framing.
+//
+// Anchored to the top rather than centred, so what gets cut is the empty southern
+// ocean and not the pinned northern hemisphere.
+.stage {
+  height: 420px;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+
+  // Faded in once the first tiles have painted. Mapbox shows the style's flat
+  // background colour until then, which on a globe is a hard rectangle of grey
+  // filling the card — worse than empty space for the half-second it lasts.
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.ready {
+  opacity: 1;
+}
+
+// Mapbox writes its own canvas styles; these only ensure the canvas fills the
+// stage when the container is sized by absolute positioning rather than layout.
+.stage :global(.mapboxgl-canvas) {
+  height: 100% !important;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100% !important;
+}
+
+// Visually hidden but read: the pinned cities as text, since the globe itself is a
+// canvas and says nothing to a screen reader or a crawler.
+.sr {
+  border: 0;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}

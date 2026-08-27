@@ -1,0 +1,274 @@
+// Section frame copied from this page's other sections rather than invented:
+// 80px gutters, a 1280px measure and the 120px bottom rhythm that Benefits and
+// Steps both use, so the new band sits on the same grid as its neighbours.
+.section {
+  align-items: center;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 0 80px 120px;
+  width: 100%;
+}
+
+// The 1280px measure moves up to .inner so the separator spans exactly the same
+// width as the content under it.
+.inner {
+  display: flex;
+  flex-direction: column;
+  gap: 64px;
+  max-width: 1280px;
+  width: 100%;
+}
+
+// Separator above the section. Its distance from the section above is that
+// section's own bottom padding, not a top padding here — every band on this page
+// owns the space below itself, and adding one here would double it.
+.rule {
+  background: #e5e7eb;
+  display: block;
+  height: 1px;
+  width: 100%;
+}
+
+.row {
+  align-items: flex-start;
+  display: flex;
+  gap: 80px;
+  width: 100%;
+}
+
+/* ------------------------------------------------------- heading column */
+
+// 424px, the same as Benefits' rail and List With Us's heading column.
+.heading {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  gap: 16px;
+  width: 424px;
+}
+
+.title {
+  color: #111928;
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -1px;
+  line-height: 48px;
+  margin: 0;
+}
+
+.subtitle {
+  color: #6b7280;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  margin: 0;
+}
+
+/* --------------------------------------------------------- partner list */
+
+.list {
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  list-style: none;
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+}
+
+// Each entry carries its own top rule, and the first is dropped — so the rules read
+// as dividers BETWEEN entries and the list never opens or closes on one.
+// ⚠️  `flex-start`, not `baseline`. It was baseline, to sit the label's and the body's
+// baselines on one line — and with a 36px icon box in the row, baseline alignment measures
+// the BOX's baseline, which for a replaced-ish element is its bottom margin edge. That
+// throws the whole left column upward by most of the icon's height.
+//
+// Nothing is lost by top-aligning: the label and the body carry the SAME 26px line-height,
+// so their first baselines sit at the same offset inside their line boxes and top-aligning
+// the boxes puts those baselines on one line anyway. If either line-height ever changes,
+// this stops being true and the two need re-aligning by hand.
+.item {
+  align-items: flex-start;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  gap: 40px;
+  // 28px, up with the type: the rows sit on a 26px line height now, and 24px of padding
+  // against a taller line left the rules closer to the text than the text is to itself.
+  padding: 28px 0;
+
+  &:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+}
+
+// The row's fixed left column: the mark and the label together.
+//
+// The WIDTH lives here rather than on `.itemTitle`, so the icon sits inside the measure
+// rather than in front of it — otherwise every row's body copy would start 50px further
+// right than the heading column above, and the two would stop sharing an edge.
+//
+// 390px = 340 of text width + the 36px mark + its 14px gap. The 340 is set by ONE string:
+// "Fintech / travel / student services companies" is much the longest label, and that is
+// the width which still holds it on two lines at 18px. Narrower and it takes three, and
+// that row's rule falls out of rhythm with the four above it.
+.itemLead {
+  align-items: flex-start;
+  display: flex;
+  flex-shrink: 0;
+  gap: 14px;
+  width: 390px;
+}
+
+// ── A bare coloured glyph, one colour per row ──────────────────────────────
+// Matched to List With Us's section of this shape, which dropped the tinted disc these
+// used to sit in. The disc gave five rows five soft circles down the left edge and made
+// the column read as a set of buttons; the glyph alone reads as a mark against a label.
+//
+// 30px, not 20px in a 36px disc. With the disc gone the glyph has to carry the row on its
+// own, and at 20px it read as an afterthought beside 18px type. The SVGs are drawn on a
+// 20px grid with a 1.5px stroke, so at 30px the stroke lands at the same weight as the
+// icons on the other page — they scale identically.
+//
+// ⚠️  `margin-top: -2px` is arithmetic, not a nudge: the box is 30px so its centre is at
+// 15px, the label's first line is 26px so its centre is at 13px, and the glyph sits 2px
+// too low without it. If the box size or the label's line-height changes, recompute it.
+.itemIcon {
+  align-items: center;
+  color: var(--icon);
+  display: flex;
+  flex-shrink: 0;
+  height: 30px;
+  justify-content: center;
+  margin-top: -2px;
+  width: 30px;
+
+  svg {
+    height: 30px;
+    width: 30px;
+  }
+}
+
+// The three swatches from List With Us's section, reused rather than extended: five rows
+// need five values, and inventing two more brand colours to fill the gap is a bigger
+// decision than this section should be making on its own. Rotated so no two adjacent rows
+// share a colour — violet, blue, purple, blue, violet.
+//
+// Only `--icon` now; the matching `--icon-bg` went with the disc.
+.iconViolet {
+  --icon: #6d5ae0;
+}
+
+.iconBlue {
+  --icon: #3e9be8;
+}
+
+.iconPurple {
+  --icon: #8f56f7;
+}
+
+// Type scale matched to List With Us's section of the same shape, so the two pages' "who
+// we work with" read as one pattern rather than two sizes of it.
+.itemTitle {
+  color: #111928;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  line-height: 26px;
+  margin: 0;
+}
+
+.itemBody {
+  color: #4b5563;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 26px;
+  margin: 0;
+}
+
+/* ------------------------------------------------------- the partner marks */
+
+// A full-width strip spanning the same measure as the row above it. No longer a
+// column: it held a label over the marks, and the marks are all that is left.
+.marks {
+  width: 100%;
+}
+
+// TWO ROWS OF THREE, not one row of six.
+//
+// A grid rather than a wrapping flex row: `flex-wrap` breaks wherever the marks happen
+// to run out of width, so the split moved with each logo's own box and the second row
+// was never the same length as the first. Three explicit tracks put the break where it
+// is meant to be and keep both rows on one set of columns.
+//
+// `1fr` tracks with the mark centred in each, rather than `space-between` across the
+// row: each mark keeps its own width from the node — a round crest and a wide wordmark
+// are not the same size at the same height — so distributing the leftover space between
+// them made the gaps visibly unequal.
+// Six tracks, twelve cells — two rows of six. The gap comes down from 40 to 24 because
+// six marks across the 1280px measure leaves each roughly 180px, and 40px gutters would
+// eat a fifth of that.
+.marksGrid {
+  align-items: center;
+  column-gap: 24px;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  justify-items: center;
+  row-gap: 36px;
+  width: 100%;
+}
+
+// Width and height come inline from each mark's own box in the node, exactly as the
+// logo strip sets them.
+.mark {
+  align-items: center;
+  display: flex;
+  flex-shrink: 0;
+  justify-content: center;
+}
+
+.markImage {
+  height: 100%;
+  object-fit: contain;
+  width: 100%;
+}
+
+// Same 1100px threshold as List With Us's Audience: the heading column gives up
+// its fixed width first, and the entries stack title-over-body only once the
+// two-column row itself is too tight to keep a 300px title column.
+@media (max-width: 1100px) {
+  .row {
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .heading {
+    width: 100%;
+  }
+
+  // Three tracks once the row stacks — six across a narrow measure leaves each mark too
+  // little width to sit in.
+  .marksGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .section {
+    padding: 0 24px 80px;
+  }
+
+  .item {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .itemLead {
+    width: 100%;
+  }
+}

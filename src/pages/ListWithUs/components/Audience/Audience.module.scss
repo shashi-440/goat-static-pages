@@ -1,9 +1,39 @@
+// 80px gutters and a 1280px measure, as the photo-tile version of this section had.
+//
+// The 120px BOTTOM is new, and it matches `Tools` directly above and `Steps` above that
+// — every white band on this page owns the space below itself. This section had none,
+// which went unnoticed while the video band sat underneath it and absorbed the gap; with
+// the video gone, Testimonials' grey background began immediately under the logo strip
+// and the marks read as sitting on the edge of it.
 .section {
   align-items: center;
   background: #fff;
   display: flex;
   flex-direction: column;
-  padding: 0 80px;
+  padding: 0 80px 120px;
+  width: 100%;
+}
+
+// The measure moves up from `.row` to here, so the logo strip at the foot spans
+// exactly the same width as the content above it.
+.inner {
+  display: flex;
+  flex-direction: column;
+  gap: 64px;
+  max-width: 1280px;
+  width: 100%;
+}
+
+// Separator above the section, spanning the same 1280px measure as the content under it
+// — which is why it lives inside `.inner` rather than being a full-bleed line.
+//
+// The 64px between it and the heading is `.inner`'s own gap. Its distance from the
+// section ABOVE is that section's bottom padding, not a top padding here: every band on
+// this page owns the space below itself, and adding one here would double it.
+.rule {
+  background: #e5e7eb;
+  display: block;
+  height: 1px;
   width: 100%;
 }
 
@@ -11,15 +41,18 @@
   align-items: flex-start;
   display: flex;
   gap: 56px;
-  max-width: 1280px;
   width: 100%;
 }
 
+/* ------------------------------------------------------- heading column */
+
+// 424px, unchanged — it is the same left edge and measure as this page's other
+// heading columns, and the list to its right inherits the gap the tiles used.
 .heading {
   display: flex;
   flex-direction: column;
-  gap: 16px;
   flex-shrink: 0;
+  gap: 16px;
   width: 424px;
 }
 
@@ -40,59 +73,209 @@
   margin: 0;
 }
 
-.tiles {
-  display: flex;
-  flex: 1 0 0;
-  gap: 24px;
-  min-width: 0;
-}
+/* -------------------------------------------------------- audience list */
 
-.tile {
+.list {
   display: flex;
   flex: 1 0 0;
   flex-direction: column;
+  list-style: none;
+  margin: 0;
   min-width: 0;
+  padding: 0;
 }
 
-.imageWrap {
-  border-radius: 16px;
-  height: 360px;
-  overflow: hidden;
-  position: relative;
-  width: 100%;
-}
-
-.image {
-  height: 100%;
-  inset: 0;
-  object-fit: cover;
-  position: absolute;
-  width: 100%;
-}
-
-.copy {
+// Each entry carries its own top rule, and the first is dropped — so the rules read
+// as dividers BETWEEN entries and the list never opens or closes on one.
+// ⚠️  `flex-start`, not `baseline`. It was baseline, to sit the label's and the body's
+// baselines on one line — and with a 36px icon box in the row, baseline alignment measures
+// the BOX's baseline, which for a replaced-ish element is its bottom margin edge. That threw
+// the whole left column upward by most of the icon's height.
+//
+// Nothing is lost by top-aligning: the label and the body carry the SAME 26px line-height, so
+// their first baselines sit at the same offset inside their line boxes and top-aligning the
+// boxes puts those baselines on one line anyway. If either line-height ever changes, this
+// stops being true and the two will need re-aligning by hand.
+.item {
+  align-items: flex-start;
+  border-top: 1px solid #e5e7eb;
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding-top: 40px;
+  gap: 40px;
+  // 28px, up with the type: the rows sit on the same 26px line height now, and 24px of
+  // padding against a taller line left the rules closer to the text than the text is to
+  // itself.
+  padding: 28px 0;
+
+  &:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  &:last-child {
+    padding-bottom: 0;
+  }
 }
 
-.tileTitle {
+// The row's fixed left column: the mark and the label together.
+//
+// The WIDTH moved here from `.itemTitle`, so the icon sits inside the measure rather than in
+// front of it — otherwise every row's body copy would start 50px further right than the
+// heading column above, and the two would no longer share an edge.
+//
+// 390px, up from 340: the icon and its gap take 50px out of the column, and "Multifamily, BTR
+// and managed housing operators" needs the old 340 of text width to stay on two lines. The
+// number is set by that one string; narrower and that row takes three lines and its rule
+// falls out of rhythm with the other two.
+.itemLead {
+  align-items: flex-start;
+  display: flex;
+  flex-shrink: 0;
+  // 14px. It came down to 12 when the disc was removed — a bare glyph has none of the disc's own
+  // internal padding — and back up to 14 when the glyph grew to 30px, because a larger mark needs
+  // proportionally more air before the title or the two collide optically.
+  gap: 14px;
+  width: 390px;
+}
+
+// ── A CIRCLE, AND A COLOUR PER ROW ──────────────────────────────────────────
+// A rounded square tinted in amber blue before; the reference treatment is a soft CIRCLE
+// holding a coloured stroke icon, one colour per item.
+//
+// ⚠️  The reference sits its circles on a light grey card, where a WHITE fill reads. This
+// section's ground is white, so a white circle would be invisible — the fill is a 10% tint of
+// each icon's own colour instead. That keeps the treatment (soft disc, coloured stroke) and
+// still separates the disc from the page, which is what the white was doing over there.
+//
+// Both values come from `--icon` and `--icon-bg`, set by the modifier classes below, so a row
+// is re-coloured in one place and the two can never disagree.
+//
+// ⚠️  `margin-top: -5px` is not a nudge, it is arithmetic: the box is 36px so its centre is at
+// 18px, the label's first line is 26px so its centre is at 13px, and the icon is 5px too low
+// without it. If the box size or the label's line-height changes, recompute it — do not
+// eyeball it.
+// ⚠️  NO CONTAINER. This was a 36px disc filled with `--icon-bg`; the disc is gone and the glyph
+// stands on the page in `--icon`. Three consequences, all handled here rather than left to drift:
+//
+//   · THE `--icon-bg` TINT IS NOW UNUSED. It stays declared on the `.icon*` classes below because it
+//     is half of a matched pair — a fill and its line — and deleting one leaves the next person
+//     wondering what the survivor was matched to. Nothing reads it.
+//
+//   · THE GLYPH GREW, 20px -> 30px, in two steps. The disc was doing the work of making a small icon
+//     read at a distance; without it a 20px line drawing next to 18px bold type looks like a bullet,
+//     and 24 still read as timid — most visibly on the one-line row, where there is no second line
+//     of title to balance it. At 30 it is 1.67x the type size, which is about where a row's only
+//     visual has to sit to hold its own against 18px bold.
+//
+//   · THE OPTICAL LIFT IS DERIVED FROM THE TWO, not chosen: `(line-height - glyph) / 2`, which for a
+//     26px title line and a 30px glyph is -2px. It was -5 for the 36px disc and -1 at 24px. If
+//     either the glyph or the title's leading changes, recompute it rather than nudging.
+.itemIcon {
+  align-items: center;
+  color: var(--icon);
+  display: flex;
+  flex-shrink: 0;
+  height: 30px;
+  justify-content: center;
+  margin-top: -2px;
+  width: 30px;
+
+  svg {
+    height: 30px;
+    width: 30px;
+  }
+}
+
+// All three are sampled from supplied swatches.
+//
+// ⚠️  ROWS 1 AND 3 ARE BOTH VIOLETS, and that is what was asked for — the third swatch
+// replaced an emerald. They are far enough apart to read as two colours (#6d5ae0 is the
+// deeper, cooler one; #8f56f7 is brighter and more magenta) and the blue between them keeps
+// them from touching. Worth knowing before "fixing" one of them to match the other.
+.iconViolet {
+  --icon: #6d5ae0;
+  --icon-bg: rgba(109, 90, 224, 0.1);
+}
+
+.iconBlue {
+  --icon: #3e9be8;
+  --icon-bg: rgba(62, 155, 232, 0.1);
+}
+
+.iconPurple {
+  --icon: #8f56f7;
+  --icon-bg: rgba(143, 86, 247, 0.1);
+}
+
+.itemTitle {
   color: #111928;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
-  line-height: 24px;
+  letter-spacing: -0.2px;
+  line-height: 26px;
   margin: 0;
+  min-width: 0;
 }
 
-.tileBody {
+.itemBody {
   color: #4b5563;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
-  line-height: 24px;
+  line-height: 26px;
   margin: 0;
 }
 
+/* ----------------------------------------------------- the operator marks */
+
+.marks {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  width: 100%;
+}
+
+// Small, grey and wide-tracked — the same register as the mock-ups' column labels on
+// this page, so it reads as a caption over the marks rather than as a heading
+// competing with the section's own.
+.marksLabel {
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 20px;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+// Spread across the measure rather than gathered, which is how this page's other logo
+// wall reads. Wraps rather than shrinking, because each mark keeps its own box — a
+// tall roundel and a wide wordmark do not read as the same size at the same height.
+.marksGrid {
+  align-items: center;
+  column-gap: 40px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  row-gap: 28px;
+  width: 100%;
+}
+
+// Width and height come inline from each mark's own box, exactly as `Ticker` sets them.
+.mark {
+  align-items: center;
+  display: flex;
+  flex-shrink: 0;
+  justify-content: center;
+}
+
+.markImage {
+  height: 100%;
+  object-fit: contain;
+  width: 100%;
+}
+
+// 1100px, the threshold this section already used for the tiles: the heading column
+// gives up its fixed width first, and the entries only stack title-over-body once the
+// two-column row itself is too tight to keep a 320px title column.
 @media (max-width: 1100px) {
   .row {
     flex-direction: column;
@@ -100,6 +283,30 @@
   }
 
   .heading {
+    width: 100%;
+  }
+
+  // Gathered rather than spread once the row stacks: `space-between` across a narrow
+  // measure pushes two marks to the extremes with a chasm between them.
+  .marksGrid {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 720px) {
+  .section {
+    padding: 0 24px 80px;
+  }
+
+  .item {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  // The fixed width lives on `.itemLead` now, so it is what has to give — `.itemTitle` no
+  // longer carries one. Stacked, the lead is the full measure and the label takes whatever
+  // the icon leaves.
+  .itemLead {
     width: 100%;
   }
 }

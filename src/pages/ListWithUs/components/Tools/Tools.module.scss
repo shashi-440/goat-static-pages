@@ -1,19 +1,53 @@
+// Same frame as the page's other white bands: 80px gutters, a 1280px measure and the 120px
+// bottom rhythm.
 .section {
   align-items: center;
   background: #fff;
   display: flex;
   flex-direction: column;
-  padding: 0 80px 120px;
+  padding: 0 var(--pad) 120px;
   width: 100%;
+
+  // The section's own gutter, named so the rail can both cancel it and restore it.
+  //
+  // It is the distance from the window edge to the 1280px measure: the padding, plus
+  // whatever slack sits beside a maxed-out `.inner` on a wide screen. Deriving it beats
+  // hard-coding 80px, which is only correct at exactly 1440px.
+  --pad: 80px;
+  --gutter: calc((100vw - min(1280px, 100vw - 2 * var(--pad))) / 2);
 }
 
 .inner {
   display: flex;
   flex-direction: column;
-  gap: 56px;
   max-width: 1280px;
   width: 100%;
 }
+
+/* ---------------------------------------------------------------- the heading */
+
+// The h2 on the left, the attribution on the right.
+//
+// `flex-end`, so the attribution rests on the heading's BASELINE side rather than its cap: the
+// heading is 48px of line box and the lockup is 26px, and centring it leaves the pair floating
+// against the middle of the words beside it.
+.head {
+  align-items: flex-end;
+  display: flex;
+  gap: 40px;
+  justify-content: space-between;
+  margin-bottom: 48px;
+  width: 100%;
+}
+
+// ── THE SUBTITLE IS GONE ────────────────────────────────────────────────────
+// "Your partner dashboard for listings, campaigns and performance." sat under the h2, and
+// `.headText` existed only to hold the two together against `.head`'s alignment. It was
+// saying what the four card titles beside it already say, one word at a time — and the
+// lockup on the right now names the product, which was the only part of that sentence
+// carrying information the cards did not.
+//
+// The h2 is a direct flex child of `.head` again, so `.headText` went with it.
 
 .heading {
   color: #111928;
@@ -24,516 +58,599 @@
   margin: 0;
 }
 
-.body {
-  align-items: flex-start;
-  display: flex;
-  gap: 56px;
-  width: 100%;
-}
+/* ------------------------------------------------------- powered by lockup */
 
-/* --------------------------------------------------------------- tab column */
-
-// The list holds its place while the panels scroll past it. `top` clears the
-// navbar, which is all that stays fixed once the announcement rail has slid out.
-.rail {
-  align-self: flex-start;
-  flex-shrink: 0;
-  position: sticky;
-  top: 104px;
-  width: 424px;
-}
-
-.tabs {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-// Every entry is the same height whether it is the active one or not, and no
-// property that changes between the two states affects layout: the label swaps
-// size inside a fixed 24px line box, and the description only changes colour.
-// That is what keeps the column still — an entry that grew or collapsed as the
-// active one moved would shove the entries below it and read as a bounce.
-.tab {
-  background: none;
-  border: 0;
-  color: #9ca3af;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  // The extra bottom pixel is the rule's own: the track is positioned rather
-  // than a border, so without it the row would swallow the design's 112 + 1.
-  padding: 20px 0 21px;
-  position: relative;
-  text-align: left;
-  transition: color 0.28s cubic-bezier(0.22, 1, 0.36, 1);
-  width: 100%;
-}
-
-// The column's box already lines up with the panels, but the first row's top
-// padding pushed its label 20px below the top edge of the image beside it.
-// Dropping it sits the first label on that edge; the rows below keep the
-// design's 20px, which is the breathing room between entries rather than a
-// leading indent. Row heights stay fixed per row, so this costs no movement.
-.tab:first-child {
-  padding-top: 0;
-}
-
-.tabLabel {
+// ⚠️  INLINE FLOW, NOT FLEX, and the reason is not visual. As a flex row with `gap: 8px`
+// this looked identical and read as "Powered byamber connect": each child becomes a flex
+// item, the whitespace between them is dropped, and the gap draws a space that exists only
+// in the layout. Anything reading the text rather than the pixels — a screen reader, a
+// crawler, a copy-paste — got the two words joined.
+//
+// Inline flow puts a real space character back and aligns the two sizes on their shared
+// baseline for free, which is the alignment the flex version was asking for explicitly.
+.poweredBy {
+  color: #6b7280;
   font-size: 16px;
-  font-weight: 500;
-  letter-spacing: -0.2px;
-  line-height: 24px;
-  transition: font-size 0.28s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.tabBody {
-  color: #9ca3af;
-  font-size: 14px;
   font-weight: 400;
-  line-height: 20px;
-  transition: color 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  line-height: 26px;
+  margin: 0;
+  white-space: nowrap;
 }
 
-.tabActive {
-  color: #111928;
+// The lockup. Height-driven with `width: auto`, so the mark keeps the file's own 155:28
+// aspect rather than being squashed to a box.
+//
+// `inline-block` and a baseline nudge, because it replaces an inline word: an image's own
+// baseline is its bottom edge, which would drop the wordmark's letters below the "Powered by"
+// beside it. -5px is measured against this file — its glyphs sit close to the box's bottom
+// edge, so it needs most of a descender's worth of lift. A different export with built-in
+// padding would want less.
+//
+// ⚠️  `max-width: none` because the app's global reset caps images at 100% of their container.
+// The container here is a `nowrap` paragraph, so the cap is not currently binding — but it
+// would silently shrink the mark the first time this paragraph is given a narrower measure.
+.poweredLogo {
+  display: inline-block;
+  height: 26px;
+  max-width: none;
+  vertical-align: -5px;
+  width: auto;
+}
 
-  .tabLabel {
-    font-size: 20px;
-    font-weight: 600;
-  }
+/* ---------------------------------------------------------------- the track */
 
-  .tabBody {
-    color: #4b5563;
+// Runs END TO END on BOTH sides: out past the 1280px measure to each window edge, so a
+// partly-scrolled card is cut by the window rather than stopping short of it with a stripe
+// of page beside it. The gutter it cancels is restored as PADDING on the track below — the
+// two must stay equal and opposite.
+.viewport {
+  margin-left: calc(-1 * var(--gutter));
+  margin-right: calc(-1 * var(--gutter));
+  overflow-x: auto;
+  // ⚠️  EXPLICIT, and not redundant. Per spec a `visible` axis computes to `auto` when the
+  // other axis is not visible, so `overflow-x: auto` alone silently makes this a VERTICALLY
+  // scrolling box too — and Reveal starts every card at translateY(32px), which is 32px of
+  // real content below the box. That is a stray vertical scrollbar on the rail.
+  overflow-y: hidden;
+  // Snap positions are measured from the padding edge, so without this the first card snaps
+  // to the window edge instead of to the measure.
+  scroll-padding-left: var(--gutter);
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  width: auto;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
   }
 }
 
-// The design's 1px divider, doubling as the progress readout: it fills across
-// while its panel travels past the sticky line, so an entry shows how far
-// through its own section the reader is. Entries already passed sit full,
-// entries still to come sit empty.
-.tabTrack {
-  background: #e5e7eb;
-  bottom: 0;
-  height: 1px;
-  left: 0;
+.track {
+  display: flex;
+  gap: 24px;
+  // Restores, as padding, exactly what the viewport cancelled as margin. The leading one
+  // puts the first card on the measure at rest; the trailing one lets the LAST card come to
+  // rest on the measure too, instead of stopping half off the window edge.
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
+  // ⚠️  REQUIRED for `padding-right` above to do anything at all. As a block-level flex box
+  // the track's used width is the viewport's, and the cards — which do not shrink — simply
+  // overflow it; its trailing padding then sits inside that box, hundreds of px left of
+  // where the cards actually end, contributing nothing to the scrollable width. Sizing the
+  // track to its content puts its right padding edge after the last card, where it belongs.
+  width: max-content;
+}
+
+// ── ART ON TOP, COPY UNDER IT ───────────────────────────────────────────────
+// The card is no longer a container: it was a grey #f7f7f7 panel with the copy inset at the
+// top and the mock-up filling the rest, and it is now just a stack — a coloured tile, then
+// text on the page's own white. Two consequences worth stating, because they are what the
+// shape buys:
+//
+//   · The tile is a FIXED SQUARE, so every tile in the row is identical whatever its
+//     mock-up does, and the row reads as one band of art rather than four panels of
+//     different weight.
+//   · Card heights now VARY with the copy, because nothing is stretching to a common
+//     height any more. That is fine and it is the reference's own behaviour: the tiles all
+//     start on one line, which is the alignment the eye actually reads.
+//
+// Width still comes from `--card-w`, set on the track by the component — it depends on the
+// number of cards, which CSS cannot see. The fallback is the three-up fraction, so a card is
+// never widthless if the property fails to land.
+.railCard {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  gap: 24px;
+  scroll-snap-align: start;
+  width: var(--card-w, calc((100% - 48px) / 3));
+}
+
+
+// The art's ground. A square, so every tile in the row is identical whatever its chip does.
+//
+// `aspect-ratio` rather than a hard height, because the height has to track `--card-w` and
+// the narrow breakpoint's `min(320px, 82vw)` — a fixed px height would have to be restated
+// alongside every width and would silently disagree with one of them.
+//
+// ── The ground is a SUPPLIED IMAGE, not a CSS gradient ──────────────────────
+// It was three stacked gradients approximating amber's blues. This is the real artwork, and a
+// hand-written `linear-gradient` cannot reproduce it — the source has soft overlapping blades
+// with their own edges, which is the part that stops it reading as stock chrome.
+//
+// `background-image` on the tile rather than an `<img>`: it is decoration with no content of
+// its own, so it wants no place in the accessibility tree and no alt text to justify. The
+// `#3f83f8` underneath is not a fallback gesture — it is sampled from the artwork, so the
+// tile is the right colour for the frame or two before the file paints, and if the image ever
+// 404s the card degrades to a flat brand blue rather than to white.
+//
+// Sized to 800px square and re-encoded as JPEG on the way in: the source was a 1254px PNG at
+// 1.5MB, which is 30x the bytes for a decorative ground that renders at 356px. 52KB now.
+//
+// The chip is CENTRED by this grid rather than absolutely positioned. It used to be
+// `position: absolute` with a top-left inset, which the tile needed because the old art was a
+// 319px panel taller than the tile and had to be allowed to overflow it. A chip is small
+// enough to sit inside, so centring is both simpler and self-adjusting — and it means the
+// tile has a real in-flow child, so `aspect-ratio` is no longer the only thing giving it
+// height.
+.tile {
+  align-items: center;
+  aspect-ratio: 1 / 1;
+  background-color: #3f83f8;
+  background-image: url("../../assets/tile-gradient.jpg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-radius: 20px;
+  display: grid;
   overflow: hidden;
-  position: absolute;
-  right: 0;
-}
-
-// Driven by transform rather than width so tracking the scroll costs no layout.
-// Only opacity is transitioned — the width has to track the scroll exactly, so
-// easing it would make the line lag the page.
-.tabFill {
-  background: #1466ff;
-  height: 100%;
-  left: 0;
-  opacity: 0;
-  position: absolute;
-  top: 0;
-  transform: scaleX(0);
-  transform-origin: left center;
-  transition: opacity 0.3s ease;
+  place-items: center;
   width: 100%;
 }
 
-/* ------------------------------------------------------------- media panel */
+// ── The two other supplied grounds ──────────────────────────────────────────
+// Only the image and the under-colour change; everything structural stays on `.tile`. Each
+// `background-color` is the average of its own artwork (sampled, not guessed), so a tile is
+// the right hue for the frame before its file paints and degrades to a sensible flat colour
+// rather than to white if the file ever 404s.
+//
+// ⚠️  BOTH ARE PALE, and the chip sitting on them is white. The chip keeps its shadow rather
+// than gaining a border: on these grounds the wide soft layer is doing the separating almost
+// on its own, and a 1px border would read as a hairline box on the deep blue tiles where it
+// is not needed. If a paler ground than these ever arrives, the chip needs its own treatment
+// on it — do not lighten the shared shadow, which is tuned for the saturated tiles.
+.tileIris {
+  background-color: #b8dcf4;
+  background-image: url("../../assets/tile-gradient-iris.jpg");
+}
 
-.panels {
+.tilePrism {
+  background-color: #cad7e8;
+  background-image: url("../../assets/tile-gradient-prism.jpg");
+}
+
+.tileMint {
+  background-color: #b4dcc3;
+  background-image: url("../../assets/tile-gradient-mint.jpg");
+}
+
+// Flush with the tile's left edge — the copy is on the page now, not inside a padded card, so
+// it aligns to the art rather than being inset from a container that no longer exists.
+.copy {
   display: flex;
-  flex: 1 0 0;
   flex-direction: column;
-  gap: 48px;
+  gap: 14px;
+}
+
+.cardTitle {
+  color: #111928;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  line-height: 30px;
+  margin: 0;
+}
+
+.cardBody {
+  color: #4b5563;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 24px;
+  margin: 0;
+}
+
+/* ------------------------------------------------------------------ the chip */
+
+// ONE FRAGMENT of amber connect, floating on the tile — see the long note in Tools.tsx for
+// why each of these carries a control rather than a headline number.
+//
+// 252px is the measure the type is drawn for: it holds "Chapter Spitalfields" beside a 40px
+// thumbnail without ellipsising, which is the tightest pairing any of the four has to make.
+//
+// ── The border and the shadow are BOTH doing work ───────────────────────────
+// The hairline is what real interface has and drawn interface usually forgets: it holds the
+// chip's edge against a pale ground, where a shadow alone leaves it dissolving into the
+// gradient. The shadow is then three layers — a 1px contact, a mid lift and a wide diffuse —
+// because a single blur reads as a drop shadow, and three read as an object above a surface.
+// One 40px blur at 22% was the previous version, and on the pale tiles it looked like grey
+// smudge under a white rectangle.
+.chip {
+  background: #fff;
+  border: 1px solid rgba(16, 24, 40, 0.05);
+  border-radius: 16px;
+  box-shadow:
+    0 1px 2px rgba(16, 24, 40, 0.06),
+    0 10px 20px -6px rgba(16, 24, 40, 0.1),
+    0 28px 48px -18px rgba(16, 24, 40, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  width: 252px;
+}
+
+.chipRow {
+  align-items: center;
+  display: flex;
+  gap: 10px;
   min-width: 0;
 }
 
-.panel {
+// Label and control pushed to the two ends. `min-width: 0` on the stack beside it, so a long
+// title ellipsises instead of shoving the control off the edge.
+.chipBetween {
   align-items: center;
-  border-radius: 24px;
   display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.chipStack {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+// A figure and the thing qualifying it, on one baseline.
+.chipFigure {
+  align-items: baseline;
+  display: flex;
+  gap: 8px;
+}
+
+/* -------------------------------------------------------------- chip content */
+
+.chipThumb {
+  border-radius: 9px;
   flex-shrink: 0;
-  height: 500px;
-  justify-content: center;
-  overflow: hidden;
-  padding: 40px;
-  position: relative;
-  width: 100%;
-}
-
-.panelImage {
-  height: 100%;
-  inset: 0;
+  height: 40px;
   object-fit: cover;
-  position: absolute;
-  width: 100%;
+  width: 40px;
 }
 
-.panelWash {
-  -webkit-backdrop-filter: blur(3px);
-  backdrop-filter: blur(3px);
-  background: rgba(0, 0, 0, 0.05);
-  inset: 0;
-  position: absolute;
+.chipTitle {
+  color: #101828;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.1px;
+  line-height: 18px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.bezel {
-  border-radius: 24px;
-  position: relative;
+.chipNote {
+  color: #98a2b3;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 16px;
+  white-space: nowrap;
 }
 
-.card {
-  background: #fff;
-  border-radius: 16px;
-  display: flex;
-  flex-direction: column;
-  padding: 16px;
-  width: 319px;
+// The row label — a shade darker than `.chipNote`, because it names a control rather than
+// annotating a value, and a control whose label is the faintest thing beside it reads as
+// disabled.
+.chipMeta {
+  color: #475467;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  white-space: nowrap;
 }
 
-// The design spaces the card internals with explicit spacer frames of three
-// different heights. They were collapsed to one 12px margin here, which was
-// right in only two of the nine places it was used — so each height is its own
-// class now, named after the frame it stands in for.
-.sp10 {
-  margin-top: 10px;
-}
-
-.sp12 {
-  margin-top: 12px;
-}
-
-.sp14 {
-  margin-top: 14px;
-}
-
-// The 8px spacer between a column header and the first row rule. On the header
-// rather than the row because `:first-of-type` on the row groups resolves
-// against the card's first div — the crumb — and so never matched.
-.thSpaced {
-  margin-bottom: 8px;
-}
-
-.stats {
-  display: flex;
-  gap: 16px;
-  width: 100%;
-}
-
-.fullBar {
+.chipRule {
+  background: #f2f4f7;
   display: block;
+  height: 1px;
   width: 100%;
 }
 
-.sectionLabel {
-  color: #a3a3a3;
-  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 9px;
+// Tabular figures, so 4,849 and 4.7 sit on the same stem widths as any other number that
+// lands in this slot — a mock-up whose digits reflow when the data changes is a mock-up.
+.chipValue {
+  color: #101828;
+  font-feature-settings: "tnum" 1;
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.7px;
+  line-height: 30px;
+}
+
+.chipUnit {
+  color: #475467;
+  font-size: 13px;
   font-weight: 500;
-  letter-spacing: 0.5px;
-  line-height: 13px;
+  line-height: 18px;
 }
 
-.cardCta {
-  color: #0284c7;
-  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 9px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-  line-height: 13px;
-}
-
-/* ---------------------------------------------------- analytics card pieces */
-
-.cardTabs {
-  display: flex;
-  gap: 18px;
-  margin: 12px 0 0;
-  width: 100%;
-}
-
-.cardTab {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.cardTabInner {
-  align-items: center;
+.chipOffer {
+  align-items: baseline;
   display: flex;
   gap: 5px;
 }
 
-.cardTabIcon {
-  height: 10px;
-  width: 9px;
-}
-
-.cardTabLabel,
-.cardTabLabelActive {
-  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 9px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-  line-height: 13px;
-  white-space: nowrap;
-}
-
-.cardTabLabel {
-  color: #a3a3a3;
-}
-
-.cardTabLabelActive {
-  color: #0a0a0a;
-}
-
-.cardTabUnderline {
-  background: #1466ff;
-  height: 2px;
-  width: 100%;
-}
-
-.chart {
-  align-items: flex-end;
-  display: flex;
-  height: 108px;
-  justify-content: space-between;
-  margin-top: 12px;
-  width: 100%;
-}
-
-.chartBar {
-  border-radius: 4px 4px 0 0;
-  flex-shrink: 0;
-  width: 24px;
-}
-
-.chartBarOn {
-  background: #1466ff;
-}
-
-.chartBarOff {
-  background: rgba(20, 102, 255, 0.28);
-}
-
-.months {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 8px;
-  width: 100%;
-}
-
-.month {
-  color: #a3a3a3;
-  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 9px;
-  font-weight: 500;
-  line-height: 12px;
-  text-align: center;
-  width: 24px;
-}
-
-/* ------------------------------------------------------- promos card pieces */
-
-.promoCrumb {
+.chipDelta {
   align-items: center;
+  color: #039855;
   display: flex;
-  height: 20px;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.promoLabel {
-  color: #737373;
-  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 9px;
-  font-weight: 500;
-  letter-spacing: 0.6px;
-  line-height: 13px;
-  white-space: nowrap;
-}
-
-.promoNew {
-  align-items: center;
-  background: #1466ff;
-  border-radius: 8px;
-  color: #fff;
-  display: flex;
-  font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  font-size: 10px;
-  font-weight: 500;
-  line-height: 14px;
-  padding: 3px 8px;
-}
-
-.featured {
-  background: #fafafa;
-  border: 1px solid #e5e5e5;
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: 12px;
-  padding: 12px;
-  width: 100%;
-}
-
-.featuredLabel {
-  color: #a3a3a3;
-  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 9px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-  line-height: 13px;
-}
-
-.featuredValue {
-  align-items: center;
-  display: flex;
-  gap: 6px;
-}
-
-.featuredNote {
-  color: #737373;
-  font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 11px;
-  font-weight: 400;
-  line-height: 15px;
+  font-weight: 600;
+  gap: 3px;
+  line-height: 16px;
 }
 
-/* ------------------------------------------------- shared list rows (2 & 3) */
+.chipDeltaIcon {
+  height: 7px;
+  width: 7px;
+}
 
-.listGroup {
+// A running campaign, said with a dot rather than a filled pill. A green badge is what every
+// status chip in every dashboard illustration looks like; a small live dot is what a product
+// uses when the state is ambient rather than a label you assigned.
+.chipLive {
+  align-items: center;
+  color: #039855;
   display: flex;
-  flex-direction: column;
+  font-size: 11px;
+  font-weight: 600;
+  gap: 5px;
+  line-height: 16px;
+}
+
+.chipDot {
+  background: #12b76a;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(18, 183, 106, 0.14);
+  display: block;
+  height: 5px;
+  width: 5px;
+}
+
+// A photograph now, not initials — see the note on the import.
+//
+// `object-fit: cover` because the source is square and this is a circle: without it the face
+// would letterbox inside the disc. The 1px inset ring is the detail that keeps a photo
+// avatar from sitting flush against white — real interfaces draw it, drawn ones forget it.
+.chipAvatar {
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(16, 24, 40, 0.08);
+  flex-shrink: 0;
+  height: 28px;
+  object-fit: cover;
+  width: 28px;
+}
+
+/* -------------------------------------------------------------- the controls */
+
+// The publish toggle. Drawn rather than an <input>: it is a picture of a control, and a real
+// checkbox here would be a focusable, clickable thing inside decorative art.
+.toggle {
+  background: #1c64f2;
+  border-radius: 999px;
+  display: block;
+  flex-shrink: 0;
+  height: 18px;
+  position: relative;
+  width: 32px;
+}
+
+.toggleKnob {
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.2);
+  height: 14px;
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  width: 14px;
+}
+
+// The discount slider. The fill and the handle share one number — see the note at the call
+// site — so the control cannot disagree with the figure above it.
+.slider {
+  background: #e4e7ec;
+  border-radius: 999px;
+  display: block;
+  height: 4px;
+  position: relative;
   width: 100%;
 }
 
-.listRow {
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 0;
-  width: 100%;
+.sliderFill {
+  background: #1c64f2;
+  border-radius: 999px;
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 50%;
 }
 
-.stars {
-  align-items: center;
-  display: flex;
-  gap: 2px;
-}
-
-.star {
-  height: 10px;
-  width: 10px;
-}
-
-.ratingValue {
-  align-items: center;
-  display: flex;
-  gap: 4px;
-}
-
-.ratingStar {
+.sliderKnob {
+  background: #fff;
+  border: 2px solid #1c64f2;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.24);
   height: 13px;
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
   width: 13px;
 }
 
-// Reduced motion keeps the active entry switching and the line filling — both
-// are information, not decoration — but drops the easing between states.
-@media (prefers-reduced-motion: reduce) {
-  .tab,
-  .tabLabel,
-  .tabBody {
-    transition: none;
+// The range picker. A bordered pill with a caret, which is what a select looks like — the
+// caret is the whole tell, and it is why this is not just another grey label.
+.chipSelect {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #e4e7ec;
+  border-radius: 7px;
+  color: #475467;
+  display: flex;
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 500;
+  gap: 5px;
+  line-height: 16px;
+  padding: 3px 7px;
+}
+
+.caret {
+  color: #98a2b3;
+  flex-shrink: 0;
+}
+
+/* ------------------------------------------------------------- the two charts */
+
+// Stretches to the chip's measure — the viewBox does the scaling, so there is no width to
+// keep in step with `.chip` and no JS to size it.
+.area {
+  display: block;
+  height: 58px;
+  width: 100%;
+}
+
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.barRow {
+  align-items: center;
+  display: flex;
+  gap: 7px;
+}
+
+// Both end columns are fixed so the tracks share one left and one right edge down the stack;
+// left to size themselves, a "5" and a "68%" would step the bars in and out by a pixel or two
+// each row, which reads as sloppy long before it reads as wrong.
+.barNum {
+  color: #98a2b3;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 14px;
+  width: 6px;
+}
+
+.barTrack {
+  background: #f2f4f7;
+  border-radius: 999px;
+  flex: 1;
+  height: 5px;
+  overflow: hidden;
+}
+
+.barFill {
+  background: #1c64f2;
+  border-radius: 999px;
+  display: block;
+  height: 100%;
+}
+
+.barPct {
+  color: #98a2b3;
+  font-feature-settings: "tnum" 1;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 14px;
+  text-align: right;
+  width: 24px;
+}
+
+/* ── THE LAYERED "SAVED" TOAST IS GONE ─────────────────────────────────────
+   `.chipToast` and `.chipTick` lived here — a dark pill overlapping the listings chip's
+   bottom-right corner, with `.chipWrap` as its positioning context.
+
+   It was there to give the art depth, on the reference's model of a file chip overlapping a
+   composer. That works in the reference because the two elements BELONG together: the chip is
+   the attachment the composer is about to send. A confirmation toast has no such relationship
+   to the card it covers — it just hangs off the corner, anchored to nothing, and it clipped
+   the card's own rounded edge on the way past. One plane, cleanly drawn, beats two planes
+   where the second is decoration.
+
+   It also made the listings chip the only one built differently from the other three, for no
+   reason the reader could see. All four are a plain `.chip` now. */
+
+.chipStars {
+  display: flex;
+  flex-shrink: 0;
+  gap: 2px;
+}
+
+.chipStar {
+  height: 11px;
+  width: 11px;
+}
+
+/* ── THE CHEVRON CONTROLS ARE GONE ─────────────────────────────────────────
+   `.discs`, `.disc` and `.chev` lived here — a 40px disc pair borrowed from Partner With Us's
+   rails. They were removed along with the JavaScript that drove them; see the note in
+   Tools.tsx. The rail is scroll-snap and native overflow now, with nothing to click.
+
+   `.headRight` went with them: it existed to stack the attribution above the discs, and with
+   the discs gone the attribution is a direct child of `.head` again. */
+
+@media (max-width: 900px) {
+  .section {
+    // --gutter is derived from --pad, so the rail's bleed and the track's padding both follow
+    // this one change.
+    --pad: 24px;
+    padding-bottom: 80px;
   }
-}
 
-// Stacked: the list sits above the panels, so there is nothing for it to stick
-// to and the progress line has nothing to report.
-/* ------------------------------------------- mock reveal, once per page load */
-
-// The first time a panel is reached, the contents of its mock come to life: the
-// stat underlines sweep, the chart columns grow from the baseline and the rows
-// deal in behind them. The card itself does not move — animating the whole
-// panel in was too much on top of this, and it reads better as a card that was
-// already there filling with its data. Everything is opacity and transform, so
-// nothing reflows and the card's measured geometry is untouched.
-//
-// Every rule below hangs off `.alive`, which the observer adds when the panel
-// is reached and clears once the section has fully left, so it plays again on
-// the next visit. `--i` carries each item's place in its queue so the stagger
-// reads left to right, and top to bottom, rather than everything landing flat.
-//
-// The lead-in before each group is small and deliberate: enough that the pieces
-// do not all start on the same frame, without a wait for anything to arrive.
-
-$reveal-ease: cubic-bezier(0.22, 1, 0.36, 1);
-
-.fullBar {
-  transform: scaleX(0);
-  transform-origin: left center;
-  transition: transform 0.7s $reveal-ease 0.04s;
-}
-
-.alive .fullBar {
-  transform: scaleX(1);
-}
-
-.chartBar {
-  transform: scaleY(0);
-  transform-origin: bottom;
-  transition: transform 0.55s $reveal-ease;
-  transition-delay: calc(0.06s + var(--i, 0) * 45ms);
-}
-
-.alive .chartBar {
-  transform: scaleY(1);
-}
-
-.featured {
-  opacity: 0;
-  transform: translateY(6px);
-  transition: opacity 0.45s $reveal-ease 0.05s, transform 0.45s $reveal-ease 0.05s;
-}
-
-.alive .featured {
-  opacity: 1;
-  transform: none;
-}
-
-.listRow {
-  opacity: 0;
-  transform: translateY(6px);
-  transition: opacity 0.45s $reveal-ease, transform 0.45s $reveal-ease;
-  transition-delay: calc(0.08s + var(--i, 0) * 55ms);
-}
-
-.alive .listRow {
-  opacity: 1;
-  transform: none;
-}
-
-// Under reduced motion the panels are marked revealed on mount rather than by
-// the observer, so these are already in their finished state — this only drops
-// the easing so nothing slides.
-@media (prefers-reduced-motion: reduce) {
-  .fullBar,
-  .chartBar,
-  .featured,
-  .listRow {
-    transition: none;
-  }
-}
-
-@media (max-width: 1100px) {
-  .body {
+  // Stacked under the copy: the attribution beside a 30px heading leaves the heading almost
+  // no measure to wrap in.
+  .head {
+    align-items: flex-start;
     flex-direction: column;
+    gap: 24px;
+    margin-bottom: 32px;
   }
 
-  .rail {
-    position: static;
-    width: 100%;
+  .heading {
+    font-size: 30px;
+    letter-spacing: -0.6px;
+    line-height: 38px;
   }
+
+  // Overrides `--card-w` at every count: three-up is not an option on a phone, so the card is
+  // always just under a viewport width and the peek always survives — it is the only thing
+  // telling a touch reader the row scrolls.
+  //
+  // No height here: the tile follows this width through its `aspect-ratio` and the copy takes
+  // what it needs, so the card sizes itself.
+  .railCard {
+    width: min(320px, 82vw);
+  }
+
+  .cardTitle {
+    font-size: 20px;
+    line-height: 28px;
+  }
+
+  // The chip is 244px and the narrow tile is 320px, which leaves 38px of ground each side —
+  // enough to read as floating, so the chip keeps its measure rather than being scaled.
 }

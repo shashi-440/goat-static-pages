@@ -1,10 +1,10 @@
-// Rail + navbar move as one fixed block. The shared navbar module positions the
-// <nav> itself `fixed; top: 0`, which would slide it over the rail — .navbar
-// below hands positioning back to this stack.
-// The whole stack slides up by the rail's height on the first scroll, so the
-// rail travels out through the top of the viewport and the navbar lands on the
-// top edge. Scroll back to 0 and it rides down again. The offset is set inline
-// from the rail's measured height (see Header.tsx).
+// The shared navbar module positions the <nav> itself `fixed; top: 0`; .navbar below
+// hands positioning back to this stack, which is what holds the bar at the top.
+//
+// ⚠️  This used to be a two-part stack — an announcement rail above the navbar — that
+// translated up by the rail's measured height on first scroll. The rail is gone, so the
+// stack holds one child and never moves. It is kept rather than collapsed because the
+// navbar's positioning override still depends on having this parent.
 .stack {
   left: 0;
   position: fixed;
@@ -17,47 +17,6 @@
 
 .navbar {
   position: relative;
-}
-
-// Announcement rail — Figma node 2456:6003.
-.rail {
-  align-items: center;
-  background: #f7f7f7;
-  display: flex;
-  gap: 8px;
-  height: 42px;
-  justify-content: center;
-  padding: 12px 24px;
-  width: 100%;
-}
-
-.railText {
-  color: #111928;
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 18px;
-  margin: 0;
-  white-space: nowrap;
-}
-
-.railStrong {
-  font-weight: 600;
-}
-
-.railCta {
-  color: #1466ff !important;
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 18px;
-  text-decoration: none;
-  white-space: nowrap;
-
-  &:hover,
-  &:active,
-  &:focus {
-    color: #1466ff !important;
-    text-decoration: underline;
-  }
 }
 
 // The design's nav links are 14px medium rather than the shared 16px/600.
@@ -77,7 +36,7 @@
 }
 
 // "Partner with us" in the bar. Collapsed to nothing at the top of the page so the
-// nav sits exactly as designed, then it opens out as the rail slides away.
+// nav sits exactly as designed, then it opens out once the hero is half past.
 //
 // The class is doubled on purpose: it shares the hero's `.cta` class and both
 // are single-class selectors, so without the extra specificity which one wins
@@ -109,17 +68,5 @@
   .stack,
   .navCta.navCta {
     transition: none;
-  }
-}
-
-// Below 1180px the full rail sentence no longer fits on one line; drop the
-// nowrap and let it wrap rather than overflow the viewport.
-@media (max-width: 1180px) {
-  .rail {
-    height: auto;
-  }
-
-  .railText {
-    white-space: normal;
   }
 }

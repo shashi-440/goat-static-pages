@@ -25,6 +25,14 @@ interface Step {
   video?: string;
   /** Optional poster frame shown before the clip can play. */
   poster?: string;
+  /**
+   * Tints the media container instead of leaving it on the default #f7f7f7.
+   *
+   * ⚠️  Needed because the step-two asset has a TRANSPARENT background — verified, 53% of it is
+   * fully transparent alpha. On a white-ish container the phone mock-up floats with no ground; the
+   * container's own colour becomes the artwork's background, so it has to be stated per step.
+   */
+  tint?: string;
 }
 
 const STEPS: Step[] = [
@@ -37,11 +45,47 @@ const STEPS: Step[] = [
     title: "Get your paperwork done",
     description:
       "Paperwork’s on us, no need to fuss — we handle the contracts, the deposit and every form in between, and keep you posted at every step.",
+    // ⚠️  THE #F2F2F2 GROUND IS BAKED INTO THE CLIP, not just set on the container, and that is the
+    // interesting part. The source (hgesjsdjklsdkjhdsjdskghkdgh.mov) is Apple HEVC WITH AN ALPHA
+    // CHANNEL — 53% of every frame is fully transparent, which ffprobe under-reports as plain
+    // `yuv420p`. Two facts follow and they box you in:
+    //   · H.264 cannot carry alpha at all;
+    //   · HEVC-with-alpha plays in Safari and NOT in Chrome.
+    // The usual way out is two sources (VP9/WebM for Chrome, HEVC/MP4 for Safari). Not needed here:
+    // the design puts this clip on a flat #F2F2F2 panel, so compositing that colour underneath gives
+    // a pixel-identical result from one universally playable H.264 file. Verified — every corner of
+    // the transcoded frame reads #F2F2F2.
+    //
+    // The trade, stated so nobody is surprised: this clip is no longer reusable on any other
+    // background. Re-flatten from the source if the panel colour ever changes.
+    //
+    // 4.2MB HEVC -> 365KB H.264 at 1280x720, which is a real reduction and not a compression
+    // artefact of the codec swap: the source was 1920x1080 and the media box is 712x475.
+    video: "/assets/images/pages/HowItWorksV2/assets/step-processing.mp4",
+    tint: "#f2f2f2",
   },
   {
     title: "Accommodation Booked!",
     description:
       "Relax, pack your bags, and unravel a new life chapter — your room is confirmed, your move-in date is set, and our team stays a message away.",
+    // The first step to carry its own clip; the other two still fall back to the placeholder.
+    //
+    // ⚠️  REFERENCED BY URL, NOT IMPORTED, for the same reason as the placeholder above: the asset
+    // rule only matches images, so `import` on an .mp4 does not build. CopyRspackPlugin's existing
+    // `src/pages/**\/assets/*.*` pattern emits it to this path.
+    //
+    // Same treatment as step two, and for the same reason — see the long note there. The source
+    // (hgshjssjhjhss.mov) is Apple HEVC WITH ALPHA, 61% of each frame transparent, so it cannot be
+    // H.264 without losing the transparency and cannot stay HEVC without losing Chrome. #F2F2F2 is
+    // composited underneath and the container is tinted to match, which makes the seam invisible.
+    //
+    // 4.8MB HEVC -> 380KB H.264 at 1280x720. This replaced an earlier 6.4MB stream copy of a
+    // different source that was kept at 1080p; the weight problem went away with it.
+    video: "/assets/images/pages/HowItWorksV2/assets/step-booked.mp4",
+    // ⚠️  MUST MATCH THE COLOUR BAKED INTO THE CLIP ABOVE. The clip's own ground is #F2F2F2; leaving
+    // the container on the stylesheet's #F7F7F7 default puts a five-level step right at the video's
+    // edge, which reads as a visible rectangle around the artwork.
+    tint: "#f2f2f2",
   },
 ];
 
@@ -199,7 +243,13 @@ const Steps = () => {
               <p className={styles.cardText}>{step.description}</p>
             </div>
 
-            <div className={styles.media}>
+            {/* The tint is inline because it is per-step data; the class carries everything else.
+                Undefined leaves the stylesheet's own #f7f7f7 in place rather than overriding it
+                with a literal, so the default lives in one file. */}
+            <div
+              className={styles.media}
+              style={step.tint ? { background: step.tint } : undefined}
+            >
               {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
               <video
                 className={styles.video}

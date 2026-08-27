@@ -18,15 +18,10 @@
   width: 100%;
 }
 
-.headingBlock {
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  text-align: center;
-  width: 100%;
-}
-
+// ── `.headingBlock` AND `.subheading` ARE GONE ──────────────────────────────
+// The block was a centred column pairing the h2 with a line of copy under it. With the copy
+// removed there is one child left, so the h2 takes the block's own centring — `text-align`
+// and the full width — and the wrapper is one element for nothing.
 .heading {
   color: #111928;
   font-size: 40px;
@@ -34,15 +29,8 @@
   letter-spacing: -1px;
   line-height: 48px;
   margin: 0;
-}
-
-.subheading {
-  color: #4b5563;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 24px;
-  margin: 0;
-  max-width: 660px;
+  text-align: center;
+  width: 100%;
 }
 
 // Figma: the list is 880px wide, centred.
@@ -51,6 +39,36 @@
   flex-direction: column;
   max-width: 880px;
   width: 100%;
+}
+
+// A group heading between runs of questions.
+//
+// ⚠️  IT SITS IN THE SAME FLEX COLUMN AS THE ROWS, as a sibling rather than a wrapper. Wrapping each
+// group in its own container would nest the rows one level deeper and break `.item:last-child`, which
+// is what removes the final rule — every group's last row would lose its border instead of just the
+// list's.
+//
+// The first one needs no top margin: it is the first thing in the list and `.inner`'s gap already
+// separates it from the h2.
+.group {
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1.1px;
+  line-height: 16px;
+  margin: 44px 0 4px;
+  text-transform: uppercase;
+
+  &:first-child {
+    margin-top: 0;
+  }
+}
+
+// ⚠️  A ROW FOLLOWING A HEADING DROPS ITS TOP RULE. Without this the heading is sandwiched between the
+// previous group's closing border and its own group's first border — two hairlines a few px apart
+// with a label squeezed between them.
+.group + .item {
+  border-top: 0;
 }
 
 .item {

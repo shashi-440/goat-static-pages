@@ -1,0 +1,28 @@
+// The 108px frame from the design (node 5985:12087 and its siblings).
+//
+// `overflow: hidden` is the design's own `overflow-clip`: the radiating diagram is positioned with
+// negative insets on two sides and is MEANT to be cut off by this box. Removing the clip does not
+// reveal more of a drawing, it lets that fragment spill into the cell above.
+.icon {
+  height: 108px;
+  overflow: hidden;
+  position: relative;
+  width: 108px;
+}
+
+// Both levels are plain absolute boxes; the `inset` value comes in from the component, because it
+// differs per fragment and there is no sensible way to express forty distinct insets as classes.
+.outer,
+.inner {
+  position: absolute;
+}
+
+// Fills whichever box encloses it. `max-width: none` because the site's global image rules cap
+// images at 100% of their container in a way that would shrink a fragment whose own box is
+// deliberately larger than the artwork.
+.art {
+  display: block;
+  height: 100%;
+  max-width: none;
+  width: 100%;
+}

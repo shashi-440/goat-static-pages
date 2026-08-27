@@ -1,17 +1,40 @@
+// Same frame as the page's other bands: 80px gutters, a 1280px measure and the
+// 120px bottom rhythm.
 .section {
   align-items: center;
   background: #fff;
   display: flex;
   flex-direction: column;
-  padding: 0 80px 120px;
+  padding: 0 var(--pad) 120px;
   width: 100%;
+
+  // The section's own gutter, named so the rail can both cancel it and restore it.
+  //
+  // It is the distance from the window edge to the 1280px measure: the padding, plus
+  // whatever slack sits beside a maxed-out .inner on a wide screen. Deriving it beats
+  // hard-coding 80px, which is only correct at exactly 1440px.
+  --pad: 80px;
+  --gutter: calc((100vw - min(1280px, 100vw - 2 * var(--pad))) / 2);
 }
 
 .inner {
   display: flex;
   flex-direction: column;
-  gap: 56px;
   max-width: 1280px;
+  width: 100%;
+}
+
+/* ------------------------------------------------------- heading + controls */
+
+// `flex-end` so the control cluster sits on the heading's BASELINE side rather
+// than its cap — the heading is 48px of line box and the discs are 40px, so
+// centring them leaves the pair floating above the word it sits beside.
+.head {
+  align-items: flex-end;
+  display: flex;
+  gap: 32px;
+  justify-content: space-between;
+  margin-bottom: 48px;
   width: 100%;
 }
 
@@ -24,243 +47,351 @@
   margin: 0;
 }
 
-.body {
-  align-items: flex-start;
-  display: flex;
-  gap: 80px;
-  width: 100%;
-}
+/* ---------------------------------------------------------------- the track */
 
-/* --------------------------------------------------------------- tab column */
-
-// The list holds its place while the panels scroll past it. `top` clears the
-// navbar, which is all that stays fixed once the announcement rail has slid out.
-.rail {
-  align-self: flex-start;
-  flex-shrink: 0;
-  position: sticky;
-  top: 104px;
-  width: 424px;
-}
-
-.tabs {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-// Every entry is the same height whether it is the active one or not, and no
-// property that changes between the two states affects layout: the label swaps
-// size inside a fixed 24px line box, and the description only changes colour.
-// That is what keeps the column still — an entry that grew or collapsed as the
-// active one moved would shove the entries below it and read as a bounce.
+// Runs END TO END on BOTH sides: out past the 1280px measure to each window edge, so
+// a partly-scrolled card is cut by the window rather than stopping short of it with a
+// stripe of page beside it.
 //
-// This is deliberately the List With Us behaviour rather than the Figma frame's,
-// which draws the inactive entries label-only at 64px. Every description stays
-// readable and the rail never reflows.
-.tab {
-  background: none;
-  border: 0;
-  color: #9ca3af;
-  cursor: pointer;
+// The gutter it cancels is restored as PADDING on the track below, which is what keeps
+// the first card on the measure at rest and gives the last one somewhere to stop. The
+// two must stay equal and opposite.
+//
+// (100vw counts the classic scrollbar where one is reserved, so on those platforms the
+// bleed overshoots by its width — a few px further off screen, which is harmless.)
+.viewport {
+  margin-left: calc(-1 * var(--gutter));
+  margin-right: calc(-1 * var(--gutter));
+  // Snap positions are measured from the padding edge, so without this the first card
+  // snaps to the window edge instead of to the measure.
+  scroll-padding-left: var(--gutter);
+  overflow-x: auto;
+  // ⚠️  EXPLICIT, and not redundant. Per spec a `visible` axis computes to `auto`
+  // when the other axis is not visible, so `overflow-x: auto` alone silently makes
+  // this a VERTICALLY scrolling box too — and Reveal starts every card at
+  // translateY(32px), which is 32px of real content below the box. That was a
+  // stray vertical scrollbar on the rail.
+  overflow-y: hidden;
+  // Snap so a trackpad swipe settles on a card edge instead of mid-card. Works
+  // with the chevrons' own scrollTo rather than against it — that lands on a
+  // pitch multiple, which is already a snap position.
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  width: auto;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.track {
+  display: flex;
+  gap: 24px;
+  // ⚠️  REQUIRED for `padding-right` below to do anything at all.
+  //
+  // As a block-level flex box the track's used width is its containing block's — the
+  // viewport's 1440px — and the cards, which do not shrink, simply overflow it. Its
+  // trailing padding then sits inside that 1440px box, hundreds of pixels to the LEFT
+  // of where the cards actually end, and contributes nothing to the scrollable width.
+  // Measured: `scrollWidth` came out as leading-padding + cards exactly, with the
+  // trailing gutter missing, so the last card could never come to rest on the measure.
+  //
+  // Sizing the track to its content puts its right padding edge after the last card,
+  // where it belongs.
+  width: max-content;
+  // Restores, as padding, exactly what the viewport cancelled as margin. The leading
+  // one puts the first card on the measure at rest; the trailing one lets the LAST
+  // card come to rest on the measure too, instead of stopping half off the window
+  // edge with nowhere left to scroll.
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
+}
+
+// Width comes from `--card-w`, set on the track by the component — it depends on
+// the number of cards, which CSS cannot see. See `cardWidth` in Benefits.tsx for
+// why. The fallback is the three-up fraction, so a card is never widthless if the
+// property fails to land.
+.card {
+  background: #f7f7f7;
+  border-radius: 20px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  // The extra bottom pixel is the rule's own: the track is positioned rather
-  // than a border, so without it the row would swallow the design's 112 + 1.
-  padding: 20px 0 21px;
-  position: relative;
-  text-align: left;
-  transition: color 0.28s cubic-bezier(0.22, 1, 0.36, 1);
-  width: 100%;
+  flex-shrink: 0;
+  gap: 28px;
+  height: 424px;
+  overflow: hidden;
+  // ⚠️  NO LEFT PADDING. The inset is applied by `.copy` and `.media` separately
+  // instead, which is what lets one card's art opt out of it — see `.mediaBleed`.
+  // While it lived here, a full-bleed art could only try to escape with a negative
+  // margin, and `.media`'s own `overflow: hidden` clipped that straight back to the
+  // inset window. The globe looked padded no matter what the art asked for.
+  padding: 28px 0 0 0;
+  scroll-snap-align: start;
+  width: var(--card-w, calc((100% - 48px) / 3));
+
+  // Published so art can CANCEL it. Most art wants the inset — a screenshot needs a
+  // left margin or its bezel sits on the card's edge — but the globe is a picture of
+  // the earth and has to reach both sides. Exposing the number beats hard-coding 28
+  // in another file and letting the two drift.
+  --card-inset: 28px;
 }
 
-// The column's box already lines up with the panels, but the first row's top
-// padding pushed its label 20px below the top edge of the image beside it.
-// Dropping it sits the first label on that edge; the rows below keep the
-// design's 20px, which is the breathing room between entries rather than a
-// leading indent. Row heights stay fixed per row, so this costs no movement.
-.tab:first-child {
-  padding-top: 0;
+// Inset on BOTH sides. The card no longer supplies the left one, and the copy always
+// wants both — only art ever goes edge to edge.
+.copy {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 var(--card-inset);
 }
 
-.tabLabel {
-  font-size: 16px;
-  font-weight: 500;
+.cardTitle {
+  color: #111928;
+  font-size: 20px;
+  font-weight: 600;
   letter-spacing: -0.2px;
-  line-height: 24px;
-  transition: font-size 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  line-height: 28px;
+  margin: 0;
 }
 
-.tabBody {
-  color: #9ca3af;
+.cardBody {
+  color: #4b5563;
   font-size: 14px;
   font-weight: 400;
-  line-height: 20px;
-  transition: color 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  line-height: 22px;
+  margin: 0;
 }
 
-.tabActive {
-  color: #111928;
-
-  .tabLabel {
-    font-size: 20px;
-    font-weight: 600;
-  }
-
-  .tabBody {
-    color: #4b5563;
-  }
+// The amber flex wordmark set inline in a card TITLE.
+//
+// Sized to the title's own cap height rather than its font-size: at 20px/600 the caps
+// measure ~19px, and matching that is what makes the mark sit as the first word of the
+// heading instead of as a picture in front of it.
+.titleMark {
+  display: inline-block;
+  height: 19px;
+  vertical-align: -2px;
+  width: auto;
 }
 
-// The design's 1px divider, doubling as the progress readout: it fills across
-// while its panel travels past the sticky line, so an entry shows how far
-// through its own section the reader is. Entries already passed sit full,
-// entries still to come sit empty.
-.tabTrack {
-  background: #e5e7eb;
-  bottom: 0;
-  height: 1px;
-  left: 0;
+
+/* ------------------------------------------------------------- the mock-ups */
+
+// Just the WINDOW: it takes whatever height the copy leaves and clips whatever is
+// inside it, so a two-line title and a three-line one still produce a level row.
+// The frame belongs to the art rather than to the window, because the two kinds of
+// art frame themselves differently — a screenshot needs a bezel drawn round it, a
+// drawn panel already is one.
+.media {
+  flex: 1;
+  // The left inset, applied here rather than by the card, so a card can drop it.
+  margin-left: var(--card-inset);
+  min-height: 0;
   overflow: hidden;
-  position: absolute;
-  right: 0;
 }
 
-// Driven by transform rather than width so tracking the scroll costs no layout.
-// Only opacity is transitioned — the width has to track the scroll exactly, so
-// easing it would make the line lag the page.
-.tabFill {
-  background: #1466ff;
+// Full-bleed art: reaches the card's left edge as well as its right and bottom.
+// Used by the globe — a picture of the earth with a margin down one side reads as
+// the planet floating in a box.
+.mediaBleed {
+  margin-left: 0;
+}
+
+// A browser window for the real screenshots. Square on the right and bottom because
+// the art leaves the card on those two sides, and a radius there would draw a corner
+// in mid-air.
+.shot {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px 0 0 0;
+  box-shadow: 0 12px 32px rgba(17, 25, 40, 0.08);
+  display: flex;
+  flex-direction: column;
   height: 100%;
-  left: 0;
-  opacity: 0;
-  position: absolute;
-  top: 0;
-  transform: scaleX(0);
-  transform-origin: left center;
-  transition: opacity 0.3s ease;
+  overflow: hidden;
+}
+
+// The window's title bar. `flex-shrink: 0` so it keeps its height whatever the card
+// leaves for the screenshot below it — the frame reading as a window depends entirely
+// on this bar being intact.
+.chrome {
+  align-items: center;
+  background: #fbfbfc;
+  border-bottom: 1px solid #eef0f3;
+  display: flex;
+  flex-shrink: 0;
+  gap: 8px;
+  height: 26px;
+  padding: 0 10px;
+}
+
+.dots {
+  align-items: center;
+  display: flex;
+  flex-shrink: 0;
+  gap: 4px;
+
+  i {
+    background: #dcdfe4;
+    border-radius: 50%;
+    display: block;
+    height: 6px;
+    width: 6px;
+  }
+}
+
+// Empty by design — see the note on `Screenshot` in Benefits.tsx for why there is no
+// address in it. Capped rather than full-width so it reads as an address bar in a
+// window wider than the card, which is what the crop already implies.
+.urlPill {
+  background: #eef0f3;
+  border-radius: 999px;
+  height: 9px;
+  max-width: 150px;
   width: 100%;
 }
 
-/* ------------------------------------------------------------- media panels */
+// Takes the height the chrome leaves and crops the screenshot to it.
+.shotBody {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
 
-.panels {
+/* ---------------------------------------------- drawn art (globe fallback) */
+
+// The drawn panels fit the window's WIDTH and leave only by the bottom. A
+// screenshot cropped on the right reads as more app continuing past the edge; a
+// drawn panel cropped on the right just reads as severed text, because its own
+// right column is a value that has to be whole to mean anything.
+// `min-height: 100%` so the panel reaches the card's bottom edge rather than
+// stopping mid-card and leaving a band of bare card colour under it, which reads
+// as a panel that failed to load.
+.drawn {
+  box-shadow: 0 12px 32px rgba(17, 25, 40, 0.08);
   display: flex;
-  flex: 1 0 0;
   flex-direction: column;
-  gap: 24px;
+  gap: 10px;
+  min-height: 100%;
+  width: 100%;
+}
+
+// The rows take the height the crumb leaves and SPREAD to fill it, rather than
+// stacking at a fixed pitch and leaving white beneath.
+//
+// This is why the drawn panels do not need to overflow the way the screenshots do.
+// Making them crop would mean padding them out with rows nobody wrote — three more
+// cities is harmless mock data, but three more stages of a student journey is a
+// claim about the product. Distributing the real rows fills the frame honestly.
+.drawnRows {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 0;
+}
+
+// The dot-and-name pairs down the left of a drawn row.
+.drawnLeft {
+  align-items: center;
+  display: flex;
+  gap: 8px;
   min-width: 0;
 }
 
-.panel {
+// `mock.chip` is a flex with no gap and no justification — sized for a chip that
+// is only a label. These carry a label AND a note, so the two need pushing apart
+// or they read as one run-together string.
+.drawnChip {
+  justify-content: space-between;
+  width: 100%;
+}
+
+// Its own size, top-left anchored, overflowing the frame on the right and
+// bottom. `max-width: none` because the app's reset caps images at 100% of their
+// container, which would scale this back down to fit and undo the crop.
+// Its own size, top-left anchored, overflowing the bezel on the right and bottom.
+// `max-width: none` because the app's reset caps images at 100% of their container,
+// which would scale this back down to fit and undo the crop. Held near its native
+// size deliberately: at card width a 577px screenshot scaled to fit is unreadable.
+// `height: auto` keeps its aspect and the bezel's `overflow: hidden` does the
+// cropping, so there is no object-fit here — it would have nothing to do.
+.mockup {
+  display: block;
+  height: auto;
+  max-width: none;
+  width: 520px;
+}
+
+/* ---------------------------------------------------------------- controls */
+
+// The disc values are Testimonials' own — #ebebeb, #202020, 40px, and the
+// #f1f1f1/#c9c9c9 disabled pair — so the two rails on this page cannot drift
+// apart. Only the discs are shared; this rail has no dots (see Benefits.tsx).
+.discs {
   align-items: center;
-  border-radius: 24px;
   display: flex;
   flex-shrink: 0;
-  height: 485px;
-  justify-content: center;
-  overflow: hidden;
-  padding: 40px;
-  position: relative;
-  width: 100%;
+  gap: 8px;
 }
 
-.panelImage {
-  height: 100%;
-  inset: 0;
-  object-fit: cover;
-  position: absolute;
-  width: 100%;
-}
-
-.panelWash {
-  -webkit-backdrop-filter: blur(3px);
-  backdrop-filter: blur(3px);
-  background: rgba(0, 0, 0, 0.05);
-  inset: 0;
-  position: absolute;
-}
-
-// 593 x 380 in the design, holding the screenshot in a 577 x 364 window. Both
-// dimensions are capped rather than fixed so the frame narrows with the column
-// below 1360px instead of overflowing its panel.
-.bezel {
-  aspect-ratio: 593 / 380;
-  border-radius: 16px;
+// Both discs carry the same pair of looks, chosen by whether there is anywhere
+// left to go in that direction. `color` drives the inline chevron.
+.disc {
+  align-items: center;
+  background: #ebebeb;
+  border: 0;
+  border-radius: 50%;
+  color: #202020;
+  cursor: pointer;
   display: flex;
-  flex-direction: column;
-  max-height: 380px;
-  max-width: 593px;
-  position: relative;
-  width: 100%;
-}
+  height: 40px;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.2s ease, color 0.2s ease;
+  width: 40px;
 
-.mockup {
-  border-radius: 8px;
-  flex: 1 0 0;
-  min-height: 0;
-  // The assets are cropped to the window's own aspect, so this only guards
-  // against the rounding either side of it — the screenshots are anchored to
-  // their top edge because that is the part of each product page the design
-  // shows.
-  object-fit: cover;
-  object-position: top;
-  width: 100%;
-}
-
-/* ------------------------------------------------- panel reveal, per visit */
-
-// The first time a panel is reached its frame settles into place. Opacity and
-// transform only, so the measured geometry the sticky rail depends on never
-// moves. `.alive` is added by the observer when the panel is reached and cleared
-// once the section has fully left, so it plays again on the next visit.
-.bezel {
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.alive .bezel {
-  opacity: 1;
-  transform: none;
-}
-
-// Reduced motion keeps the active entry switching and the line filling — both
-// are information, not decoration — but drops the easing between states. The
-// panels are marked revealed on mount in that mode, so the frame is already in
-// its finished state and this only stops it sliding there.
-@media (prefers-reduced-motion: reduce) {
-  .tab,
-  .tabLabel,
-  .tabBody,
-  .bezel {
-    transition: none;
+  &:disabled {
+    background: #f1f1f1;
+    color: #c9c9c9;
+    cursor: default;
   }
 }
 
-// Stacked: the list sits above the panels, so there is nothing for it to stick
-// to and the progress line has nothing to report.
-@media (max-width: 1100px) {
-  .body {
-    flex-direction: column;
-    gap: 40px;
-  }
-
-  .rail {
-    position: static;
-    width: 100%;
-  }
+.chev {
+  height: 16px;
+  width: 16px;
 }
 
 @media (max-width: 900px) {
   .section {
-    padding: 0 24px 64px;
+    // --gutter is derived from --pad, so the rail's bleed and the track's padding
+    // both follow this one change.
+    --pad: 24px;
+    padding-bottom: 80px;
   }
 
-  .panel {
-    height: auto;
-    padding: 24px;
+  // Stacks under the heading on narrow screens: a 40px control cluster beside a
+  // 30px heading leaves the heading almost no measure to wrap in.
+  .head {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .heading {
+    font-size: 30px;
+    letter-spacing: -0.6px;
+    line-height: 38px;
+  }
+
+  // Overrides `--card-w` at every count: on a phone three-up is not an option, so
+  // the card is always just under a viewport width and the peek always survives —
+  // it is the only thing telling a touch reader the row scrolls.
+  .card {
+    height: 400px;
+    width: min(320px, 82vw);
   }
 }

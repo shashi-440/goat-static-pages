@@ -5,10 +5,12 @@
 // either side.
 // Just the globe now — the headline stat row above it was removed, so there is
 // nothing to space against.
+// The 1200px cap this used to carry belonged to a sphere sitting in a page column. The
+// map is full-bleed now and the layer that holds it is already exactly as wide as it
+// should be, so anything narrower here shows as white margins the map cannot reach past.
 .box {
   display: flex;
   flex-direction: column;
-  max-width: 1200px;
   width: 100%;
 }
 
@@ -40,10 +42,6 @@
 // recover without an explicit resize().
 .stage {
   aspect-ratio: var(--globe-aspect, 880 / 620);
-  // Standard paints deep space behind the globe, which lands as a hard black
-  // rectangle in a white hero. Rounded to the same 24px the hero photo used, so it
-  // reads as a panel rather than an unfinished crop.
-  border-radius: 24px;
   overflow: hidden;
   // NO fade-in, deliberately.
   //
@@ -59,13 +57,19 @@
   // same moment, which is what the entrance needs.
   width: 100%;
 
-  // The radius has to be repeated on Mapbox's canvas and its container. A WebGL
-  // canvas gets its own compositing layer, and a composited layer is not clipped by
-  // an ancestor's border-radius — the stage measured as `border-radius: 24px;
-  // overflow: hidden` while the dark corners rendered square anyway.
+  // NO CORNER RADIUS, on the stage or on Mapbox's own elements.
+  //
+  // There was 24px here, from when this was a globe sitting as a panel in a hero column.
+  // The map is full-bleed: it runs to the window's edges, so a rounded corner is a bite
+  // taken out of the Pacific rather than a softened panel.
+  //
+  // ⚠️ It has to be stated on the CANVAS too, not just the stage. A WebGL canvas gets its
+  // own compositing layer, and a composited layer is NOT clipped by an ancestor's
+  // border-radius — squaring the stage alone left the canvas rounding its corners
+  // regardless, which is the same reason the radius was duplicated here originally.
   :global(.mapboxgl-canvas-container),
   :global(.mapboxgl-canvas) {
-    border-radius: 24px;
+    border-radius: 0;
   }
 
   // Mapbox's own chrome.
@@ -258,5 +262,102 @@
   // leaves the frame mostly empty.
   .stage {
     aspect-ratio: var(--globe-aspect-mobile, 1 / 1);
+  }
+}
+
+
+/* ───────────────────────────────────────────────── the tour tooltip ── */
+
+// The label over the city the tour is currently showing.
+//
+// A DOM element rather than a Mapbox `symbol` layer, and the reason is this block: a
+// text layer's `text-halo` is the whole of the background it can have. No rounded
+// plate, no translucency, and above all no backdrop blur — which is what lets a light
+// panel sit over a saturated globe without either washing the map out or being
+// unreadable against it.
+//
+// Positioned entirely from JS (see `tipRef`): the frame loop writes `transform` and
+// `opacity`, so nothing here sets either.
+.tip {
+  align-items: center;
+  backdrop-filter: blur(14px) saturate(1.4);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  background: rgba(255, 255, 255, 0.66);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 14px;
+  box-shadow:
+    0 10px 30px rgba(12, 24, 48, 0.18),
+    0 2px 6px rgba(12, 24, 48, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  left: 0;
+  padding: 9px 14px 10px;
+  // Decorative, and it hangs over a globe that can be dragged. It must never take a
+  // pointer event meant for the map underneath it.
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  // Only the fade is transitioned. `transform` is rewritten every frame by the loop, and
+  // a transition on it would lag one frame behind the building forever.
+  transition: opacity 0.3s ease;
+  white-space: nowrap;
+  z-index: 6;
+}
+
+.tipHead {
+  align-items: center;
+  color: #111928;
+  display: flex;
+  font-size: 13px;
+  font-weight: 600;
+  gap: 7px;
+  letter-spacing: -0.1px;
+  line-height: 18px;
+}
+
+// White behind the flag for the same reason the pins carry it: Nepal's is the one
+// non-rectangular national flag and its PNG has transparent corners.
+.tipFlag {
+  background: #fff;
+  border-radius: 50%;
+  display: block;
+  height: 15px;
+  object-fit: cover;
+  width: 15px;
+}
+
+.tipCountry {
+  color: #6b7280;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+// The counter. Tabular figures so the number does not jitter sideways as it ticks —
+// proportional digits change the panel's width on every arrival.
+// `.tipStats` and `.tipDivide` lived here — a flex row and a hairline, for the moment the
+// tooltip printed enquiries AND bookings side by side. One figure again, so the row is one
+// child and the wrapper earned nothing.
+
+.tipStat {
+  align-items: baseline;
+  display: flex;
+  font-feature-settings: "tnum" 1;
+  font-variant-numeric: tabular-nums;
+  gap: 5px;
+
+  b {
+    color: #1466ff;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    line-height: 20px;
+  }
+
+  i {
+    color: #4b5563;
+    font-size: 11px;
+    font-style: normal;
+    font-weight: 500;
   }
 }

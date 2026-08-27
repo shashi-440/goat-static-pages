@@ -273,9 +273,9 @@ const Steps = () => {
               </div>
 
               <div className={styles.copy}>
-                <h3 className={styles.stepTitle}>Fill the form</h3>
+                <h3 className={styles.stepTitle}>Signup with us</h3>
                 <p className={styles.stepBody}>
-                  Share your details and property info. Our team reaches out within 24 hours.
+                  Tell us about your rooms, availability, and portfolio.
                 </p>
               </div>
             </div>
@@ -333,9 +333,9 @@ const Steps = () => {
               </div>
 
               <div className={styles.copy}>
-                <h3 className={styles.stepTitle}>Let us do the work</h3>
+                <h3 className={styles.stepTitle}>We set you up</h3>
                 <p className={styles.stepBody}>
-                  We review your offerings, terms and commission, then finalise onboarding.
+                  Our team handles onboarding, commercials, and getting your property live.
                 </p>
               </div>
             </div>
@@ -402,9 +402,9 @@ const Steps = () => {
               </div>
 
               <div className={styles.copy}>
-                <h3 className={styles.stepTitle}>Get booked</h3>
+                <h3 className={styles.stepTitle}>You get booked</h3>
                 <p className={styles.stepBody}>
-                  Go live in front of student demand from 160+ source countries.
+                  Reach students across 160+ source countries and turn demand into bookings.
                 </p>
               </div>
             </div>

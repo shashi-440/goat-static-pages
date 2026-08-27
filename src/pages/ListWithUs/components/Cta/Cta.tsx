@@ -24,11 +24,14 @@ const Cta = () => (
       <div className={styles.content}>
         <Reveal className={styles.block}>
           <div className={styles.text}>
-            <h2 className={styles.heading}>
-              Fill the form in minutes.
-              <br />
-              amber takes it from there.
-            </h2>
+            {/* ONE LINE now, and the `<br />` that split the old two-line heading is gone with
+                it — a manual break under a single short line would just add an empty row.
+
+                It replaced "Fill the form in minutes. / amber takes it from there.", which had
+                gone stale: the Steps section above no longer has a "fill the form" step at all
+                (it reads Signup with us / We set you up / You get booked), so this was the last
+                place on the page still describing a form. */}
+            <h2 className={styles.heading}>Sign Up now with amber</h2>
             <p className={styles.sub}>A dedicated team. Student demand from 160+ countries.</p>
           </div>
 

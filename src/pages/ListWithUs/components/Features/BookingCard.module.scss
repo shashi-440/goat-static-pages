@@ -1,0 +1,353 @@
+// One booking, start to finish. Sits in the card's media window and fills it.
+//
+// ⚠️  THE MARGIN IS SHADOW CLEARANCE. `.media` clips with `overflow: hidden`, so a shadow can only show
+// as far as this margin reaches. Bottom stays 0: the art is meant to bleed off the foot.
+//
+// ⚠️  `min-height: 100%`, NOT more. An overhang was copied here from the receipt once, where the extra
+// height is deliberately BLANK so a tilt can cover the corners. There is no tilt here, so the content
+// flowed into it and the footer ended up below the window, clipped.
+.card {
+  background: #fff;
+  border: 1px solid #eceef1;
+  border-radius: 10px;
+  // Three layers, which is what reads as elevation rather than as a grey blur: a tight edge, a close
+  // contact shadow, and a wider lift. Radii sit inside the 18px margin or they would be cut.
+  box-shadow:
+    0 1px 2px rgba(17, 25, 40, 0.05),
+    0 4px 8px rgba(17, 25, 40, 0.06),
+    0 10px 18px rgba(17, 25, 40, 0.07);
+  display: flex;
+  flex-direction: column;
+  margin: 12px 18px 0;
+  min-height: 100%;
+  padding: 13px 14px 12px;
+  transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.34s ease;
+  width: calc(100% - 36px);
+}
+
+/* --------------------------------------------------------------------- head */
+
+.head {
+  align-items: baseline;
+  display: flex;
+  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  font-weight: 500;
+  justify-content: space-between;
+  letter-spacing: 0.6px;
+  line-height: 13px;
+}
+
+.headL {
+  color: #737373;
+}
+
+.headR {
+  color: #a3a3a3;
+}
+
+/* ----------------------------------------------------------------- the student */
+
+// A tinted strip rather than another plain row: it groups the three facts about WHO this booking is
+// and separates them from the timeline below without needing a rule to do it.
+.who {
+  align-items: center;
+  background: linear-gradient(180deg, #f8fafd 0%, #f4f7fc 100%);
+  border: 1px solid #eaeff7;
+  border-radius: 9px;
+  display: flex;
+  gap: 9px;
+  margin: 11px 0 2px;
+  padding: 8px 9px;
+}
+
+// ⚠️  `box-sizing: border-box` is set here rather than inherited: on a content-box img the 1px ring
+// would make this 32px and push the row's height by a pixel.
+//
+// The ring is lighter than it was for the photo. These illustrations carry their own pastel circle
+// that fills the frame, so the crop already reads as round — the ring is now just an edge against the
+// strip's tint rather than the thing making the circle legible.
+.avatar {
+  border: 1px solid rgba(17, 25, 40, 0.06);
+  border-radius: 50%;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  height: 30px;
+  object-fit: cover;
+  width: 30px;
+}
+
+// `min-width: 0` so the meta line can ellipsis instead of forcing the chip out of the strip.
+.whoText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.whoName {
+  color: #111928;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 17px;
+}
+
+.whoMeta {
+  color: #6b7280;
+  font-size: 10.5px;
+  line-height: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// The progress count. Blue rather than green: the booking is not finished, and a green chip on an
+// unfinished booking is the kind of detail that gets read as a bug.
+.chip {
+  background: rgba(28, 100, 242, 0.09);
+  border-radius: 999px;
+  color: #1c64f2;
+  flex-shrink: 0;
+  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  line-height: 11px;
+  padding: 4px 7px;
+}
+
+/* ------------------------------------------------------------------ the trail */
+
+// ⚠️  `flex: 1` PLUS `space-between` IS WHAT FILLS THE PANEL. An earlier version was a fixed stack of
+// four rows and left the bottom 40% of the card blank. Distributed, the steps use whatever height is
+// left at any card size.
+.trail {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 8px 0 6px;
+}
+
+.step {
+  align-items: center;
+  display: flex;
+  gap: 11px;
+}
+
+// The tile and its connector share one column so the line runs through the tiles' centres. The column
+// is `relative` and the line absolute, so the line spans the row's full height whatever it contains.
+.mark {
+  align-self: stretch;
+  flex-shrink: 0;
+  position: relative;
+  width: 26px;
+}
+
+// ⚠️  A TILE WITH AN ICON, NOT A DOT — and this is what stops the panel reading as four identical
+// rows. Each step's tile carries its own hue from `--tint`/`--ink`, set by the `.tone*` classes, so
+// the four events are distinguishable at a glance.
+//
+// STATE IS FILL, NOT COLOUR: a done step gets the filled tint, the open one gets a dashed outline
+// (`.tileOpen`). Keeping the two axes separate is what lets colour mean "kind of event" rather than
+// "done or not", which is the distinction the old single-blue version could not make.
+.tile {
+  align-items: center;
+  background: var(--tint);
+  border: 1px solid transparent;
+  border-radius: 7px;
+  color: var(--ink);
+  display: flex;
+  height: 26px;
+  justify-content: center;
+  left: 0;
+  position: absolute;
+  top: calc(50% - 13px);
+  width: 26px;
+  // Over the connector, so the tile breaks the line rather than the line crossing it.
+  z-index: 1;
+}
+
+// The step that has not happened: no fill, a dashed edge, and the glyph dropped back to grey.
+.tileOpen {
+  background: #fff;
+  border-color: #d7dbe2;
+  border-style: dashed;
+  color: #b0b7c3;
+  transition: border-color 0.34s ease, color 0.34s ease;
+}
+
+// ⚠️  A MASK, NOT AN IMAGE. This build emits `.svg` as a plain asset URL (`type: "asset"` in
+// webpack/base.config.ts — there is no svgr), so the file cannot be tinted as an `<img>`. Masked, it
+// contributes only its alpha and `background: currentColor` takes the tile's `--ink`.
+//
+// `-webkit-` prefixes are carried because Safari only dropped them at 15.4.
+.glyph {
+  background: currentColor;
+  height: 14px;
+  width: 14px;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+$booking-icons: (
+  iconMail: "mail-open",
+  iconCalendar: "calendar-check",
+  iconFile: "file-check",
+  iconKey: "key-round",
+);
+
+@each $class, $file in $booking-icons {
+  .#{$class} {
+    -webkit-mask-image: url("../../assets/icons/booking/#{$file}.svg");
+    mask-image: url("../../assets/icons/booking/#{$file}.svg");
+  }
+}
+
+// The four hues, from the same palette the numbers panel uses. Each is a fill and its ink, kept as a
+// pair so a recolour cannot change one and miss the other.
+.toneSky {
+  --ink: #4ba3e3;
+  --tint: rgba(75, 163, 227, 0.12);
+}
+
+.toneIndigo {
+  --ink: #6466e9;
+  --tint: rgba(100, 102, 233, 0.12);
+}
+
+.toneTeal {
+  --ink: #3f9e91;
+  --tint: rgba(85, 181, 166, 0.16);
+}
+
+.tonePending {
+  --ink: #b0b7c3;
+  --tint: transparent;
+}
+
+// Runs from this row's tile to the next. `top`/`bottom` rather than a height, so it stretches with the
+// distributed rows.
+.line {
+  background: #e2e6ec;
+  bottom: -50%;
+  left: 12.25px;
+  position: absolute;
+  top: calc(50% + 15px);
+  width: 1.5px;
+}
+
+// The leg into the step that has not happened. Dashed rather than solid, so the run of solid line
+// stops exactly where the booking actually got to — a gradient because a 1.5px-wide element cannot
+// carry a dashed border.
+.lineOpen {
+  background: repeating-linear-gradient(#c9ced6 0 3px, transparent 3px 6px);
+}
+
+/* ------------------------------------------------------------------- the copy */
+
+// ⚠️  `.body` AND `.gap` ARE GONE. The label used to sit in a `.body` column alongside an elapsed-time
+// line; with that line cut the wrapper had one child and the label takes the `flex: 1` directly.
+
+.label {
+  color: #111928;
+  flex: 1;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 17px;
+  min-width: 0;
+}
+
+// The step still open. Lighter, not struck through: it has not failed, it has not happened yet.
+.labelOpen {
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+
+// Mono so the clocks form a column instead of four differently-set strings.
+.time {
+  color: #6b7280;
+  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9.5px;
+  line-height: 14px;
+  white-space: nowrap;
+}
+
+.timeOpen {
+  color: #c9ced6;
+}
+
+/* ------------------------------------------------------------------- the foot */
+
+.rule {
+  background: #eceef1;
+  height: 1px;
+  width: 100%;
+}
+
+.foot {
+  align-items: baseline;
+  display: flex;
+  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9.5px;
+  justify-content: space-between;
+  letter-spacing: 0.2px;
+  line-height: 14px;
+  padding: 10px 0 2px;
+}
+
+.footLabel {
+  color: #6b7280;
+}
+
+.footValue {
+  color: #111928;
+  font-weight: 600;
+}
+/* --------------------------------------------------------------------- hover */
+
+// ⚠️  GATED ON A REAL POINTER. Without `(hover: hover) and (pointer: fine)` a touch device applies the
+// hover state on tap and then LEAVES IT APPLIED until something else is tapped — a card stuck in its
+// lifted state with no way to dismiss it.
+//
+// ⚠️  THE SHADOW DEEPENS BY ALPHA, NOT BY BLUR, and that is a hard constraint rather than a
+// preference. `.media` clips with `overflow: hidden`, so these radii were sized to fit inside the
+// panel's own margin — growing them on hover would push the shadow past the clip and the lift would
+// arrive with a straight cut edge on two sides. Alpha costs no geometry.
+//
+// ⚠️  `prefers-reduced-motion` DROPS THE TRANSITION AND THE MOVE, keeping only the shadow. The point
+// of the gesture is "this is a surface"; that survives without the 2px, and a translate is exactly
+// what a reader who asked for no motion asked not to get.
+
+// The panel-specific half: the OPEN step firms up. It is the one thing on this card that is still to
+// happen, so drawing attention there on hover says something rather than just glowing.
+@media (hover: hover) and (pointer: fine) {
+  .card:hover {
+    box-shadow:
+      0 1px 2px rgba(17, 25, 40, 0.07),
+      0 4px 8px rgba(17, 25, 40, 0.09),
+      0 10px 18px rgba(17, 25, 40, 0.11);
+    transform: translateY(-2px);
+  }
+
+  .card:hover .tileOpen {
+    border-color: #aeb7c4;
+    color: #8d95a3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .tileOpen {
+    transition: none;
+  }
+
+  .card:hover {
+    transform: none;
+  }
+}

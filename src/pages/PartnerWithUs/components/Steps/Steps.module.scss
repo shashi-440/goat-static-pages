@@ -242,23 +242,42 @@
   align-items: center;
   display: flex;
   flex: 1 0 0;
-  gap: 16px;
+  // 12px, down from 16: the chip brings its own 12px of padding, so the old gap read
+  // as double the space between the label and its rule.
+  gap: 12px;
   min-width: 0;
 }
 
+// A chip rather than bare text, so the label reads as a marker ON the rail instead
+// of a word sitting beside it.
+//
+// Only colour ever changes between the two states — never a dimension. The chip has
+// a border rather than an outline-free fill so the reached state can darken the edge
+// too, and a border does not move anything; a state that changed the padding or the
+// border width would shift the rule beside it by that much on every step.
 .railLabel {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
   color: #9ca3af;
   flex-shrink: 0;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
-  line-height: 20px;
-  transition: color 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  line-height: 18px;
+  padding: 4px 12px;
+  transition: background 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.32s cubic-bezier(0.22, 1, 0.36, 1);
   white-space: nowrap;
 }
 
-// Every step the rail has walked so far, including the one filling now.
+// Every step the rail has walked so far, including the one filling now. Tinted with
+// the rail's own blue rather than going black: the chip and the bar next to it are
+// one indicator, and two different "done" colours read as two.
 .railLabelReached {
-  color: #000;
+  background: rgba(20, 102, 255, 0.09);
+  border-color: rgba(20, 102, 255, 0.22);
+  color: #1466ff;
 }
 
 .railTrack {
