@@ -256,3 +256,36 @@ $row-gap: 14px;
     display: none;
   }
 }
+
+@media (max-width: 600px) {
+  .headerInner {
+    margin-bottom: 32px;
+  }
+
+  .title {
+    font-size: 30px;
+    letter-spacing: -0.4px;
+  }
+
+  .subtitle {
+    font-size: 16px;
+    line-height: 26px;
+  }
+
+  // Scaled further than the 900px rule's 0.56. A 400px card at 0.56 is still
+  // 224px, so on a 375px screen barely more than one card is on view and the arc
+  // reads as a flat strip. At 0.42 roughly three cards are visible either side of
+  // centre, which is what makes the curve legible.
+  //
+  // The margin is recomputed for the new scale: two rows at 190px plus the 14px
+  // row gap is a ~394px box, and 0.42 leaves ~166px of it — so ~114px is
+  // reclaimed at each end.
+  .stage {
+    margin: -114px 0;
+    transform: scale(0.42);
+  }
+
+  .section {
+    padding-bottom: 48px;
+  }
+}

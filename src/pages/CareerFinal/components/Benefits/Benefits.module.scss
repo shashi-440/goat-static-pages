@@ -30,8 +30,9 @@
   align-items: center;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  max-width: 640px;
+  // Holds the heading alone since the lede was removed, so there is no gap to
+  // set and the cap is sized to keep the title on two lines rather than three.
+  max-width: 820px;
   text-align: center;
 }
 
@@ -46,14 +47,6 @@
   margin: 0;
 }
 
-// $neutral6, the body grey the other light v2 sections use for a section lede.
-.lede {
-  color: $neutral6;
-  font-size: 18px;
-  font-weight: 400;
-  line-height: 28px;
-  margin: 0;
-}
 
 // Three columns, all cards the same height.
 //
@@ -173,7 +166,12 @@
     gap: 16px;
   }
 
-  .card {
-    padding: 24px;
+  // The padding lives on `.tilt` (the rotating surface), not on `.card` — this
+  // rule targeted `.card` and so did nothing.
+  .tilt {
+    // Cards are content-height in one column; the 232px floor only existed to
+    // even out a multi-column row and here it just pads short cards with air.
+    min-height: 0;
+    padding: 22px;
   }
 }

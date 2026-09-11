@@ -29,3 +29,96 @@
     font-family: inherit;
   }
 }
+
+// ---------------------------------------------------------------- responsive
+//
+// The gutter is the page's single layout lever: every section pads itself with
+// `var(--page-gutter)`, so stepping it down here re-flows the whole page at once
+// rather than each section carrying its own gutter override.
+//
+// The desktop value floors at 80px, which is what broke phones — at 375px that
+// is 160px of a 375px viewport spent on padding, leaving ~215px for content.
+// The steps below bring it to a phone-appropriate 20px.
+@media (max-width: 900px) {
+  .page {
+    --page-gutter: 40px;
+  }
+}
+
+@media (max-width: 600px) {
+  .page {
+    --page-gutter: 20px;
+  }
+}
+
+// ------------------------------------------------ shared Navbar and Footer
+//
+// Both are shared with the other v2 pages and neither carries mobile rules, so
+// the fixes are scoped to this page's wrapper rather than edited at the source —
+// About Us, How It Works and the rest keep their current behaviour untouched.
+//
+// Targeted by ELEMENT (`nav`, `footer`), not by class: those classes belong to
+// the shared modules and are hashed at build time, so a `:global(.navbar)`
+// selector would never match. `.page nav` is stable and, since this page renders
+// exactly one of each, unambiguous.
+@media (max-width: 900px) {
+  // The Navbar prices its own gutter in a private `--gutter` custom property
+  // that floors at 80px, same as the page's did. It has to be stepped down
+  // separately — `--page-gutter` above does not reach it.
+  .page nav {
+    --gutter: 40px;
+  }
+}
+
+@media (max-width: 600px) {
+  .page nav {
+    --gutter: 20px;
+  }
+
+  // The nav is two links plus the CTA, which fits a phone once the gutter is
+  // off — but only just, so the link padding tightens to buy back a few pixels.
+  .page nav a {
+    font-size: 15px;
+  }
+}
+
+// The footer replica is a percentage-width flex row (`max-width: 30%` left,
+// `20%` contact) with `display: contents` on the link-column wrapper, so every
+// column is a direct flex child of one row. It never wraps, which on a phone
+// squeezes five columns into ~335px.
+//
+// `[data-testid="footer-section"]` is the stable, unhashed hook the replica
+// already exposes; `> div` beneath it is the `.mainDesktopContainer` row.
+@media (max-width: 900px) {
+  .page [data-testid="footer-section"] {
+    padding: 48px var(--page-gutter);
+
+    > div {
+      // The columns become a wrapping grid rather than an unwrappable row. The
+      // percentage caps are lifted so each column takes its grid track.
+      display: grid;
+      gap: 32px 24px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+
+      > div {
+        max-width: none;
+        width: auto;
+      }
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .page [data-testid="footer-section"] {
+    padding: 40px var(--page-gutter);
+
+    > div {
+      gap: 28px 20px;
+      // The brand block (logo, blurb, Trustpilot) is much wider than a link
+      // column, so it spans the full width and the link columns pair up beneath.
+      > div:first-child {
+        grid-column: 1 / -1;
+      }
+    }
+  }
+}

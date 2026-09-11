@@ -7,6 +7,7 @@ import Reveal from "../../../AboutUsV2/components/Reveal/Reveal";
 // are present without JS, then counts from 0 once visible.
 import CountUp from "../../../AboutUsV2/components/CountUp/CountUp";
 import LottieIcon, { LottieIconHandle } from "../LottieIcon/LottieIcon";
+import firstName from "../../firstName";
 import styles from "./Globe.module.scss";
 // Team headshots — the markers are the people, not the places. Six individual
 // shots plus five crew shots is every face this page has; with fifteen markers a
@@ -659,7 +660,7 @@ const Globe = () => {
                   <div
                     className={`${styles.hoverCard} ${isActive ? styles.hoverCardOpen : ""}`}
                   >
-                    <p className={styles.cardName}>{person.name}</p>
+                    <p className={styles.cardName}>{firstName(person.name)}</p>
                     <p className={styles.cardDept}>{person.department}</p>
                     <div className={styles.cardCountry}>
                       <img src={person.flag} alt="" className={styles.cardFlag} />

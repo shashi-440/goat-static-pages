@@ -164,3 +164,82 @@
   margin: 0;
   max-width: 488px;
 }
+
+/* ------------------------------------------------------------- responsive */
+
+@media (max-width: 900px) {
+  .section {
+    padding: 64px var(--page-gutter);
+  }
+
+  .heading {
+    font-size: 38px;
+    letter-spacing: -0.7px;
+  }
+
+  .subtitle {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 600px) {
+  .section {
+    padding: 56px var(--page-gutter);
+  }
+
+  // The fan is 84 + 90 + 123 + 90 + 84 wide less its overlaps — about 407px,
+  // which overflows a 375px phone on its own. Everything steps down by roughly a
+  // third and the overlaps tighten with it, so the arrangement is preserved
+  // rather than wrapped or truncated.
+  .avatars {
+    margin-bottom: 28px;
+  }
+
+  .avatarSmall {
+    height: 54px;
+    width: 54px;
+  }
+
+  .avatarMedium {
+    height: 60px;
+    margin: 0 -14px;
+    width: 60px;
+  }
+
+  .avatarCenter {
+    height: 82px;
+    margin: 0 -8px;
+    width: 82px;
+  }
+
+  // The entrance slides the outer avatars in from their desktop offsets; at this
+  // size those overshoot well past the centre, so they scale down to match.
+  .side {
+    &.left1 {
+      transform: translateX(38px) scale(0.6);
+    }
+    &.left2 {
+      transform: translateX(82px) scale(0.6);
+    }
+    &.right1 {
+      transform: translateX(-38px) scale(0.6);
+    }
+    &.right2 {
+      transform: translateX(-82px) scale(0.6);
+    }
+  }
+
+  .copy {
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .heading {
+    font-size: 30px;
+    letter-spacing: -0.4px;
+  }
+
+  .subtitle {
+    font-size: 16px;
+  }
+}

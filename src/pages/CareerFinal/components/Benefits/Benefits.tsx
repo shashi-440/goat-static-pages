@@ -3,24 +3,25 @@ import wrapperHOC from "@Utils/wrapperHOC";
 import Reveal from "../../../AboutUsV2/components/Reveal/Reveal";
 import LottieIcon, { LottieIconHandle } from "../LottieIcon/LottieIcon";
 import styles from "./Benefits.module.scss";
-// One purpose-picked icon per benefit, from the Iconly animation set.
+// One purpose-picked icon per benefit, re-sourced from the Iconly animation set
+// when the section copy was rewritten, so each glyph matches its new card.
 //
-// Copied into this folder rather than referenced from outside the repo, and
-// recoloured on import from pure black (and a few red accents) to $neutral7 —
-// the grey every other Lottie on this page uses. White stops are deliberately
-// left alone: in these files white is the knockout that gives each glyph its
-// counters, so recolouring it would fill the holes and turn the icon into a blob.
+// Recoloured on import from pure black to $neutral7 (#374151) — the grey every
+// other Lottie on this page uses. White stops are deliberately left alone: in
+// these files white is the knockout that gives each glyph its counters, so
+// recolouring it would fill the holes and turn the icon into a blob.
 //
-// Each was rendered at frames 0/20/40/60/89 before being committed, to confirm it
-// ends on a drawn frame. That check exists because four of this page's original
-// icons (heart-bag, cup, party, shield) are blank at every frame, and LottieIcon
-// parks on the last one — so a broken export shows up as a missing icon.
+// Every file was checked for vector content before being committed. That matters
+// because the previous set included four blank exports (heart-bag, cup, party,
+// shield) that carried ~4 shapes against the ~14 a drawn icon has, and
+// LottieIcon parks on the last frame — so a blank export shows as a missing
+// icon.
 import healthAnim from "../../assets/lottie/benefit-health.json";
-import everydayAnim from "../../assets/lottie/benefit-everyday.json";
-import familyAnim from "../../assets/lottie/benefit-family.json";
+import perksAnim from "../../assets/lottie/benefit-perks.json";
+import leaveAnim from "../../assets/lottie/benefit-leave.json";
 import financialAnim from "../../assets/lottie/benefit-financial.json";
-import timeAnim from "../../assets/lottie/benefit-time.json";
-import learningAnim from "../../assets/lottie/benefit-learning.json";
+import celebrationsAnim from "../../assets/lottie/benefit-celebrations.json";
+import growthAnim from "../../assets/lottie/benefit-growth.json";
 
 interface Benefit {
   title: string;
@@ -37,42 +38,38 @@ interface Benefit {
 // offer letter rather than a careers page.
 const BENEFITS: Benefit[] = [
   {
-    title: "Health & Wellbeing",
+    title: "Health & Wellness",
     body:
-      "Medical, dental and vision cover for you and your dependents, plus therapy and mental " +
-      "health support when you need it.",
+      "Medical insurance, wellness support and benefits that help you take care of yourself " +
+      "and your family.",
     icon: healthAnim,
   },
   {
-    title: "Everyday Life",
-    body:
-      "A monthly lifestyle stipend, commuter and phone allowances, and lunch and snacks on the " +
-      "house.",
-    icon: everydayAnim,
-  },
-  {
-    title: "Family Support",
-    body:
-      "Paid parental leave for biological, adoptive and foster parents, with support for your " +
-      "path to parenthood.",
-    icon: familyAnim,
-  },
-  {
-    title: "Financial Future",
-    body:
-      "Retirement and pension plans with a company match, and help navigating equity and " +
-      "financial planning.",
+    title: "Financial Benefits",
+    body: "Competitive pay, performance bonuses and recognition for the work you do.",
     icon: financialAnim,
   },
   {
-    title: "Time Away",
-    body: "Flexible paid vacation, public holidays, and a company-wide year-end closure.",
-    icon: timeAnim,
+    title: "Perks & Support",
+    body: "Meals, cab support and relocation assistance to make everyday work life easier.",
+    icon: perksAnim,
   },
   {
-    title: "Learning & Growth",
-    body: "Funds for courses, training and subscriptions, so you keep growing in the role.",
-    icon: learningAnim,
+    title: "Leave & Flexibility",
+    body: "We provide flexible leaves when life needs your attention.",
+    icon: leaveAnim,
+  },
+  {
+    title: "Celebrations & Culture",
+    body: "Festivals, team wins, milestones and plenty of reasons to celebrate together.",
+    icon: celebrationsAnim,
+  },
+  {
+    title: "Growth & Ownership",
+    body:
+      "Early responsibility, direct access to leaders and the freedom to take on bigger " +
+      "opportunities.",
+    icon: growthAnim,
   },
 ];
 
@@ -160,11 +157,7 @@ const Benefits = () => {
     <section className={styles.section}>
       <div className={styles.inner}>
         <Reveal className={styles.top}>
-          <h2 className={styles.heading}>Benefits</h2>
-          <p className={styles.lede}>
-            We want people to do their best work here, which means taking care of them in the
-            moments that matter.
-          </p>
+          <h2 className={styles.heading}>Because a good job should feel good too</h2>
         </Reveal>
 
         <ul ref={gridRef} className={styles.grid}>

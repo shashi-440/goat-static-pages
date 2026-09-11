@@ -533,3 +533,61 @@
     box-shadow: 0 0 0 2px #fff, 0 2px 7px rgba(0, 0, 0, 0.22);
   }
 }
+
+// ----------------------------------------------------------------- phones
+//
+// Same technique as the 900px rule above and for the same reason: the globe's
+// 622px box is set inline from the JS SIZE and the avatar pins are projected
+// into that exact pixel space, so the box is never re-laid-out — only scaled as
+// a whole, which carries the pins with it. The negative margin reclaims the
+// layout space the untransformed box still occupies.
+@media (max-width: 600px) {
+  .section {
+    padding-bottom: 56px;
+  }
+
+  .title {
+    font-size: 30px;
+    letter-spacing: -0.4px;
+    // The desktop cap holds the heading's line break; on a phone the viewport
+    // is already narrower than the cap, so it just blocks the text from using
+    // the full column.
+    max-width: none;
+  }
+
+  .lede {
+    font-size: 16px;
+    line-height: 26px;
+    margin-bottom: 32px;
+    max-width: none;
+  }
+
+  .grid {
+    gap: 32px;
+  }
+
+  // 622px scaled to 0.52 is ~323px, which fits a 375px viewport inside the 20px
+  // page gutter with room to spare.
+  .globeWrap {
+    margin: -149px 0;
+    transform: scale(0.52);
+  }
+
+  // Three stat columns will not sit on one line at this width, so the row
+  // becomes a two-up grid — content-sized flex columns would wrap 2 + 1 with
+  // the orphan hanging under a gap of empty space.
+  .stats {
+    display: grid;
+    gap: 24px 16px;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stat {
+    min-width: 0;
+  }
+
+  .statValue {
+    font-size: 22px;
+    line-height: 28px;
+  }
+}
