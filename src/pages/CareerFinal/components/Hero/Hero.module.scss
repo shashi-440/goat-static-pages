@@ -138,3 +138,70 @@
     border-radius: calc(16px * var(--shrink));
   }
 }
+
+/* --------------------------------------------------- hero image switcher */
+
+// A review control, not page furniture: it floats above the page, sits at 45%
+// opacity so it never pulls the eye away from the hero, and only resolves to
+// full strength when it is actually being used (hover / keyboard focus).
+.switch {
+  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(10, 10, 40, 0.08);
+  border-radius: 999px;
+  bottom: 24px;
+  box-shadow: 0 6px 24px rgba(10, 10, 40, 0.08);
+  display: flex;
+  gap: 2px;
+  left: 50%;
+  opacity: 0.45;
+  padding: 4px;
+  position: fixed;
+  transform: translateX(-50%);
+  transition: opacity 0.2s ease;
+  z-index: 60;
+
+  &:hover,
+  &:focus-within {
+    opacity: 1;
+  }
+}
+
+.switchOption {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  color: rgba(10, 10, 40, 0.55);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+  line-height: 16px;
+  padding: 6px 14px;
+  transition: background 0.2s ease, color 0.2s ease;
+  white-space: nowrap;
+
+  &:hover {
+    color: rgba(10, 10, 40, 0.8);
+  }
+}
+
+.switchOptionActive {
+  background: rgba(10, 10, 40, 0.07);
+  color: rgba(10, 10, 40, 0.9);
+}
+
+@media (max-width: 600px) {
+  .switch {
+    bottom: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .switch,
+  .switchOption {
+    transition: none;
+  }
+}

@@ -34,7 +34,7 @@ const CareerFinal = () => (
         the CTA becomes "Apply now", secondary until the page is scrolled. */}
     <Navbar
       links={[
-        { label: "Blogs", href: "/blog" },
+        { label: "Visit Amber", href: "/" },
         { label: "About Us", href: "/about-us-v2" },
       ]}
       ctaLabel="Apply now"

@@ -4,15 +4,44 @@ import wrapperHOC from "@Utils/wrapperHOC";
 import Reveal from "../../../AboutUsV2/components/Reveal/Reveal";
 import RolesButton from "../RolesButton/RolesButton";
 import styles from "./Hero.module.scss";
-// 2432x1368 (16:9) JPEG — the hero goes full-bleed at 100vw before shrinking,
-// so it needs the extra width; JPEG keeps it at 767KB instead of 6MB.
+// 16:9 JPEGs — the hero goes full-bleed at 100vw before shrinking, so it needs
+// the width; JPEG keeps each one under 500KB instead of several MB.
 import heroImg from "../../assets/hero.jpg";
+import heroNeonImg from "../../assets/hero-neon.jpg";
+// 3:2 rather than 16:9 like the other two, so `object-fit: cover` trims roughly
+// 8% off the top and bottom of this one inside the hero frame.
+import heroCampusImg from "../../assets/hero-campus.jpg";
+
+// Hero photo candidates, switchable from the floating control at the bottom of
+// the page so the shot can be compared in place before one is committed to.
+// Adding another option is one entry here; the switch sizes itself to the list.
+const HERO_OPTIONS = [
+  {
+    id: "campus",
+    label: "Campus",
+    src: heroCampusImg,
+    alt: "Students talking on a campus bench under blossoming trees",
+  },
+  {
+    id: "open-floor",
+    label: "Open floor",
+    src: heroImg,
+    alt: "An amber team member working at a laptop in the open-plan office",
+  },
+  {
+    id: "neon",
+    label: "Neon desk",
+    src: heroNeonImg,
+    alt: "Two amber teammates working together under a neon 'Believe in your dreams' sign",
+  },
+];
 
 // Distance (px) over which the hero image eases from full-bleed to contained.
 const SHRINK_DISTANCE = 420;
 
 const Hero = () => {
   const [mediaShown, setMediaShown] = useState(false);
+  const [heroOption, setHeroOption] = useState(0);
   const mediaRef = useRef<HTMLDivElement>(null);
 
   // On first load: reveal the hero image AFTER the title + button have shown.
@@ -68,13 +97,30 @@ const Hero = () => {
 
       <div ref={mediaRef} className={`${styles.media} ${mediaShown ? styles.mediaShown : ""}`}>
         <Image
-          src={heroImg}
-          alt="An amber team member working in a sunlit office lounge"
+          key={HERO_OPTIONS[heroOption].id}
+          src={HERO_OPTIONS[heroOption].src}
+          alt={HERO_OPTIONS[heroOption].alt}
           className={styles.image}
           width="100%"
           height="100%"
           isEagerLoad
         />
+      </div>
+
+      {/* Deliberately low-contrast: a review aid that sits over the page
+          without competing with it. Comes up to full opacity on hover/focus. */}
+      <div className={styles.switch} role="group" aria-label="Hero image option">
+        {HERO_OPTIONS.map((option, index) => (
+          <button
+            key={option.id}
+            type="button"
+            className={`${styles.switchOption} ${index === heroOption ? styles.switchOptionActive : ""}`}
+            aria-pressed={index === heroOption}
+            onClick={() => setHeroOption(index)}
+          >
+            {option.label}
+          </button>
+        ))}
       </div>
     </section>
   );

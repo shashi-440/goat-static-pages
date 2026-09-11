@@ -85,9 +85,26 @@ const CARDS: Shot[] = [
 // is, until there are enough photos for twelve a row.
 //
 // The cost is duplicates: every row draws from the same deck, so a photo can be
-// visible in two rows at once. Offsets space them as far apart as the deck allows,
-// which is the most that can be done without more photos — the rows spin at
-// different speeds, so no offset keeps them apart forever.
+// visible in two rows at once. That is unavoidable without more photos — but
+// what made it READ as duplication was the ordering, not the repeat.
+//
+// Rotating one deck (the old `[...slice(k), ...slice(0, k)]`) leaves every row
+// walking the photos in the SAME sequence, just started at a different card. So
+// whenever two rows drifted into a matching angle — and they do, since a rotation
+// by k slots is exactly what the spin keeps producing — they showed the same RUN
+// of photos, in the same order, stacked directly above one another. Four abreast
+// in the screenshot that prompted this.
+//
+// Each row now walks the deck with its own STRIDE instead. A stride co-prime with
+// the deck length visits every card exactly once before repeating, so each row
+// still carries the full deck (the arc needs the count) while no two rows ever
+// share more than a single card in sequence. Lone coincidences still happen and
+// the rows' differing speeds carry them apart within a second or two; it is the
+// four-in-a-row block that is now impossible.
+//
+// STRIDES MUST STAY CO-PRIME WITH CARDS.length. A common factor makes the walk
+// close early and the row would carry a repeating subset instead of the deck —
+// 6 against 18 would give one photo cycled three times. Asserted below in dev.
 //
 // WHEN 18 MORE PHOTOS ARRIVE: switch to disjoint slices of twelve —
 //   const PER_ROW = Math.floor(CARDS.length / ROW_COUNT);
@@ -95,11 +112,24 @@ const CARDS: Shot[] = [
 // — which makes a repeat impossible AND keeps the arc, since each row still holds
 // twelve cards.
 const ROW_COUNT = 3;
-const ROW_OFFSET = [0, 6, 12];
-const ROWS: Shot[][] = Array.from({ length: ROW_COUNT }, (_, r) => {
-  const k = ROW_OFFSET[r] % CARDS.length;
-  return [...CARDS.slice(k), ...CARDS.slice(0, k)];
-});
+const ROW_START = [0, 6, 12];
+const ROW_STRIDE = [1, 5, 7];
+const ROWS: Shot[][] = Array.from({ length: ROW_COUNT }, (_, r) =>
+  CARDS.map((_card, i) => CARDS[(ROW_START[r] + i * ROW_STRIDE[r]) % CARDS.length]),
+);
+
+if (__DEV__) {
+  const gcd = (a: number, b: number): number => (b ? gcd(b, a % b) : a);
+  ROW_STRIDE.forEach((stride, r) => {
+    if (gcd(stride, CARDS.length) !== 1) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `Gallery: ROW_STRIDE[${r}] = ${stride} shares a factor with the ${CARDS.length}-card deck, ` +
+          "so that row repeats a subset instead of carrying every photo.",
+      );
+    }
+  });
+}
 
 // ---- Cylinder geometry ---------------------------------------------------
 // Cards sit on the INSIDE wall of a cylinder with the viewer at its centre,
