@@ -1,6 +1,7 @@
 import Image from "@Components/Image";
 import wrapperHOC from "@Utils/wrapperHOC";
 import Reveal from "../../../AboutUsV2/components/Reveal/Reveal";
+import firstName from "../../firstName";
 import styles from "./Team.module.scss";
 // Headshots, from Figma (Career Page Cleanup, node 3007:4592) where each is
 // labelled with its owner's name and country. Head-cropped before committing the
@@ -221,7 +222,7 @@ const TestimonialCard = ({ member, ariaHidden = false }: TestimonialCardProps) =
         <img src={member.flag} alt="" className={styles.avatarFlag} />
       </span>
       <div className={styles.authorText}>
-        <p className={styles.name}>{member.name}</p>
+        <p className={styles.name}>{firstName(member.name)}</p>
         {/* Department, then the light-hearted title in brackets. One line, two
             weights: the department is the real information and the aside sits
             behind it rather than competing. */}

@@ -3,7 +3,12 @@
   background: #0a0a0a;
   display: flex;
   flex-direction: column;
-  padding: 80px 120px;
+  // The same gutter CareerFinal's CrewCTA uses, written out rather than as
+  // `var(--page-gutter)`: that custom property is declared on CareerFinal's own
+  // page wrapper, so referencing it here resolves to nothing and the padding
+  // collapses to 0. The literal keeps the two bands identical without making this
+  // page depend on the other one's scope.
+  padding: 80px max(80px, calc((100% - 1280px) / 2));
   width: 100%;
 }
 
@@ -154,18 +159,53 @@
   max-width: 488px;
 }
 
+// Matches CareerFinal's RolesButton `solid` variant — same white pill, radius,
+// padding and label, plus the cursor-following highlight that button has, so the
+// two closing CTAs behave identically.
+//
+// Not the shared RolesButton component itself: that links to `#open-roles`, an
+// anchor that only exists on the Career page, so on About Us it would scroll
+// nowhere. This keeps the link to /career and borrows only the styling.
 .button {
+  // Cursor position, written by the component on mousemove; centred by default so
+  // the first frame of a hover is never in a corner.
+  --mx: 50%;
+  --my: 50%;
+
+  align-items: center;
   background: #fff;
   border-radius: 999px;
   color: #202020;
+  display: inline-flex;
   font-size: 14px;
   font-weight: 600;
+  justify-content: center;
   line-height: 17px;
+  overflow: hidden;
   padding: 16px 24px;
+  position: relative;
   text-decoration: none;
-  transition: opacity 0.15s ease;
+  transition: box-shadow 0.18s ease, background-color 0.18s ease;
+}
 
-  &:hover {
-    opacity: 0.9;
-  }
+// The highlight. A dark wash, because a white one is invisible on a white button.
+// Drawn as a pseudo-element from the two custom properties rather than from React
+// state — a setState per mousemove would re-render the tree ~60x a second for a
+// value only the compositor consumes.
+.button::after {
+  background: radial-gradient(
+    120px circle at var(--mx) var(--my),
+    rgba(0, 0, 0, 0.07),
+    transparent 70%
+  );
+  content: "";
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  transition: opacity 0.18s ease;
+}
+
+.button:hover::after {
+  opacity: 1;
 }

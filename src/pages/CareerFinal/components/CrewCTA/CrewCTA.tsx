@@ -4,19 +4,27 @@ import wrapperHOC from "@Utils/wrapperHOC";
 import Reveal from "../../../AboutUsV2/components/Reveal/Reveal";
 import RolesButton from "../RolesButton/RolesButton";
 import styles from "./CrewCTA.module.scss";
-// The outer four are real teammates — two from India, two from elsewhere — so the
-// cluster reads as this team rather than as stock photography. Two of each, and
-// alternating across the fan (IN, non-IN, ?, non-IN, IN) so neither side is all
-// one office.
+// Five real teammates, no stock photography and no face twice.
 //
-// The centre keeps crew-3.jpg: it is the largest circle at 123px and the only one
-// shot square-on at that size, and the real headshots are 160px crops that would
-// soften noticeably scaled up to it.
+// Dan holds the centre. The four around them are two from India (Harshal, Prachi)
+// and two from elsewhere (Mirna, Summer), alternating so neither side of the fan
+// is a single region.
+//
+// The last slot has been through two others. Solomon first, whose backdrop is
+// near-black — measured 16/255 at the crop's outer ring against this section's
+// #0a0a0a (10), so the circle lost its edge and the face appeared to float. Then
+// Michael, whose ring measures 243. Summer now, by request; hers measures 43,
+// which is dimmer than Michael's but clearly above Solomon's, so the circle still
+// reads against the band.
+//
+// Dan's crop is a separate 320px file rather than the shared 160px one: the centre
+// circle renders at 123px, so a 160px crop is only 1.3x and visibly soft on a
+// retina screen. 320 gives it the same 2.6x the smaller circles get from theirs.
 import harshalImg from "../../assets/people/harshal-maniyar.jpg";
 import mirnaImg from "../../assets/people/mirna-abdo.jpg";
-import crew3 from "../../assets/crew-3.jpg";
-import danImg from "../../assets/people/dan-teo.jpg";
+import danImg from "../../assets/people/dan-teo-lg.jpg";
 import prachiImg from "../../assets/people/prachi-kamble.jpg";
+import summerImg from "../../assets/people/summer-xia.jpg";
 
 /**
  * Closing black CTA band (Figma 2665:13697), reusing AboutUsV2's CrewCTA
@@ -62,13 +70,13 @@ const CrewCTA = () => {
           <Image src={mirnaImg} alt="" className={styles.avatarImage} width={90} height={90} />
         </span>
         <span className={`${styles.avatarCenter} ${styles.center}`}>
-          <Image src={crew3} alt="" className={styles.avatarImage} width={123} height={123} />
+          <Image src={danImg} alt="" className={styles.avatarImage} width={123} height={123} />
         </span>
         <span className={`${styles.avatar} ${styles.avatarMedium} ${styles.side} ${styles.right1}`}>
-          <Image src={danImg} alt="" className={styles.avatarImage} width={90} height={90} />
+          <Image src={prachiImg} alt="" className={styles.avatarImage} width={90} height={90} />
         </span>
         <span className={`${styles.avatar} ${styles.avatarSmall} ${styles.side} ${styles.right2}`}>
-          <Image src={prachiImg} alt="" className={styles.avatarImage} width={84} height={84} />
+          <Image src={summerImg} alt="" className={styles.avatarImage} width={84} height={84} />
         </span>
       </div>
 

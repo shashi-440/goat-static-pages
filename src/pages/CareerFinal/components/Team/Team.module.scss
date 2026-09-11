@@ -295,3 +295,27 @@
     display: none;
   }
 }
+
+// Below the 600px rule above the single column is already in place; the card's
+// own metrics still carry the desktop 28px padding via the 900px rule's 22px,
+// which is close but leaves a long quote tight against a 335px card edge.
+@media (max-width: 480px) {
+  .section {
+    gap: 32px;
+    padding: 56px var(--page-gutter);
+  }
+
+  .card {
+    gap: 18px;
+    padding: 20px;
+  }
+
+  .quote {
+    font-size: 15px;
+    line-height: 25px;
+  }
+
+  .columns {
+    height: 420px;
+  }
+}

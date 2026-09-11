@@ -82,3 +82,59 @@
   object-fit: cover;
   width: 100%;
 }
+
+/* ------------------------------------------------------------- responsive */
+
+@media (max-width: 900px) {
+  .hero {
+    padding-top: 40px;
+  }
+
+  .title {
+    font-size: 38px;
+    letter-spacing: -0.7px;
+    line-height: 44px;
+  }
+
+  .header {
+    margin-bottom: 32px;
+  }
+
+  // The contained width is written against the desktop 80px gutter (100vw -
+  // 160px). Below 900px the page gutter is 40px, so the inset has to follow or
+  // the shrunk image would sit inside a wider box than the copy above it.
+  .media {
+    --contained: min(1280px, 100vw - 80px);
+  }
+}
+
+@media (max-width: 600px) {
+  .hero {
+    padding-top: 32px;
+  }
+
+  .title {
+    font-size: 30px;
+    letter-spacing: -0.4px;
+    line-height: 36px;
+  }
+
+  .header {
+    margin-bottom: 24px;
+  }
+
+  .cta {
+    margin-top: 16px;
+  }
+
+  // Matches the 20px phone gutter, and the corner radius is scaled back with
+  // it — 24px on a 335px-wide image reads as a pill, not a rounded rectangle.
+  .media {
+    --contained: min(1280px, 100vw - 40px);
+
+    // 1280/720 is very wide for a phone; a 3:2 crop keeps the hero image tall
+    // enough to read as a photograph rather than a letterbox strip.
+    aspect-ratio: 3 / 2;
+    border-radius: calc(16px * var(--shrink));
+  }
+}
