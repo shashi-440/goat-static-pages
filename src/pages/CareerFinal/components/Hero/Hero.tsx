@@ -4,18 +4,47 @@ import wrapperHOC from "@Utils/wrapperHOC";
 import Reveal from "../../../AboutUsV2/components/Reveal/Reveal";
 import RolesButton from "../RolesButton/RolesButton";
 import styles from "./Hero.module.scss";
-// 16:9 JPEGs — the hero goes full-bleed at 100vw before shrinking, so it needs
-// the width; JPEG keeps each one under 500KB instead of several MB.
-import heroImg from "../../assets/hero.jpg";
-import heroNeonImg from "../../assets/hero-neon.jpg";
-// 3:2 rather than 16:9 like the other two, so `object-fit: cover` trims roughly
-// 8% off the top and bottom of this one inside the hero frame.
+// The hero paints full-bleed at 100vw before shrinking, so on a retina laptop it
+// is asked for ~3000 device px. Encode the source as wide as it actually is —
+// anything narrower is upscaled by the browser and reads soft. mozjpeg at q82+
+// with 4:4:4 chroma holds up at that size; the byte cost is worth it on the one
+// image above the fold. All six are 3:2, so `object-fit: cover` trims roughly
+// 8% off the top and bottom inside the 16:9 hero frame.
 import heroCampusImg from "../../assets/hero-campus.jpg";
+import heroWalkImg from "../../assets/hero-walk.jpg";
+import heroStreetImg from "../../assets/hero-street.jpg";
+import heroCourtyardImg from "../../assets/hero-courtyard.jpg";
+import heroPlazaImg from "../../assets/hero-plaza.jpg";
+import heroColonnadeImg from "../../assets/hero-colonnade.jpg";
 
 // Hero photo candidates, switchable from the floating control at the bottom of
 // the page so the shot can be compared in place before one is committed to.
 // Adding another option is one entry here; the switch sizes itself to the list.
 const HERO_OPTIONS = [
+  {
+    id: "colonnade",
+    label: "Colonnade",
+    src: heroColonnadeImg,
+    alt: "Two students walking and talking past the columns of a campus building",
+  },
+  {
+    id: "campus-walk",
+    label: "Campus walk",
+    src: heroWalkImg,
+    alt: "Two students walking and talking along a tree-lined campus path",
+  },
+  {
+    id: "courtyard",
+    label: "Courtyard",
+    src: heroCourtyardImg,
+    alt: "Two students working together over a laptop at an outdoor table in a campus courtyard",
+  },
+  {
+    id: "plaza",
+    label: "Plaza",
+    src: heroPlazaImg,
+    alt: "Three students greeting each other on a brick campus plaza, laptops under their arms",
+  },
   {
     id: "campus",
     label: "Campus",
@@ -23,16 +52,10 @@ const HERO_OPTIONS = [
     alt: "Students talking on a campus bench under blossoming trees",
   },
   {
-    id: "open-floor",
-    label: "Open floor",
-    src: heroImg,
-    alt: "An amber team member working at a laptop in the open-plan office",
-  },
-  {
-    id: "neon",
-    label: "Neon desk",
-    src: heroNeonImg,
-    alt: "Two amber teammates working together under a neon 'Believe in your dreams' sign",
+    id: "street",
+    label: "Old town",
+    src: heroStreetImg,
+    alt: "A student in an amber hoodie walking a cobbled old-town street with her laptop",
   },
 ];
 
