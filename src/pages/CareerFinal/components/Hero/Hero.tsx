@@ -8,16 +8,37 @@ import styles from "./Hero.module.scss";
 // is asked for ~3000 device px. Encode the source as wide as it actually is —
 // anything narrower is upscaled by the browser and reads soft. These two are
 // ~1670px, which is all the source there is; at q82 with 4:4:4 chroma that is the
-// best of it. All three are natively 16:9, so unlike the campus set they replace
+// best of it. All six are natively 16:9, so unlike the campus set they replace
 // they fill the hero frame with no crop.
 import heroNotebookImg from "../../assets/hero-notebook.jpg";
 import heroPairImg from "../../assets/hero.jpg";
 import heroTrioImg from "../../assets/hero-trio.jpg";
+import heroLoungeImg from "../../assets/hero-lounge.jpg";
+import heroStepsImg from "../../assets/hero-steps.jpg";
+import heroLongDeskImg from "../../assets/hero-long-desk.jpg";
 
 // Hero photo candidates, switchable from the floating control at the bottom of
 // the page so the shot can be compared in place before one is committed to.
 // Adding another option is one entry here; the switch sizes itself to the list.
 const HERO_OPTIONS = [
+  {
+    id: "lounge",
+    label: "Lounge",
+    src: heroLoungeImg,
+    alt: "Four amber teammates talking over laptops on the sofas in the office lounge",
+  },
+  {
+    id: "long-desk",
+    label: "Long desk",
+    src: heroLongDeskImg,
+    alt: "Two amber teammates at their laptops across a long desk under the amber sign",
+  },
+  {
+    id: "steps",
+    label: "Steps",
+    src: heroStepsImg,
+    alt: "Three amber teammates sharing a laptop on the office's stepped seating",
+  },
   {
     id: "notebook",
     label: "Notebook",
