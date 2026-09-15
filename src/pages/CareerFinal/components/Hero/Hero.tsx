@@ -6,56 +6,35 @@ import RolesButton from "../RolesButton/RolesButton";
 import styles from "./Hero.module.scss";
 // The hero paints full-bleed at 100vw before shrinking, so on a retina laptop it
 // is asked for ~3000 device px. Encode the source as wide as it actually is —
-// anything narrower is upscaled by the browser and reads soft. mozjpeg at q82+
-// with 4:4:4 chroma holds up at that size; the byte cost is worth it on the one
-// image above the fold. All six are 3:2, so `object-fit: cover` trims roughly
-// 8% off the top and bottom inside the 16:9 hero frame.
-import heroCampusImg from "../../assets/hero-campus.jpg";
-import heroWalkImg from "../../assets/hero-walk.jpg";
-import heroStreetImg from "../../assets/hero-street.jpg";
-import heroCourtyardImg from "../../assets/hero-courtyard.jpg";
-import heroPlazaImg from "../../assets/hero-plaza.jpg";
-import heroColonnadeImg from "../../assets/hero-colonnade.jpg";
+// anything narrower is upscaled by the browser and reads soft. These two are
+// ~1670px, which is all the source there is; at q82 with 4:4:4 chroma that is the
+// best of it. All three are natively 16:9, so unlike the campus set they replace
+// they fill the hero frame with no crop.
+import heroNotebookImg from "../../assets/hero-notebook.jpg";
+import heroPairImg from "../../assets/hero.jpg";
+import heroTrioImg from "../../assets/hero-trio.jpg";
 
 // Hero photo candidates, switchable from the floating control at the bottom of
 // the page so the shot can be compared in place before one is committed to.
 // Adding another option is one entry here; the switch sizes itself to the list.
 const HERO_OPTIONS = [
   {
-    id: "colonnade",
-    label: "Colonnade",
-    src: heroColonnadeImg,
-    alt: "Two students walking and talking past the columns of a campus building",
+    id: "notebook",
+    label: "Notebook",
+    src: heroNotebookImg,
+    alt: "Three amber teammates sketching in a notebook beside a laptop in the office",
   },
   {
-    id: "campus-walk",
-    label: "Campus walk",
-    src: heroWalkImg,
-    alt: "Two students walking and talking along a tree-lined campus path",
+    id: "pair",
+    label: "Pair",
+    src: heroPairImg,
+    alt: "Two amber teammates at their laptops under the amber sign in the office",
   },
   {
-    id: "courtyard",
-    label: "Courtyard",
-    src: heroCourtyardImg,
-    alt: "Two students working together over a laptop at an outdoor table in a campus courtyard",
-  },
-  {
-    id: "plaza",
-    label: "Plaza",
-    src: heroPlazaImg,
-    alt: "Three students greeting each other on a brick campus plaza, laptops under their arms",
-  },
-  {
-    id: "campus",
-    label: "Campus",
-    src: heroCampusImg,
-    alt: "Students talking on a campus bench under blossoming trees",
-  },
-  {
-    id: "street",
-    label: "Old town",
-    src: heroStreetImg,
-    alt: "A student in an amber hoodie walking a cobbled old-town street with her laptop",
+    id: "trio",
+    label: "Trio",
+    src: heroTrioImg,
+    alt: "Three amber teammates looking over a laptop together under the amber sign in the office",
   },
 ];
 
