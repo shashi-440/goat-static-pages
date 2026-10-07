@@ -8,6 +8,12 @@ import content from "../../footerContent.json";
 
 interface FollowUsProps {
   isMobile?: boolean;
+  /**
+   * Emit the per-network JSON-LD. Footer renders FollowUs twice (desktop layout and
+   * the stacked below-1200px one, both always in the DOM), so the second copy passes
+   * false to keep each schema block in the page once.
+   */
+  withSchema?: boolean;
 }
 
 /**
@@ -18,18 +24,20 @@ interface FollowUsProps {
  * Difference from the original: navigation uses a plain <a> rather than the
  * app's customWindowOpen bridge (which routes through the native webview shell).
  */
-const FollowUs: FC<FollowUsProps> = () => (
+const FollowUs: FC<FollowUsProps> = ({ withSchema = true }) => (
   <div className={classes.outerDiv}>
     <div className={classes.label}>{content.followUs.label}:</div>
 
     <div className={classes.innerDiv}>
       {content.followUs.items.map((item) => (
         <div className={classes.container} data-testid={item.testId} key={item.name}>
-          <HelmetServer>
-            <script type="application/ld+json" suppressHydrationWarning>
-              {getSiteNavSchema(item.name, item.href)}
-            </script>
-          </HelmetServer>
+          {withSchema && (
+            <HelmetServer>
+              <script type="application/ld+json" suppressHydrationWarning>
+                {getSiteNavSchema(item.name, item.href)}
+              </script>
+            </HelmetServer>
+          )}
           <a href={item.href} target="_blank" rel="noreferrer" aria-label={item.name}>
             <LazyImage
               src={getImagePath(item.src)}

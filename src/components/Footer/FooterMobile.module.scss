@@ -1,0 +1,113 @@
+// Values follow amber-user-website's FooterV2.module.scss (the mobile footer), so the
+// stacked layout matches what amberstudent.com shows below 1200px. Classes identical
+// to Footer.module.scss's (imageContainer, amberImg, hiddenForUsers) are used from there.
+
+// Which layout shows is decided here, by width, matching production's
+// `isBelow(SCREEN_SIZE.LG)` switch in FooterDesktop.tsx — that is `innerWidth < 1200`,
+// so exactly 1200px still gets the desktop footer. The two queries are exact
+// complements (one negates the other), so no width — fractional ones under browser
+// zoom included — shows both layouts or neither. Don't swap in applies-below(lg): it
+// is `max-width: 1200px`, which would flip 1200px itself to the stacked layout.
+.desktopOnly {
+  @media not all and (min-width: map-get($breakpoints, lg)) {
+    display: none;
+  }
+}
+
+.mobileOnly {
+  @include applies-above(lg) {
+    display: none;
+  }
+}
+
+.container {
+  margin: 0 16px 40px;
+  padding-top: 40px;
+}
+
+.subHeading {
+  color: $neutral5;
+  font-size: 14px;
+  font-weight: 400;
+  margin-top: 8px;
+}
+
+.trustpilotWrapper {
+  align-items: center;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+  margin-top: 16px;
+  padding: 16px 12px;
+  width: 100%;
+  @media screen and (min-width: 712px) {
+    background: $neutral0;
+  }
+}
+
+.section {
+  border-bottom: 1px solid rgb(222, 226, 230);
+
+  &[open] .chevron {
+    transform: rotate(180deg);
+  }
+}
+
+.sectionHeading {
+  align-items: center;
+  color: rgb(0, 0, 0);
+  cursor: pointer;
+  display: flex;
+  font-size: 14px;
+  font-weight: 500;
+  justify-content: space-between;
+  list-style: none;
+  padding: 12px 6px 12px 12px;
+  -webkit-tap-highlight-color: transparent;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+}
+
+.chevron {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  transition: transform 200ms ease;
+  width: 24px;
+}
+
+.listItem {
+  color: $neutral5;
+  display: flex;
+  font-size: 12px;
+  margin-bottom: 17px;
+  overflow: hidden;
+  padding: 0 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  a {
+    color: inherit;
+    min-width: 0;
+    overflow: hidden;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  span {
+    background: #fee9ef;
+    border-radius: 999px;
+    color: $primary4;
+    margin-left: 8px;
+    padding: 2px 6px;
+  }
+}
+
+.followUs {
+  padding: 0 10px 10px;
+}
+
