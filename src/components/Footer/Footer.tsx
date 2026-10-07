@@ -17,8 +17,10 @@ import AppDownload from "./components/AppDownload/AppDownload";
 import FollowUs from "./components/FollowUs/FollowUs";
 import ContactCard from "./components/ContactCard/ContactCard";
 import contentJson from "./footerContent.json";
+import FooterMobile from "./FooterMobile";
+import mobileClasses from "./FooterMobile.module.scss";
 
-interface FooterLink {
+export interface FooterLink {
   label: string;
   href: string;
   gaKey: string;
@@ -32,7 +34,7 @@ interface FooterColumn {
   tagHasTestId?: boolean;
   items: FooterLink[];
 }
-interface FooterContent {
+export interface FooterContent {
   logo: { src: string; alt: string; width: string; height: string };
   copyright: string;
   columns: FooterColumn[];
@@ -55,8 +57,9 @@ const content = contentJson as unknown as FooterContent;
  *   - Contact phone is the UK default; the original picks it from the Redux
  *     `country` code.
  *   - No China variant, no gtag click events, no CSP nonce.
- *   - No sub-LG swap to the mobile FooterV2 — this sandbox is desktop-only, matching
- *     how /about-us-v2 is registered upstream.
+ *   - The sub-LG swap to the mobile footer is done in CSS rather than with
+ *     useResponsiveness: both layouts render and FooterMobile.module.scss shows one,
+ *     so pages narrower than 1200px get the stacked footer production shows there.
  *
  * Editing links or labels means editing footerContent.json, not this file.
  */
@@ -82,7 +85,10 @@ const Footer: FC = () => {
 
   return (
     <section className={classes.footerContainer}>
-      <div className={classes.container} data-testid="footer-section">
+      <div
+        className={formatClassNames(classes.container, mobileClasses.desktopOnly)}
+        data-testid="footer-section"
+      >
         <div className={classes.mainDesktopContainer}>
           {/* {Section 1} */}
           <div className={classes.leftContainer}>
@@ -182,6 +188,9 @@ const Footer: FC = () => {
             <FollowUs isMobile={false} />
           </div>
         </div>
+      </div>
+      <div className={mobileClasses.mobileOnly}>
+        <FooterMobile content={content} icons={ICONS} year={year} />
       </div>
     </section>
   );

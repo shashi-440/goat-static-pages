@@ -91,7 +91,16 @@ What differs, deliberately:
 - Copy is English from JSON, not live Tolgee `t()`
 - Phone number is the UK default; upstream picks it from the Redux `country` code
 - No China variant, no gtag click events, no CSP nonce
-- No sub-LG swap to the mobile `FooterV2`
+- The sub-LG swap to the mobile `FooterV2` is CSS, not `useResponsiveness`. Below 1200px
+  (`innerWidth < 1200`, as upstream) the footer is the stacked layout in `FooterMobile.tsx`:
+  centred logo, Trustpilot, app/payment row, and a Company / Discover / Support / Contact us
+  accordion built on native `<details>`. Both layouts are always in the DOM and
+  `FooterMobile.module.scss` hides one, so there is no flash and no hydration mismatch. The
+  stacked copy emits no JSON-LD, but its shared pieces repeat their `data-testid`s, so scope
+  selectors to the visible layout. `TrustPilotDynamicWidget` adds its `trustpilot-widget` class
+  only once it scrolls into view, because Trustpilot's script initialises every
+  `.trustpilot-widget` on the page, hidden or not; the hidden layout's copy never intersects,
+  so it costs no iframe until a resize shows it
 - Social icons are real `<a>` tags (upstream routes clicks through the native app bridge)
 - Contact cards render server-side here; upstream populates them in a `useEffect`, so they are
   absent from its SSR HTML
