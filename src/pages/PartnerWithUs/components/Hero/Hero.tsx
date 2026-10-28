@@ -1,11 +1,17 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "@Components/Image";
 import CustomLink from "@Components/CustomLink";
 // Shared with About Us / Scholarship rather than copied, so every v2 page uses
 // one scroll-reveal.
 import Reveal from "../../../AboutUsV2/components/Reveal/Reveal";
 import styles from "./Hero.module.scss";
-import heroPhoto from "../../assets/hero-bg.jpg";
+// Encoded at 2400px wide (q82, 4:4:4 chroma) — the hero paints full-bleed at
+// 100vw before it shrinks. Living room is 1536px, which is all the source there is.
+import heroCourtyardImg from "../../assets/hero-courtyard.jpg";
+import heroSharedRoomImg from "../../assets/hero-shared-room.jpg";
+import heroLivingRoomImg from "../../assets/hero-living-room.jpg";
+import heroDuskImg from "../../assets/hero-dusk.jpg";
+import heroDeskImg from "../../assets/hero-bg.jpg";
 import avatar1 from "../../assets/testimonial-avatar-1.png";
 import avatar2 from "../../assets/testimonial-avatar-2.png";
 import avatar3 from "../../assets/testimonial-avatar-3.png";
@@ -26,11 +32,48 @@ import wrapperHOC from "@Utils/wrapperHOC";
  * trio further down reads as stock art in both places.
  */
 const AVATARS = [avatar1, avatar2, avatar3];
+
+// Hero photo candidates, switchable from the floating control at the bottom of
+// the page so the shot can be compared in place before one is committed to.
+// Same review aid as the Career hero. Desk is the photo the page shipped with.
+const HERO_OPTIONS = [
+  {
+    id: "courtyard",
+    label: "Courtyard",
+    src: heroCourtyardImg,
+    alt: "Students talking around a table in a sunny courtyard outside their residence",
+  },
+  {
+    id: "shared-room",
+    label: "Shared room",
+    src: heroSharedRoomImg,
+    alt: "Three students chatting in a bright shared room with a window onto the campus",
+  },
+  {
+    id: "living-room",
+    label: "Living room",
+    src: heroLivingRoomImg,
+    alt: "Four students with laptops relaxing in a sunlit living room overlooking the city",
+  },
+  {
+    id: "dusk",
+    label: "Dusk",
+    src: heroDuskImg,
+    alt: "Two students studying in their room at dusk, one on the bed and one at the desk",
+  },
+  {
+    id: "desk",
+    label: "Desk",
+    src: heroDeskImg,
+    alt: "A student working at a desk in their room, with a laptop, notes and a shelf of books behind them",
+  },
+];
 // Distance (px) over which the hero image eases from full-bleed to contained.
 // Same value as the About Us hero, so the two pages scroll identically.
 const SHRINK_DISTANCE = 420;
 
 const Hero = () => {
+  const [heroOption, setHeroOption] = useState(0);
   const mediaRef = useRef<HTMLDivElement>(null);
 
   // Hero image: starts full-bleed (edge-to-edge) and eases to its contained,
@@ -108,13 +151,30 @@ const Hero = () => {
 
       <div ref={mediaRef} className={styles.photo}>
         <Image
-          src={heroPhoto}
-          alt="A student working at a desk in their room, with a laptop, notes and a shelf of books behind them"
+          key={HERO_OPTIONS[heroOption].id}
+          src={HERO_OPTIONS[heroOption].src}
+          alt={HERO_OPTIONS[heroOption].alt}
           className={styles.photoImage}
           width="100%"
           height="100%"
           isEagerLoad
         />
+      </div>
+
+      {/* Deliberately low-contrast: a review aid that sits over the page
+          without competing with it. Comes up to full opacity on hover/focus. */}
+      <div className={styles.switch} role="group" aria-label="Hero image option">
+        {HERO_OPTIONS.map((option, index) => (
+          <button
+            key={option.id}
+            type="button"
+            className={`${styles.switchOption} ${index === heroOption ? styles.switchOptionActive : ""}`}
+            aria-pressed={index === heroOption}
+            onClick={() => setHeroOption(index)}
+          >
+            {option.label}
+          </button>
+        ))}
       </div>
     </section>
   );
